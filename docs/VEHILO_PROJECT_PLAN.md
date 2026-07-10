@@ -36,7 +36,7 @@ Current phase:
 - [x] Updated direction: use real Supabase data from the beginning.
 - [x] Created this planning and progress document.
 - [x] Updated product language direction: Czech first, translations later.
-- [ ] Create GitHub repository/project.
+- [x] Create GitHub repository/project.
 - [ ] Create or connect Vercel project. Next priority.
 - [x] Create or connect Supabase project on the correct separate Supabase account.
 - [ ] Define environment variables and local setup.
@@ -56,6 +56,12 @@ Next session priority:
 - Add Vercel `/auth/callback` URL to Supabase Auth redirect URLs.
 - Update `NEXT_PUBLIC_SITE_URL` from localhost to the active Vercel URL.
 - Continue with real authenticated CRUD for vehicles as the first application slice.
+
+GitHub status:
+
+- Repository: `https://github.com/marcelmlynarcik-cmyk/Vehilo.git`
+- Branch: `main`
+- First pushed commit: `222b2fe` (`Initial Vehilo app foundation`)
 
 ## Required Stack
 
@@ -1247,3 +1253,4 @@ For the first launchable prototype:
 - Google OAuth was configured for local development; production/Vercel callback URL changes are tracked as a required follow-up.
 - Local checks before first GitHub push: `pnpm lint`, `pnpm exec tsc --noEmit`, and `pnpm build` passed.
 - Next continuation point is Vercel setup and deployment, then production Google/Supabase URL updates.
+- First commit `222b2fe` pushed to GitHub repository `marcelmlynarcik-cmyk/Vehilo`.
