@@ -77,8 +77,8 @@ async function Landing({
           className="-z-30 object-cover object-center"
           priority
         />
-        <div className="absolute inset-0 -z-20 bg-[#05080d]/72" />
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_42%,rgba(14,165,233,0.22),transparent_34%),linear-gradient(90deg,rgba(5,8,13,0.92),rgba(5,8,13,0.62)_48%,rgba(5,8,13,0.84))]" />
+        <div className="absolute inset-0 -z-20 bg-[#05080d]/38" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_22%_46%,rgba(14,165,233,0.16),transparent_36%),linear-gradient(90deg,rgba(5,8,13,0.68),rgba(5,8,13,0.42)_45%,rgba(5,8,13,0.76))]" />
 
         <div className="mx-auto flex min-h-[92svh] w-full max-w-7xl flex-col px-4 pt-5 sm:px-6 md:px-8 lg:min-h-[88svh]">
           <header className="flex items-center justify-between gap-4">
@@ -89,7 +89,7 @@ async function Landing({
                   alt="Vehilo"
                   width={72}
                   height={72}
-                  className="size-12 object-contain sm:size-14"
+                  className="size-[3.25rem] object-contain sm:size-[3.75rem]"
                   priority
                 />
               </div>
