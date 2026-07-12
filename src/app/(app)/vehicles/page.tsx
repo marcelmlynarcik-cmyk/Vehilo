@@ -14,13 +14,13 @@ export default async function VehiclesPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Vehicles"
-        description="Manage every car, EV, LPG, CNG or hybrid in your personal garage."
+        title="Vozidla"
+        description="Spravujte auta, elektromobily, LPG, CNG i hybridy ve své osobní garáži."
         actions={
           <Button asChild>
             <Link href="/vehicles/new">
               <Plus className="mr-2 size-4" aria-hidden="true" />
-              Add Vehicle
+              Přidat vozidlo
             </Link>
           </Button>
         }
@@ -28,9 +28,9 @@ export default async function VehiclesPage() {
       {data.vehicles.length === 0 ? (
         <EmptyState
           icon={Car}
-          title="No vehicles yet"
-          description="Connect Supabase Auth and add your first real vehicle. Vehilo will adapt all fuel, energy and service fields to the selected powertrain."
-          actionLabel="Add Vehicle"
+          title="Zatím žádné vozidlo"
+          description="Přidejte první skutečné vozidlo. Vehilo přizpůsobí pole pro palivo, energii a servis podle typu pohonu."
+          actionLabel="Přidat vozidlo"
         />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
@@ -50,17 +50,17 @@ export default async function VehiclesPage() {
                         {vehicle.brand} {vehicle.model} {vehicle.year}
                       </div>
                     </div>
-                    <Badge variant="secondary">{vehicle.status}</Badge>
+                    <Badge variant="secondary">{formatStatus(vehicle.status)}</Badge>
                   </div>
                   <div className="grid gap-2 text-sm sm:grid-cols-2">
-                    <div>Plate: {vehicle.license_plate ?? "Not set"}</div>
-                    <div>Mileage: {formatNumber(vehicle.current_mileage)} km</div>
-                    <div>Powertrain: {vehicle.powertrain_type.replaceAll("_", " ")}</div>
-                    <div>Transmission: {vehicle.transmission ?? "Not set"}</div>
-                    <div>Purchase: {vehicle.purchase_price ? formatCurrency(vehicle.purchase_price, vehicle.currency) : "Not set"}</div>
-                    <div>Value: {vehicle.current_value ? formatCurrency(vehicle.current_value, vehicle.currency) : "Not set"}</div>
-                    <div>Total cost: {formatCurrency(calculateVehicleCost(data, vehicle.id), vehicle.currency)}</div>
-                    <div>Documents: Real status pending</div>
+                    <div>SPZ: {vehicle.license_plate ?? "Nevyplněno"}</div>
+                    <div>Nájezd: {formatNumber(vehicle.current_mileage)} km</div>
+                    <div>Pohon: {formatPowertrain(vehicle.powertrain_type)}</div>
+                    <div>Převodovka: {formatTransmission(vehicle.transmission)}</div>
+                    <div>Koupě: {vehicle.purchase_price ? formatCurrency(vehicle.purchase_price, vehicle.currency) : "Nevyplněno"}</div>
+                    <div>Hodnota: {vehicle.current_value ? formatCurrency(vehicle.current_value, vehicle.currency) : "Nevyplněno"}</div>
+                    <div>Náklady celkem: {formatCurrency(calculateVehicleCost(data, vehicle.id), vehicle.currency)}</div>
+                    <div>Dokumenty: čeká na reálný stav</div>
                   </div>
                 </div>
               </CardContent>
@@ -70,4 +70,40 @@ export default async function VehiclesPage() {
       )}
     </div>
   );
+}
+
+function formatPowertrain(value: string) {
+  const labels: Record<string, string> = {
+    petrol: "Benzín",
+    diesel: "Nafta",
+    hybrid: "Hybrid",
+    plug_in_hybrid: "Plug-in hybrid",
+    electric: "Elektro",
+    lpg: "LPG",
+    cng: "CNG",
+  };
+
+  return labels[value] ?? value;
+}
+
+function formatTransmission(value: string | null) {
+  if (value === "manual") {
+    return "Manuál";
+  }
+
+  if (value === "automatic") {
+    return "Automat";
+  }
+
+  return "Nevyplněno";
+}
+
+function formatStatus(value: string) {
+  const labels: Record<string, string> = {
+    active: "Aktivní",
+    sold: "Prodané",
+    archived: "Archivované",
+  };
+
+  return labels[value] ?? value;
 }

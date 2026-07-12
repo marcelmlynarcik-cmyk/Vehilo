@@ -13,6 +13,7 @@ import { loadGarageData } from "@/lib/data/garage";
 
 export default async function ExpensesPage() {
   const { data } = await loadGarageData();
+  const currency = data.profile?.currency ?? "CZK";
   const total = sumExpenses(data.expenses);
 
   return (
@@ -23,10 +24,10 @@ export default async function ExpensesPage() {
         actions={<Button><Plus className="mr-2 size-4" aria-hidden="true" />Přidat výdaj</Button>}
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Výdaje celkem" value={formatCurrency(total)} description="Ze skutečných záznamů" icon={ReceiptText} />
-        <MetricCard title="Tento měsíc" value={formatCurrency(0)} description="Po přidání dat se dopočítá" icon={ReceiptText} />
-        <MetricCard title="Největší výdaj" value={formatCurrency(0)} description="Zatím bez dat" icon={ReceiptText} />
-        <MetricCard title="Náklad na km" value="0,00 EUR/km" description="Dle vozidel a výdajů" icon={ReceiptText} />
+        <MetricCard title="Výdaje celkem" value={formatCurrency(total, currency)} description="Ze skutečných záznamů" icon={ReceiptText} />
+        <MetricCard title="Tento měsíc" value={formatCurrency(0, currency)} description="Po přidání dat se dopočítá" icon={ReceiptText} />
+        <MetricCard title="Největší výdaj" value={formatCurrency(0, currency)} description="Zatím bez dat" icon={ReceiptText} />
+        <MetricCard title="Náklad na km" value={`${formatCurrency(0, currency)}/km`} description="Dle vozidel a výdajů" icon={ReceiptText} />
       </div>
       <Card>
         <CardHeader>

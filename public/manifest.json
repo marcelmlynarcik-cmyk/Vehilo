@@ -3,16 +3,27 @@
   "short_name": "Vehilo",
   "description": "Všechny náklady, palivo, energie, servis, dokumenty a připomínky pro vaše vozidla na jednom místě.",
   "start_url": "/dashboard",
+  "scope": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "browser"],
   "background_color": "#ffffff",
   "theme_color": "#0f766e",
   "orientation": "portrait-primary",
+  "categories": ["productivity", "utilities", "finance"],
+  "lang": "cs",
+  "dir": "ltr",
   "icons": [
     {
-      "src": "/logo/Logo.png",
-      "sizes": "1448x1086",
+      "src": "/pwa/icons/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/pwa/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

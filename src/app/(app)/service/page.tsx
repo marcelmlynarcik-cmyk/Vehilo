@@ -11,16 +11,17 @@ import { loadGarageData } from "@/lib/data/garage";
 
 export default async function ServicePage() {
   const { data } = await loadGarageData();
+  const currency = data.profile?.currency ?? "CZK";
   const serviceTotal = data.serviceEntries.reduce((total, entry) => total + Number(entry.total_cost), 0);
 
   return (
     <div className="space-y-6">
       <PageHeader title="Servis a údržba" description="Kompletní servisní historie, práce, díly, záruky, faktury a plánované úkony." actions={<Button><Plus className="mr-2 size-4" />Přidat servis</Button>} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Servis letos" value={formatCurrency(serviceTotal)} description="Z reálných servisních záznamů" icon={Wrench} />
+        <MetricCard title="Servis letos" value={formatCurrency(serviceTotal, currency)} description="Z reálných servisních záznamů" icon={Wrench} />
         <MetricCard title="Poslední servis" value="-" description="Zatím bez záznamu" icon={Wrench} />
         <MetricCard title="Další servis" value="-" description="Dle připomínek" icon={Wrench} />
-        <MetricCard title="Nejdražší servis" value={formatCurrency(0)} description="Po doplnění dat" icon={Wrench} />
+        <MetricCard title="Nejdražší servis" value={formatCurrency(0, currency)} description="Po doplnění dat" icon={Wrench} />
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         {data.serviceEntries.length === 0 ? (

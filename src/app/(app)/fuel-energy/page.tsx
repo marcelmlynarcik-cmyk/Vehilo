@@ -13,6 +13,7 @@ import { loadGarageData } from "@/lib/data/garage";
 
 export default async function FuelEnergyPage() {
   const { data } = await loadGarageData();
+  const currency = data.profile?.currency ?? "CZK";
 
   return (
     <div className="space-y-6">
@@ -36,9 +37,9 @@ export default async function FuelEnergyPage() {
         </Select>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(data.energyEntries))} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
+        <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(data.energyEntries), currency)} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
         <MetricCard title="Průměrná spotřeba" value={`${calculateConsumptionPer100Km(data.energyEntries).toFixed(1)} /100 km`} description="Podle jednotky záznamu" icon={Zap} />
-        <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(data.energyEntries))} description="Z reálných záznamů" icon={BatteryCharging} />
+        <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(data.energyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
         <MetricCard title="Záznamy" value={String(data.energyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
       {data.energyEntries.length === 0 ? (

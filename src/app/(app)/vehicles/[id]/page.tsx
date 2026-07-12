@@ -35,48 +35,48 @@ export default async function VehicleDetailPage({
             <div>
               <h1 className="text-3xl font-semibold tracking-tight">{vehicle.name}</h1>
               <p className="text-muted-foreground">
-                {vehicle.brand} {vehicle.model} · {vehicle.license_plate ?? "No plate"} · {formatNumber(vehicle.current_mileage)} km
+                {vehicle.brand} {vehicle.model} · {vehicle.license_plate ?? "Bez SPZ"} · {formatNumber(vehicle.current_mileage)} km
               </p>
             </div>
-            <Badge>{vehicle.status}</Badge>
+            <Badge>{formatStatus(vehicle.status)}</Badge>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button>Add fuel / charging</Button>
-            <Button variant="outline">Add expense</Button>
-            <Button variant="outline">Add service</Button>
-            <Button variant="outline">Add reminder</Button>
-            <Button variant="ghost">Edit vehicle</Button>
+            <Button>Přidat tankování / nabíjení</Button>
+            <Button variant="outline">Přidat výdaj</Button>
+            <Button variant="outline">Přidat servis</Button>
+            <Button variant="outline">Přidat připomínku</Button>
+            <Button variant="ghost">Upravit vozidlo</Button>
           </div>
         </div>
       </div>
 
       <Tabs defaultValue="overview">
         <TabsList className="grid h-auto grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="expenses">Expenses</TabsTrigger>
-          <TabsTrigger value="energy">Fuel & Energy</TabsTrigger>
-          <TabsTrigger value="service">Service</TabsTrigger>
-          <TabsTrigger value="reminders">Reminders</TabsTrigger>
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="statistics">Statistics</TabsTrigger>
+          <TabsTrigger value="overview">Přehled</TabsTrigger>
+          <TabsTrigger value="expenses">Výdaje</TabsTrigger>
+          <TabsTrigger value="energy">Palivo a energie</TabsTrigger>
+          <TabsTrigger value="service">Servis</TabsTrigger>
+          <TabsTrigger value="reminders">Připomínky</TabsTrigger>
+          <TabsTrigger value="documents">Dokumenty</TabsTrigger>
+          <TabsTrigger value="statistics">Statistiky</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricCard title="Total cost" value={formatCurrency(totalCost, vehicle.currency)} description="Real ownership cost" icon={ReceiptText} />
-            <MetricCard title="Depreciation" value={formatCurrency(calculateDepreciation(vehicle), vehicle.currency)} description="Purchase minus current value" icon={Gauge} />
-            <MetricCard title="Mileage" value={`${formatNumber(vehicle.current_mileage)} km`} description="Current odometer" icon={Car} />
-            <MetricCard title="Powertrain" value={vehicle.powertrain_type.replaceAll("_", " ")} description="Adaptive tracking mode" icon={Fuel} />
+            <MetricCard title="Náklady celkem" value={formatCurrency(totalCost, vehicle.currency)} description="Skutečné vlastnické náklady" icon={ReceiptText} />
+            <MetricCard title="Ztráta hodnoty" value={formatCurrency(calculateDepreciation(vehicle), vehicle.currency)} description="Koupě minus aktuální hodnota" icon={Gauge} />
+            <MetricCard title="Nájezd" value={`${formatNumber(vehicle.current_mileage)} km`} description="Aktuální tachometr" icon={Car} />
+            <MetricCard title="Pohon" value={formatPowertrain(vehicle.powertrain_type)} description="Režim sledování" icon={Fuel} />
           </div>
           <Card>
             <CardHeader>
-              <CardTitle>Vehicle Health</CardTitle>
+              <CardTitle>Stav vozidla</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-4 md:grid-cols-2">
-              {["Maintenance status", "Reminder status", "Document status", "Cost trend"].map((label) => (
+              {["Stav údržby", "Stav připomínek", "Stav dokumentů", "Trend nákladů"].map((label) => (
                 <div key={label} className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>{label}</span>
-                    <span className="text-muted-foreground">Pending real data</span>
+                    <span className="text-muted-foreground">Čeká na reálná data</span>
                   </div>
                   <Progress value={0} />
                 </div>
@@ -97,7 +97,7 @@ export default async function VehicleDetailPage({
               <CardContent className="flex min-h-56 items-center justify-center p-8 text-center text-sm text-muted-foreground">
                 <div>
                   <Icon className="mx-auto mb-3 size-8" aria-hidden="true" />
-                  Vehicle-specific {String(value)} will load from Supabase records.
+                  {formatTabPlaceholder(String(value))}
                 </div>
               </CardContent>
             </Card>
@@ -106,4 +106,41 @@ export default async function VehicleDetailPage({
       </Tabs>
     </div>
   );
+}
+
+function formatPowertrain(value: string) {
+  const labels: Record<string, string> = {
+    petrol: "Benzín",
+    diesel: "Nafta",
+    hybrid: "Hybrid",
+    plug_in_hybrid: "Plug-in hybrid",
+    electric: "Elektro",
+    lpg: "LPG",
+    cng: "CNG",
+  };
+
+  return labels[value] ?? value;
+}
+
+function formatStatus(value: string) {
+  const labels: Record<string, string> = {
+    active: "Aktivní",
+    sold: "Prodané",
+    archived: "Archivované",
+  };
+
+  return labels[value] ?? value;
+}
+
+function formatTabPlaceholder(value: string) {
+  const labels: Record<string, string> = {
+    expenses: "Výdaje vozidla se načtou ze záznamů v Supabase.",
+    energy: "Tankování a energie vozidla se načtou ze záznamů v Supabase.",
+    service: "Servisní historie vozidla se načte ze záznamů v Supabase.",
+    reminders: "Připomínky vozidla se načtou ze záznamů v Supabase.",
+    documents: "Dokumenty vozidla se načtou ze záznamů v Supabase.",
+    statistics: "Statistiky vozidla se načtou ze záznamů v Supabase.",
+  };
+
+  return labels[value] ?? "Data vozidla se načtou ze záznamů v Supabase.";
 }

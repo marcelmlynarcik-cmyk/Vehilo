@@ -2,6 +2,7 @@ import type {
   EnergyEntry,
   Expense,
   GarageData,
+  Profile,
   Reminder,
   ServiceEntry,
   Vehicle,
@@ -18,6 +19,7 @@ export interface GarageLoadResult {
 }
 
 const emptyGarageData: GarageData = {
+  profile: null,
   vehicles: [],
   expenses: [],
   energyEntries: [],
@@ -68,6 +70,7 @@ export async function loadGarageData(): Promise<GarageLoadResult> {
   }
 
   const [
+    profileResult,
     vehiclesResult,
     expensesResult,
     energyResult,
@@ -75,6 +78,7 @@ export async function loadGarageData(): Promise<GarageLoadResult> {
     remindersResult,
     documentsResult,
   ] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
     supabase.from("vehicles").select("*").order("created_at", { ascending: false }),
     supabase.from("expenses").select("*").order("date", { ascending: false }),
     supabase.from("energy_entries").select("*").order("date", { ascending: false }),
@@ -84,6 +88,7 @@ export async function loadGarageData(): Promise<GarageLoadResult> {
   ]);
 
   const error =
+    profileResult.error?.message ??
     vehiclesResult.error?.message ??
     expensesResult.error?.message ??
     energyResult.error?.message ??
@@ -95,6 +100,7 @@ export async function loadGarageData(): Promise<GarageLoadResult> {
     configured: true,
     authenticated: true,
     data: {
+      profile: (profileResult.data ?? null) as Profile | null,
       vehicles: (vehiclesResult.data ?? []) as Vehicle[],
       expenses: (expensesResult.data ?? []) as Expense[],
       energyEntries: (energyResult.data ?? []) as EnergyEntry[],

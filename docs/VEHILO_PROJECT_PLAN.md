@@ -42,16 +42,14 @@ Current phase:
 - [x] Define environment variables and local setup.
 - [x] Scaffold Next.js application.
 - [x] Implement Supabase schema and migrations.
-- [ ] Implement app shell and first vertical slice.
+- [x] Implement app shell baseline.
+- [ ] Implement first real data vertical slice.
 
 Next session priority:
 
-- Connect Vercel to the GitHub repository from the Vercel dashboard. CLI project creation succeeded, but automatic GitHub connection failed with an access/repository linking error.
-- Add Vercel URL to Google OAuth Authorized JavaScript origins.
-- Add Vercel `/auth/callback` URL to Supabase Auth redirect URLs.
-- Review and approve the refreshed landing page design as the visual direction for the rest of the app.
-- Import the user's current Golf data from local folder `Import golf data/` into Supabase as the first real vehicle with history.
 - Continue with real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
+- Refine the imported Golf vehicle metadata after user answers follow-up questions.
+- Keep the approved refreshed landing page design as the visual direction for the rest of the app.
 
 GitHub status:
 
@@ -135,7 +133,9 @@ Current Vercel state:
 - HTTP verification: production alias returns `200`.
 - Production and preview `NEXT_PUBLIC_SITE_URL` are set to `https://vehilo-six.vercel.app`.
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` are configured for Vercel Production, Preview and Development.
-- GitHub repository connection still needs to be completed in Vercel. CLI attempted to connect `marcelmlynarcik-cmyk/Vehilo` and failed with an access/repository linking error.
+- GitHub repository connection is completed.
+- Google OAuth Authorized JavaScript origins include the Vercel production URL.
+- Supabase Auth redirect URLs include the Vercel `/auth/callback` URL.
 
 ### Supabase
 
@@ -1264,3 +1264,22 @@ For the first launchable prototype:
 - Local checks before first GitHub push: `pnpm lint`, `pnpm exec tsc --noEmit`, and `pnpm build` passed.
 - Next continuation point is Vercel setup and deployment, then production Google/Supabase URL updates.
 - First commit `222b2fe` pushed to GitHub repository `marcelmlynarcik-cmyk/Vehilo`.
+
+### 2026-07-12
+
+- Confirmed Vercel GitHub repository connection is completed.
+- Confirmed Vercel production URL is added to Google OAuth Authorized JavaScript origins.
+- Confirmed Vercel `/auth/callback` URL is added to Supabase Auth redirect URLs.
+- Approved the refreshed landing page design as the visual direction for the rest of the app.
+- Confirmed the remaining plan still matches the intended direction.
+- Imported `Import golf data/My_Car_Costs_20260712-101336.csv` into Supabase for Google user `marcel.mlynarcik@gmail.com`.
+- Created vehicle `Golfík` as a diesel Volkswagen Golf with `420651` km and `CZK` currency.
+- Imported 8 expense records, 166 diesel fuel cost records and 31 service records.
+- Refined imported Golf metadata: Golf V 2.0 TDI 103 kW, manual, hatchback, plate `5AL0570`, purchased from AAA Auto Brno on 2016-04-25 with 189000 km for 150000 CZK.
+- The duplicated CSV file `My_Car_Costs_20260712-101336 (1).csv` is byte-identical and was not imported separately.
+- Fuel quantity was not present in the My Car CSV export even though the source app tracks liters, so imported fuel records currently store total cost with quantity `0` and a note preserving the original timestamp.
+- Implemented real profile preference saving from Settings, including user currency, units, language and theme values.
+- Set the current user's profile currency and units to CZK, kilometers, liters and Czech.
+- Updated key dashboard, statistics, vehicle, expense, fuel and service summaries to use the profile currency instead of hardcoded EUR.
+- Added PWA manifest, Android install metadata, iOS Apple web app metadata, Apple touch icon, iPhone/iPad startup images, service worker registration and an offline fallback page.
+- Current next implementation point is validating the PWA setup, pushing the changes and then continuing the real vehicles CRUD slice.

@@ -149,7 +149,24 @@ export interface VehicleDocument {
   created_at: string;
 }
 
+export interface Profile {
+  id: string;
+  name: string | null;
+  email: string | null;
+  currency: string;
+  distance_unit: string;
+  fuel_volume_unit: string;
+  energy_unit: string;
+  consumption_format: string;
+  electric_consumption_format: string;
+  language: string;
+  theme: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface GarageData {
+  profile: Profile | null;
   vehicles: Vehicle[];
   expenses: Expense[];
   energyEntries: EnergyEntry[];
