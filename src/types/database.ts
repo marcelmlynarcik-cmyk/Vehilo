@@ -39,6 +39,7 @@ export interface Database {
           id: string;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Row"]>;
+        Relationships: [];
       };
       vehicles: {
         Row: {
@@ -83,6 +84,7 @@ export interface Database {
           powertrain_type: PowertrainType;
         };
         Update: Partial<Database["public"]["Tables"]["vehicles"]["Row"]>;
+        Relationships: [];
       };
       expenses: {
         Row: {
@@ -109,6 +111,7 @@ export interface Database {
           amount: number;
         };
         Update: Partial<Database["public"]["Tables"]["expenses"]["Row"]>;
+        Relationships: [];
       };
       energy_entries: {
         Row: {
@@ -146,6 +149,7 @@ export interface Database {
           total_price: number;
         };
         Update: Partial<Database["public"]["Tables"]["energy_entries"]["Row"]>;
+        Relationships: [];
       };
       service_entries: {
         Row: {
@@ -178,6 +182,7 @@ export interface Database {
           total_cost: number;
         };
         Update: Partial<Database["public"]["Tables"]["service_entries"]["Row"]>;
+        Relationships: [];
       };
       reminders: {
         Row: {
@@ -211,6 +216,7 @@ export interface Database {
           category: string;
         };
         Update: Partial<Database["public"]["Tables"]["reminders"]["Row"]>;
+        Relationships: [];
       };
       documents: {
         Row: {
@@ -233,6 +239,7 @@ export interface Database {
           category: string;
         };
         Update: Partial<Database["public"]["Tables"]["documents"]["Row"]>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/database";
 
 const allowedCurrencies = new Set(["CZK", "EUR", "USD", "GBP", "PLN"]);
 const allowedDistanceUnits = new Set(["kilometers", "miles"]);
@@ -41,7 +42,7 @@ export async function updatePreferences(formData: FormData) {
   const nameValue = formData.get("name");
   const name = typeof nameValue === "string" && nameValue.trim() ? nameValue.trim() : null;
 
-  const payload = {
+  const payload: Database["public"]["Tables"]["profiles"]["Insert"] = {
     id: user.id,
     email: user.email ?? null,
     name,

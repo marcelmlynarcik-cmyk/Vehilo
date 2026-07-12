@@ -57,7 +57,10 @@ export default async function SettingsPage() {
           <CardContent className="space-y-4">
             <ToggleRow title="PWA notifikace" description="Připomínky před servisem, STK/MOT a expirací dokumentů." />
             <ToggleRow title="E-mailové notifikace" description="Placeholder pro pozdější cloudové e-maily." />
-            <Field label="Upozornit dní předem" placeholder="14" />
+            <div className="space-y-2">
+              <Label htmlFor="notify_before_days">Upozornit dní předem</Label>
+              <Input id="notify_before_days" placeholder="14" disabled />
+            </div>
           </CardContent>
         </Card>
         <Card>
