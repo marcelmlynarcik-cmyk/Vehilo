@@ -1,0 +1,35 @@
+import { notFound } from "next/navigation";
+import { archiveVehicle, updateVehicle } from "@/app/(app)/vehicles/actions";
+import { VehicleForm } from "@/components/forms/vehicle-form";
+import { PageHeader } from "@/components/shared/page-header";
+import { loadGarageData } from "@/lib/data/garage";
+
+export default async function EditVehiclePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const { data } = await loadGarageData();
+  const vehicle = data.vehicles.find((item) => item.id === id);
+
+  if (!vehicle) {
+    notFound();
+  }
+
+  return (
+    <div className="space-y-6">
+      <PageHeader
+        title={`Upravit ${vehicle.name}`}
+        description="Změny se ukládají do vašeho účtu a ovlivní dashboard, statistiky i detail vozidla."
+      />
+      <VehicleForm
+        action={updateVehicle}
+        archiveAction={archiveVehicle}
+        vehicle={vehicle}
+        defaultCurrency={data.profile?.currency ?? "CZK"}
+        mode="edit"
+      />
+    </div>
+  );
+}

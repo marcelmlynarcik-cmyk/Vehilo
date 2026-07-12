@@ -44,10 +44,11 @@ Current phase:
 - [x] Implement Supabase schema and migrations.
 - [x] Implement app shell baseline.
 - [ ] Implement first real data vertical slice.
+- [x] Add installable PWA shell, manifest, service worker, offline page and mobile icons.
 
 Next session priority:
 
-- Continue with real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
+- Finish real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
 - Refine the imported Golf vehicle metadata after user answers follow-up questions.
 - Keep the approved refreshed landing page design as the visual direction for the rest of the app.
 
@@ -297,10 +298,10 @@ Theme support:
 
 PWA support:
 
-- [ ] Installable manifest
-- [ ] App icons
-- [ ] Full-screen mobile feel
-- [ ] Offline placeholder state
+- [x] Installable manifest
+- [x] App icons
+- [x] Full-screen mobile feel
+- [x] Offline placeholder state
 - [ ] Install prompt placeholder
 - [ ] Push notification permission placeholder
 - [ ] Responsive forms and charts

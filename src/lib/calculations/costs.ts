@@ -7,7 +7,7 @@ import type {
 } from "@/types/domain";
 
 export function formatCurrency(value: number, currency = "EUR") {
-  return new Intl.NumberFormat("en", {
+  return new Intl.NumberFormat("cs-CZ", {
     style: "currency",
     currency,
     maximumFractionDigits: 0,
@@ -15,7 +15,7 @@ export function formatCurrency(value: number, currency = "EUR") {
 }
 
 export function formatNumber(value: number) {
-  return new Intl.NumberFormat("en").format(value);
+  return new Intl.NumberFormat("cs-CZ").format(value);
 }
 
 export function sumExpenses(expenses: Expense[]) {
