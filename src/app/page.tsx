@@ -68,9 +68,8 @@ async function Landing({
 
   return (
     <main className="min-h-dvh bg-[#f4f1ea] text-[#101418]">
-      <section className="relative isolate overflow-hidden bg-[#f4f1ea] text-white">
-        <div className="absolute inset-x-0 top-0 -z-10 h-[calc(100%-5rem)] bg-[#101418] md:h-[calc(100%-7rem)] lg:h-[calc(100%-8rem)]" />
-        <div className="absolute inset-x-0 top-0 -z-10 h-[calc(100%-5rem)] opacity-[0.18] [background-image:linear-gradient(#ffffff_1px,transparent_1px),linear-gradient(90deg,#ffffff_1px,transparent_1px)] [background-size:48px_48px] md:h-[calc(100%-7rem)] lg:h-[calc(100%-8rem)]" />
+      <section className="relative isolate overflow-hidden bg-[#101418] text-white">
+        <div className="absolute inset-0 -z-10 opacity-[0.18] [background-image:linear-gradient(#ffffff_1px,transparent_1px),linear-gradient(90deg,#ffffff_1px,transparent_1px)] [background-size:48px_48px]" />
 
         <div className="mx-auto flex min-h-[92svh] w-full max-w-7xl flex-col px-4 pt-5 sm:px-6 md:px-8 lg:min-h-[88svh]">
           <header className="flex items-center justify-between gap-4">
@@ -100,7 +99,7 @@ async function Landing({
             </form>
           </header>
 
-          <div className="grid min-w-0 flex-1 items-center gap-8 py-10 pb-0 md:py-12 md:pb-0 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1fr)] lg:gap-10">
+          <div className="grid min-w-0 flex-1 items-center gap-8 py-10 md:py-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(420px,1fr)] lg:gap-10">
             <div className="min-w-0 max-w-3xl space-y-7">
               <Badge className="h-7 rounded-full border-white/15 bg-white/10 px-3 text-white hover:bg-white/10">
                 <Sparkles className="size-3.5" aria-hidden="true" />
@@ -147,7 +146,7 @@ async function Landing({
               </div>
             </div>
 
-            <div className="relative mx-auto min-w-0 w-[calc(100vw-2rem)] max-w-full pb-8 sm:w-full sm:max-w-[620px] md:-mb-14 lg:-mb-16 lg:pb-0">
+            <div className="relative mx-auto min-w-0 w-[calc(100vw-2rem)] max-w-full pb-8 sm:w-full sm:max-w-[620px] lg:pb-0">
               <div className="rounded-[1.75rem] border border-white/12 bg-[#171c22] p-3 shadow-2xl shadow-black/40">
                 <div className="min-w-0 rounded-[1.25rem] border border-white/10 bg-[#0f1318] p-4 sm:p-5">
                   <div className="mb-5 flex items-center justify-between gap-4">
