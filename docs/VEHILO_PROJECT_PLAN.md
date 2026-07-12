@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-10
+Last updated: 2026-07-12
 
 ## Project Summary
 
@@ -37,25 +37,21 @@ Current phase:
 - [x] Created this planning and progress document.
 - [x] Updated product language direction: Czech first, translations later.
 - [x] Create GitHub repository/project.
-- [ ] Create or connect Vercel project. Next priority.
+- [x] Create or connect Vercel project.
 - [x] Create or connect Supabase project on the correct separate Supabase account.
-- [ ] Define environment variables and local setup.
+- [x] Define environment variables and local setup.
 - [x] Scaffold Next.js application.
 - [x] Implement Supabase schema and migrations.
 - [ ] Implement app shell and first vertical slice.
 
 Next session priority:
 
-- Connect Vercel to the GitHub repository.
-- Add Vercel environment variables:
-  - `NEXT_PUBLIC_SUPABASE_URL`
-  - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-  - `NEXT_PUBLIC_SITE_URL`
-- Deploy preview/production build.
+- Connect Vercel to the GitHub repository from the Vercel dashboard. CLI project creation succeeded, but automatic GitHub connection failed with an access/repository linking error.
 - Add Vercel URL to Google OAuth Authorized JavaScript origins.
 - Add Vercel `/auth/callback` URL to Supabase Auth redirect URLs.
-- Update `NEXT_PUBLIC_SITE_URL` from localhost to the active Vercel URL.
-- Continue with real authenticated CRUD for vehicles as the first application slice.
+- Review and approve the refreshed landing page design as the visual direction for the rest of the app.
+- Import the user's current Golf data from local folder `Import golf data/` into Supabase as the first real vehicle with history.
+- Continue with real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
 
 GitHub status:
 
@@ -116,18 +112,30 @@ Goal:
 
 Open decisions:
 
-- Vercel team/account.
+- Vercel team/account: `marcelmlynarcik-1979's projects` (`team_K6xIotMnfzvPpYLZQzqYFmGR`).
 - Production domain later.
 - Preview deployment policy.
 
 Planned tasks:
 
-- [ ] Create/import Vercel project.
-- [ ] Link local project to Vercel.
-- [ ] Configure framework as Next.js.
-- [ ] Add Supabase env vars.
+- [x] Create/import Vercel project.
+- [x] Link local project to Vercel.
+- [x] Configure framework as Next.js.
+- [x] Add Supabase env vars.
 - [ ] Verify preview deployment.
-- [ ] Verify production deployment.
+- [x] Verify production deployment.
+
+Current Vercel state:
+
+- Project: `vehilo`
+- Project ID: `prj_O4cSERGTJwVVtnUISRBJYnY7q91Q`
+- Production alias: `https://vehilo-six.vercel.app`
+- Latest verified production deployment: `dpl_E6HaQUZgPoxYod1coWQwsLBNLMYN`
+- Deployment status: `READY`
+- HTTP verification: production alias returns `200`.
+- Production and preview `NEXT_PUBLIC_SITE_URL` are set to `https://vehilo-six.vercel.app`.
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` are configured for Vercel Production, Preview and Development.
+- GitHub repository connection still needs to be completed in Vercel. CLI attempted to connect `marcelmlynarcik-cmyk/Vehilo` and failed with an access/repository linking error.
 
 ### Supabase
 
@@ -157,6 +165,8 @@ Google OAuth setup status:
 - Google provider setup was completed by the user for local development.
 - Current local app URL: `http://localhost:3000`.
 - Current local app callback: `http://localhost:3000/auth/callback`.
+- Current Vercel production URL: `https://vehilo-six.vercel.app`.
+- Current Vercel production callback: `https://vehilo-six.vercel.app/auth/callback`.
 - Supabase project callback used in Google Cloud: `https://elqjzqufqjwiqsqqwhen.supabase.co/auth/v1/callback`.
 - Important before production/Vercel: add the final Vercel production URL to Google Authorized JavaScript origins and add the final Vercel `/auth/callback` URL to Supabase redirect URLs.
 - Important after custom domain: replace Vercel URLs with the final production domain in Google Cloud, Supabase URL Configuration and `NEXT_PUBLIC_SITE_URL`.
@@ -164,7 +174,7 @@ Google OAuth setup status:
 Planned tasks:
 
 - [x] Create Supabase project.
-- [ ] Store project URL and publishable key in local env.
+- [x] Store project URL and publishable key in local env.
 - [x] Configure Supabase client for browser and server usage.
 - [x] Create database schema.
 - [x] Enable RLS on all user-data tables.
