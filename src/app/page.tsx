@@ -68,8 +68,17 @@ async function Landing({
 
   return (
     <main className="min-h-dvh bg-[#f4f1ea] text-[#101418]">
-      <section className="relative isolate overflow-hidden bg-[#101418] text-white">
-        <div className="absolute inset-0 -z-10 opacity-[0.18] [background-image:linear-gradient(#ffffff_1px,transparent_1px),linear-gradient(90deg,#ffffff_1px,transparent_1px)] [background-size:48px_48px]" />
+      <section className="relative isolate overflow-hidden bg-[#05080d] text-white">
+        <Image
+          src="/pozadie/vehilo-hero-background.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="-z-30 object-cover object-center"
+          priority
+        />
+        <div className="absolute inset-0 -z-20 bg-[#05080d]/72" />
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_42%,rgba(14,165,233,0.22),transparent_34%),linear-gradient(90deg,rgba(5,8,13,0.92),rgba(5,8,13,0.62)_48%,rgba(5,8,13,0.84))]" />
 
         <div className="mx-auto flex min-h-[92svh] w-full max-w-7xl flex-col px-4 pt-5 sm:px-6 md:px-8 lg:min-h-[88svh]">
           <header className="flex items-center justify-between gap-4">
