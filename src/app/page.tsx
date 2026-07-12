@@ -70,7 +70,6 @@ async function Landing({
     <main className="min-h-dvh bg-[#f4f1ea] text-[#101418]">
       <section className="relative isolate overflow-hidden bg-[#101418] text-white">
         <div className="absolute inset-0 -z-10 opacity-[0.18] [background-image:linear-gradient(#ffffff_1px,transparent_1px),linear-gradient(90deg,#ffffff_1px,transparent_1px)] [background-size:48px_48px]" />
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-28 bg-[#f4f1ea]" />
 
         <div className="mx-auto flex min-h-[92svh] w-full max-w-7xl flex-col px-4 pt-5 sm:px-6 md:px-8 lg:min-h-[88svh]">
           <header className="flex items-center justify-between gap-4">
