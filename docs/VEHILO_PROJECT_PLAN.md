@@ -795,6 +795,8 @@ Sections:
 - [x] Vehicle photo upload from device
 - [x] Vehicle photo preview before save
 - [x] Vehicle photo replace/remove controls
+- [x] Server Action upload limit adjusted for mobile photos up to 8 MB
+- [x] Client-side vehicle photo resizing before upload for large mobile photos
 
 Must adapt fields by powertrain:
 

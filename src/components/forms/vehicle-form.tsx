@@ -256,6 +256,7 @@ function VehiclePhotoField({ currentPhotoUrl }: { currentPhotoUrl: string | null
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl);
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const [removePhoto, setRemovePhoto] = useState(false);
+  const [processingPhoto, setProcessingPhoto] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -265,20 +266,32 @@ function VehiclePhotoField({ currentPhotoUrl }: { currentPhotoUrl: string | null
     };
   }, [previewUrl]);
 
-  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
+    setProcessingPhoto(true);
+
+    const preparedFile = await resizeVehiclePhoto(file).catch(() => file);
+    const files = new DataTransfer();
+    files.items.add(preparedFile);
+    event.target.files = files.files;
+
     if (previewUrl?.startsWith("blob:")) {
       URL.revokeObjectURL(previewUrl);
     }
 
-    setPreviewUrl(URL.createObjectURL(file));
-    setSelectedFileName(file.name);
+    setPreviewUrl(URL.createObjectURL(preparedFile));
+    setSelectedFileName(
+      preparedFile.size < file.size
+        ? `${preparedFile.name} (${formatFileSize(file.size)} -> ${formatFileSize(preparedFile.size)})`
+        : `${preparedFile.name} (${formatFileSize(preparedFile.size)})`,
+    );
     setRemovePhoto(false);
+    setProcessingPhoto(false);
   }
 
   function clearSelection() {
@@ -324,13 +337,18 @@ function VehiclePhotoField({ currentPhotoUrl }: { currentPhotoUrl: string | null
             Připraveno k nahrání: {selectedFileName}
           </div>
         ) : null}
+        {processingPhoto ? (
+          <div className="rounded-[14px] border border-[rgba(56,189,248,0.22)] bg-[rgba(56,189,248,0.10)] px-3 py-2 text-sm text-sky-100">
+            Připravuji menší verzi fotografie...
+          </div>
+        ) : null}
         {removePhoto ? (
           <div className="rounded-[14px] border border-[rgba(239,68,68,0.24)] bg-[rgba(239,68,68,0.10)] px-3 py-2 text-sm text-red-200">
             Fotografie bude po uložení odstraněna.
           </div>
         ) : null}
         <div className="flex flex-col gap-2 sm:flex-row">
-          <Button type="button" variant="outline" className="gap-2" onClick={() => inputRef.current?.click()}>
+          <Button type="button" variant="outline" className="gap-2" disabled={processingPhoto} onClick={() => inputRef.current?.click()}>
             <Upload className="size-4" aria-hidden="true" />
             {previewUrl ? "Vyměnit fotku" : "Vybrat fotku"}
           </Button>
@@ -353,6 +371,73 @@ function VehiclePhotoField({ currentPhotoUrl }: { currentPhotoUrl: string | null
       </div>
     </div>
   );
+}
+
+async function resizeVehiclePhoto(file: File) {
+  if (!file.type.startsWith("image/") || file.type === "image/svg+xml") {
+    return file;
+  }
+
+  const imageUrl = URL.createObjectURL(file);
+
+  try {
+    const image = await loadImage(imageUrl);
+    const maxSize = 1600;
+    const scale = Math.min(1, maxSize / Math.max(image.naturalWidth, image.naturalHeight));
+
+    if (scale === 1 && file.size <= 1_800_000) {
+      return file;
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(image.naturalWidth * scale);
+    canvas.height = Math.round(image.naturalHeight * scale);
+
+    const context = canvas.getContext("2d");
+
+    if (!context) {
+      return file;
+    }
+
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, "image/jpeg", 0.82);
+    });
+
+    if (!blob || blob.size >= file.size) {
+      return file;
+    }
+
+    return new File([blob], replaceFileExtension(file.name, "jpg"), {
+      type: "image/jpeg",
+      lastModified: Date.now(),
+    });
+  } finally {
+    URL.revokeObjectURL(imageUrl);
+  }
+}
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
+function replaceFileExtension(fileName: string, extension: string) {
+  const baseName = fileName.replace(/\.[^.]+$/, "");
+  return `${baseName || "vehicle-photo"}.${extension}`;
+}
+
+function formatFileSize(bytes: number) {
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  }
+
+  return `${Math.max(1, Math.round(bytes / 1024))} kB`;
 }
 
 function InputWithLabel({

@@ -222,9 +222,10 @@ async function uploadVehiclePhoto({
 }) {
   const extension = extensionFromFile(file);
   const path = `${userId}/vehicles/${vehicleId}/${randomUUID()}.${extension}`;
+  const buffer = await file.arrayBuffer();
   const { error } = await supabase.storage
     .from("vehicle-photos")
-    .upload(path, file, {
+    .upload(path, buffer, {
       cacheControl: "31536000",
       contentType: file.type,
       upsert: false,
