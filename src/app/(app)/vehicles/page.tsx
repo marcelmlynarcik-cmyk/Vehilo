@@ -66,7 +66,7 @@ function VehiclesHero({
   return (
     <section className="relative min-h-[500px] overflow-hidden rounded-[32px] border border-border bg-[var(--surface-solid)] shadow-[0_32px_90px_rgba(0,0,0,0.36)] md:min-h-[430px] lg:min-h-[470px]">
       <div
-        className="absolute inset-0 bg-cover bg-[position:22%_center] md:bg-[position:18%_center] lg:bg-left"
+        className="absolute inset-0 bg-cover bg-[position:16%_center] md:bg-[position:12%_center] lg:bg-left"
         style={{ backgroundImage: "url('/pozadie/vehilo-garage-hero.png')" }}
         aria-hidden="true"
       />
