@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { Bell, CalendarDays, Car, FileText, Fuel, Gauge, Pencil, ReceiptText, Wrench, type LucideIcon } from "lucide-react";
+import { Bell, Car, FileText, Fuel, Gauge, Pencil, ReceiptText, Wrench, type LucideIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,8 +39,8 @@ export default async function VehicleDetailPage({
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-5 lg:grid-cols-[280px_1fr]">
-        <div className="overflow-hidden rounded-lg border bg-muted">
+      <section className="grid gap-5 rounded-[28px] border border-border bg-[rgba(8,17,23,0.66)] p-4 shadow-[var(--shadow-card)] backdrop-blur-[18px] lg:grid-cols-[320px_1fr] lg:p-5">
+        <div className="overflow-hidden rounded-[24px] border border-border bg-muted shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]">
           {vehicle.photo_url ? (
             <img src={vehicle.photo_url} alt={vehicle.name} className="aspect-[4/3] h-full w-full object-cover" />
           ) : (
@@ -217,25 +217,25 @@ export default async function VehicleDetailPage({
 
 function HeroFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border bg-card p-3">
+    <div className="rounded-[16px] border border-border bg-[rgba(13,23,30,0.78)] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 truncate font-medium">{value}</div>
+      <div className="mt-1 truncate font-semibold text-white">{value}</div>
     </div>
   );
 }
 
 function DetailRow({ label, value }: { label: string; value: string | null }) {
   return (
-    <div className="rounded-md bg-muted/40 p-3">
+    <div className="rounded-[14px] border border-border bg-muted/35 p-3">
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 font-medium">{value || "Nevyplněno"}</div>
+      <div className="mt-1 font-semibold text-white">{value || "Nevyplněno"}</div>
     </div>
   );
 }
 
 function CompletenessRow({ label, done }: { label: string; done: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md border p-3 text-sm">
+    <div className="flex items-center justify-between gap-3 rounded-[14px] border border-border bg-[rgba(8,17,23,0.42)] p-3 text-sm">
       <span>{label}</span>
       <Badge variant={done ? "default" : "secondary"}>{done ? "Vyplněno" : "Chybí"}</Badge>
     </div>
@@ -264,7 +264,7 @@ function RecordCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {hasChildren ? children : <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">{emptyText}</div>}
+        {hasChildren ? children : <div className="rounded-[16px] border border-dashed border-border p-6 text-center text-sm text-muted-foreground">{emptyText}</div>}
       </CardContent>
     </Card>
   );
@@ -314,22 +314,22 @@ function DocumentRow({ document }: { document: VehicleDocument }) {
 
 function ListRow({ title, detail, amount }: { title: string; detail: string; amount: string }) {
   return (
-    <div className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-2 rounded-[16px] border border-border bg-[rgba(8,17,23,0.42)] p-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <div className="truncate font-medium">{title}</div>
         <div className="text-sm text-muted-foreground">{detail}</div>
       </div>
-      <div className="shrink-0 font-medium">{amount}</div>
+      <div className="tabular-num shrink-0 font-semibold text-white">{amount}</div>
     </div>
   );
 }
 
 function StatisticTile({ label, value, icon: Icon }: { label: string; value: string; icon: LucideIcon }) {
   return (
-    <div className="rounded-lg border bg-muted/30 p-4">
-      <Icon className="mb-3 size-5 text-muted-foreground" aria-hidden="true" />
+    <div className="rounded-[16px] border border-border bg-muted/35 p-4">
+      <Icon className="mb-3 size-5 text-[var(--accent)]" aria-hidden="true" />
       <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="mt-1 text-xl font-semibold">{value}</div>
+      <div className="tabular-num mt-1 text-xl font-bold text-white">{value}</div>
     </div>
   );
 }

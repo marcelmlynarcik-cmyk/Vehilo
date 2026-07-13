@@ -43,8 +43,8 @@ export default async function RemindersPage() {
 
 function Suggestion({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-lg border p-4">
-      <div className="font-medium">{title}</div>
+    <div className="rounded-[18px] border border-border bg-muted/35 p-4">
+      <div className="font-semibold text-white">{title}</div>
       <div className="mt-3 flex flex-wrap gap-2">
         {items.map((item) => <Badge key={item} variant="secondary">{item}</Badge>)}
       </div>

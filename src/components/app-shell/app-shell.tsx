@@ -14,14 +14,14 @@ interface AppShellProps {
 
 export function AppShell({ children, configured, authenticated, error }: AppShellProps) {
   return (
-    <div className="flex min-h-dvh bg-background text-foreground">
+    <div className="flex min-h-dvh text-foreground">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 border-b bg-background/90 px-4 py-3 backdrop-blur lg:px-8">
-          <div className="flex items-center justify-between gap-3">
+        <header className="sticky top-0 z-30 border-b border-border bg-[rgba(5,11,16,0.82)] px-4 py-3 backdrop-blur-[18px] lg:px-8">
+          <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
             <div className="lg:hidden">
-              <div className="text-lg font-semibold">Vehilo</div>
-              <div className="text-xs text-muted-foreground">Smart vehicle hub</div>
+              <div className="text-[30px] font-extrabold leading-none tracking-[-0.04em] text-white">Vehilo</div>
+              <div className="mt-1 text-sm font-medium text-muted-foreground">Smart vehicle hub</div>
             </div>
             <div className="hidden min-w-0 lg:block">
               <div className="text-sm text-muted-foreground">
@@ -31,8 +31,8 @@ export function AppShell({ children, configured, authenticated, error }: AppShel
             <QuickAdd />
           </div>
         </header>
-        <main className="flex-1 px-4 py-5 pb-24 lg:px-8 lg:py-8">
-          <div className="mx-auto max-w-7xl space-y-4">
+        <main className="flex-1 px-4 py-5 pb-safe-nav md:px-6 lg:px-8 lg:py-8 lg:pb-10">
+          <div className="mx-auto max-w-[1600px] space-y-5">
             {!configured ? <SetupAlert /> : null}
             {configured && !authenticated ? <AuthAlert /> : null}
             {error ? <ErrorAlert message={error} /> : null}

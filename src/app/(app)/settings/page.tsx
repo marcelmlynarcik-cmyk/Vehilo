@@ -23,8 +23,8 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader><CardTitle>Profil</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center gap-3">
-              <Avatar><AvatarFallback>{getInitials(displayName, email)}</AvatarFallback></Avatar>
+            <div className="flex items-center gap-3 rounded-[18px] border border-border bg-muted/35 p-3">
+              <Avatar className="border border-border"><AvatarFallback className="bg-[rgba(39,211,162,0.14)] text-[#9ff5dc]">{getInitials(displayName, email)}</AvatarFallback></Avatar>
               <div>
                 <div className="font-medium">{displayName}</div>
                 <div className="text-sm text-muted-foreground">{email || "E-mail není dostupný"}</div>
@@ -168,7 +168,7 @@ function SelectField({
         name={name}
         form={form}
         defaultValue={value}
-        className="flex h-8 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-input/30"
+        className="flex h-12 w-full rounded-[14px] border border-input bg-input px-3.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {items.map(([itemValue, itemLabel]) => (
           <option key={itemValue} value={itemValue}>{itemLabel}</option>
@@ -179,7 +179,7 @@ function SelectField({
 }
 
 function ToggleRow({ title, description }: { title: string; description: string }) {
-  return <div className="flex items-center justify-between gap-4 rounded-lg border p-3"><div><div className="font-medium">{title}</div><div className="text-sm text-muted-foreground">{description}</div></div><Switch /></div>;
+  return <div className="flex items-center justify-between gap-4 rounded-[18px] border border-border bg-muted/35 p-3"><div><div className="font-semibold text-white">{title}</div><div className="text-sm text-muted-foreground">{description}</div></div><Switch /></div>;
 }
 
 function getInitials(name: string, email: string) {

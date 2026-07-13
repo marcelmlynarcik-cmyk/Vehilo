@@ -35,7 +35,7 @@ export function QuickAdd() {
     <Sheet>
       <SheetTrigger
         render={
-          <Button className="gap-2">
+          <Button className="gap-2 max-sm:size-14 max-sm:min-h-14 max-sm:rounded-[18px] max-sm:px-0">
             <Plus className="size-4" aria-hidden="true" />
             <span className="hidden sm:inline">Rychle přidat</span>
           </Button>
@@ -46,14 +46,14 @@ export function QuickAdd() {
           Rychle přidat
         </span>
       </SheetTrigger>
-      <SheetContent side="bottom" className="rounded-t-2xl sm:left-auto sm:right-4 sm:top-4 sm:w-[420px] sm:rounded-xl">
+      <SheetContent side="bottom" className="sm:left-auto sm:right-4 sm:top-4 sm:w-[440px] sm:rounded-[24px] sm:border">
         <SheetHeader className="text-left">
           <SheetTitle>Přidat do Vehilo</SheetTitle>
           <SheetDescription>
             Po připojení Supabase zde budete vytvářet skutečné záznamy.
           </SheetDescription>
         </SheetHeader>
-        <div className="grid gap-2 py-4 sm:grid-cols-2">
+        <div className="grid gap-2 px-5 pb-5 sm:grid-cols-2">
           {actions.map((action) => {
             const Icon = action.icon;
 
@@ -61,7 +61,7 @@ export function QuickAdd() {
               <Button
                 key={action.label}
                 variant="outline"
-                className="h-12 justify-start gap-3"
+                className="h-14 justify-start gap-3 rounded-[16px]"
                 type="button"
               >
                 <Icon className="size-4" aria-hidden="true" />

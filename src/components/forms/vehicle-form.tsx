@@ -53,7 +53,7 @@ export function VehicleForm({
       : "Vehilo použije správné jednotky paliva, energie a spotřeby podle typu pohonu.";
 
   return (
-    <form action={action} className="space-y-4">
+    <form action={action} className="space-y-5">
       {vehicle ? <input type="hidden" name="id" value={vehicle.id} /> : null}
       <FormSection title="Základní údaje">
         <div className="grid gap-4 md:grid-cols-2">
@@ -166,9 +166,9 @@ export function VehicleForm({
             />
           ) : null}
         </div>
-        <Card className="mt-4">
-          <CardContent className="flex gap-3 p-4 text-sm text-muted-foreground">
-            <BatteryCharging className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+        <Card className="mt-4 border-[rgba(56,189,248,0.22)] bg-[rgba(14,42,52,0.34)]">
+          <CardContent className="flex gap-3 p-4 text-sm leading-relaxed text-muted-foreground">
+            <BatteryCharging className="mt-0.5 size-5 shrink-0 text-[var(--accent-blue)]" aria-hidden="true" />
             {helperText}
           </CardContent>
         </Card>
@@ -211,18 +211,18 @@ export function VehicleForm({
       </FormSection>
 
       <FormSection title="Média">
-        <div className="flex min-h-36 flex-col items-center justify-center rounded-lg border border-dashed p-6 text-center">
-          <Upload className="mb-2 size-6 text-muted-foreground" aria-hidden="true" />
-          <div className="font-medium">Nahrání fotografie vozidla</div>
+        <div className="flex min-h-40 flex-col items-center justify-center rounded-[20px] border border-dashed border-[rgba(148,163,184,0.26)] bg-[rgba(8,17,23,0.42)] p-6 text-center">
+          <Upload className="mb-3 size-7 text-[var(--accent)]" aria-hidden="true" />
+          <div className="font-semibold text-white">Nahrání fotografie vozidla</div>
           <div className="text-sm text-muted-foreground">
             Upload do Supabase Storage navážeme v dalším kroku. Teď lze uložit externí URL fotografie.
           </div>
         </div>
       </FormSection>
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-between">
+      <div className="sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-20 flex flex-col-reverse gap-2 rounded-[22px] border border-border bg-[rgba(8,17,23,0.9)] p-3 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur-[18px] sm:static sm:flex-row sm:justify-between sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0">
         {mode === "edit" && archiveAction && vehicle?.status !== "archived" ? (
-          <Button variant="outline" formAction={archiveAction} className="gap-2 text-muted-foreground">
+          <Button variant="destructive" formAction={archiveAction} className="gap-2">
             <Archive className="size-4" aria-hidden="true" />
             Archivovat vozidlo
           </Button>
@@ -243,8 +243,8 @@ function FormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-lg border bg-card p-4">
-      <h2 className="mb-4 font-medium">{title}</h2>
+    <section className="rounded-[24px] border border-border bg-card p-4 shadow-[var(--shadow-card)] backdrop-blur-[18px] md:p-5">
+      <h2 className="mb-4 text-lg font-bold tracking-tight text-white">{title}</h2>
       {children}
     </section>
   );

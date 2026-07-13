@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "Vehilo",
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
   },
   formatDetection: {
     telephone: false,
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     "mobile-web-app-capable": "yes",
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-title": "Vehilo",
-    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
 };
 
@@ -42,7 +42,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0f766e",
+  themeColor: "#050B10",
 };
 
 export default function RootLayout({
@@ -68,7 +68,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <ServiceWorkerProvider />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
