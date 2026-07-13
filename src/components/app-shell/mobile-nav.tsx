@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { mobileNavigationItems } from "@/components/app-shell/navigation";
 import { QuickAdd } from "@/components/app-shell/quick-add";
@@ -68,7 +67,6 @@ function QuickAddButton() {
       <div className="-mt-7 rounded-full bg-[var(--background)] p-1.5 shadow-[0_0_0_1px_rgba(148,163,184,0.12)] [&>button]:size-[72px] [&>button]:min-h-[72px] [&>button]:rounded-full [&>button]:px-0 [&>button]:shadow-[0_18px_42px_rgba(45,212,163,0.26),inset_0_1px_0_rgba(255,255,255,0.22)] [&_span]:hidden">
         <QuickAdd />
       </div>
-      <Plus className="pointer-events-none absolute mt-0.5 size-7 text-white" strokeWidth={2.3} aria-hidden="true" />
     </div>
   );
 }

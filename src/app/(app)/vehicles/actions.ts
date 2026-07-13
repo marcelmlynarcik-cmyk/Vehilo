@@ -60,6 +60,10 @@ export async function updateVehicle(formData: FormData) {
   const vehicleId = requiredText(formData, "id");
   const payload = buildVehiclePayload(formData, userId);
   const photoFile = optionalImageFile(formData, "photo_file");
+  const removePhoto = optionalBoolean(formData, "remove_photo");
+  const currentPhotoPath = photoFile || removePhoto
+    ? await loadCurrentVehiclePhotoPath({ supabase, userId, vehicleId })
+    : null;
 
   const { error } = await supabase
     .from("vehicles")
@@ -86,8 +90,23 @@ export async function updateVehicle(formData: FormData) {
       .eq("user_id", userId);
 
     if (photoUpdateError) {
+      await deleteVehiclePhoto({ supabase, path: photoPath });
       throw new Error(photoUpdateError.message);
     }
+
+    await deleteVehiclePhoto({ supabase, path: currentPhotoPath });
+  } else if (removePhoto) {
+    const { error: photoUpdateError } = await supabase
+      .from("vehicles")
+      .update({ photo_url: null })
+      .eq("id", vehicleId)
+      .eq("user_id", userId);
+
+    if (photoUpdateError) {
+      throw new Error(photoUpdateError.message);
+    }
+
+    await deleteVehiclePhoto({ supabase, path: currentPhotoPath });
   }
 
   revalidateVehicleRoutes(vehicleId);
@@ -230,6 +249,47 @@ function extensionFromFile(file: File) {
   return fallback || "jpg";
 }
 
+async function loadCurrentVehiclePhotoPath({
+  supabase,
+  userId,
+  vehicleId,
+}: {
+  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>;
+  userId: string;
+  vehicleId: string;
+}) {
+  const { data, error } = await supabase
+    .from("vehicles")
+    .select("photo_url")
+    .eq("id", vehicleId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data?.photo_url ?? null;
+}
+
+async function deleteVehiclePhoto({
+  supabase,
+  path,
+}: {
+  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>;
+  path: string | null;
+}) {
+  if (!path || /^https?:\/\//i.test(path)) {
+    return;
+  }
+
+  const { error } = await supabase.storage.from("vehicle-photos").remove([path]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 function requiredText(formData: FormData, key: string) {
   const value = optionalText(formData, key);
 
@@ -243,6 +303,10 @@ function requiredText(formData: FormData, key: string) {
 function optionalText(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function optionalBoolean(formData: FormData, key: string) {
+  return formData.get(key) === "true";
 }
 
 function optionalNumber(formData: FormData, key: string) {

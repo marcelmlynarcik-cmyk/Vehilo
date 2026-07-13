@@ -1,8 +1,8 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import { Archive, BatteryCharging, Car, Save, Upload } from "lucide-react";
-import { useState, type ReactNode } from "react";
+import { Archive, BatteryCharging, Car, Save, Upload, X } from "lucide-react";
+import { useEffect, useRef, useState, type ChangeEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -218,14 +218,7 @@ export function VehicleForm({
       </FormSection>
 
       <FormSection title="Média">
-        <div className="flex min-h-40 flex-col items-center justify-center rounded-[20px] border border-dashed border-[rgba(148,163,184,0.26)] bg-[rgba(8,17,23,0.42)] p-6 text-center">
-          <Upload className="mb-3 size-7 text-[var(--accent)]" aria-hidden="true" />
-          <div className="font-semibold text-white">Nahrání fotografie vozidla</div>
-          <div className="text-sm text-muted-foreground">
-            Vyberte fotku z telefonu nebo počítače. Uloží se do privátního Supabase Storage.
-          </div>
-          <Input id="vehicle_photo_file" name="photo_file" type="file" accept="image/*" className="mt-4 max-w-md" />
-        </div>
+        <VehiclePhotoField currentPhotoUrl={vehicle?.photo_url ?? null} />
       </FormSection>
 
       <div className="sticky bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-20 flex flex-col-reverse gap-2 rounded-[22px] border border-border bg-[rgba(8,17,23,0.9)] p-3 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur-[18px] sm:static sm:flex-row sm:justify-between sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-0">
@@ -255,6 +248,110 @@ function FormSection({
       <h2 className="mb-4 text-lg font-bold tracking-tight text-white">{title}</h2>
       {children}
     </section>
+  );
+}
+
+function VehiclePhotoField({ currentPhotoUrl }: { currentPhotoUrl: string | null }) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentPhotoUrl);
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [removePhoto, setRemovePhoto] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (previewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    setPreviewUrl(URL.createObjectURL(file));
+    setSelectedFileName(file.name);
+    setRemovePhoto(false);
+  }
+
+  function clearSelection() {
+    if (previewUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(previewUrl);
+    }
+
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+
+    setPreviewUrl(null);
+    setSelectedFileName(null);
+    setRemovePhoto(Boolean(currentPhotoUrl));
+  }
+
+  return (
+    <div className="grid gap-4 rounded-[20px] border border-dashed border-[rgba(148,163,184,0.26)] bg-[rgba(8,17,23,0.42)] p-4 md:grid-cols-[220px_1fr] md:p-5">
+      <input type="hidden" name="remove_photo" value={removePhoto ? "true" : "false"} />
+      <div className="overflow-hidden rounded-[18px] border border-border bg-[rgba(5,11,16,0.82)]">
+        {previewUrl ? (
+          <div
+            className="aspect-[4/3] bg-cover bg-center"
+            style={{ backgroundImage: `url(${previewUrl})` }}
+            aria-label="Náhled fotografie vozidla"
+            role="img"
+          />
+        ) : (
+          <div className="flex aspect-[4/3] items-center justify-center">
+            <Car className="size-12 text-muted-foreground" aria-hidden="true" />
+          </div>
+        )}
+      </div>
+      <div className="flex flex-col justify-center gap-3">
+        <div>
+          <div className="font-semibold text-white">Fotografie vozidla</div>
+          <div className="mt-1 text-sm text-muted-foreground">
+            Vyberte fotku z telefonu nebo počítače. Uloží se do privátního Supabase Storage.
+          </div>
+        </div>
+        {selectedFileName ? (
+          <div className="rounded-[14px] border border-[rgba(45,212,163,0.22)] bg-[rgba(45,212,163,0.10)] px-3 py-2 text-sm text-[#9ff5dc]">
+            Připraveno k nahrání: {selectedFileName}
+          </div>
+        ) : null}
+        {removePhoto ? (
+          <div className="rounded-[14px] border border-[rgba(239,68,68,0.24)] bg-[rgba(239,68,68,0.10)] px-3 py-2 text-sm text-red-200">
+            Fotografie bude po uložení odstraněna.
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Button type="button" variant="outline" className="gap-2" onClick={() => inputRef.current?.click()}>
+            <Upload className="size-4" aria-hidden="true" />
+            {previewUrl ? "Vyměnit fotku" : "Vybrat fotku"}
+          </Button>
+          {previewUrl ? (
+            <Button type="button" variant="ghost" className="gap-2 text-destructive hover:text-destructive" onClick={clearSelection}>
+              <X className="size-4" aria-hidden="true" />
+              Odstranit
+            </Button>
+          ) : null}
+        </div>
+        <Input
+          ref={inputRef}
+          id="vehicle_photo_file"
+          name="photo_file"
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleFileChange}
+        />
+      </div>
+    </div>
   );
 }
 

@@ -50,7 +50,7 @@ Current phase:
 
 Next session priority:
 
-- Finish real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
+- Verify the real Golf vehicle flow across vehicles list, detail, edit and photo upload/removal.
 - Use the already imported Golf data as the baseline for real app screens.
 - Continue product work without reworking the established app visual design.
 
@@ -238,7 +238,7 @@ Mobile:
 - [ ] Add
 - [ ] Reminders
 - [ ] More
-- [ ] Add opens bottom sheet with quick actions
+- [x] Single centered add button opens bottom sheet with quick actions
 
 Mobile quick actions:
 
@@ -647,7 +647,8 @@ Planned buckets:
 Storage requirements:
 
 - Files must be tied to authenticated owners.
-- Upload UI must show placeholders and later real upload progress.
+- Vehicle photo upload uses private Supabase Storage with local preview, replace and remove controls.
+- Upload UI for documents/receipts/invoices must show placeholders and later real upload progress.
 - Documents with expiration dates should be able to create related reminders.
 
 ## Pages And Requirements
@@ -786,11 +787,14 @@ Vehicle Health:
 
 Sections:
 
-- [ ] Basic info
-- [ ] Vehicle type
-- [ ] Purchase info
-- [ ] Current info
-- [ ] Media
+- [x] Basic info
+- [x] Vehicle type
+- [x] Purchase info
+- [x] Current info
+- [x] Media
+- [x] Vehicle photo upload from device
+- [x] Vehicle photo preview before save
+- [x] Vehicle photo replace/remove controls
 
 Must adapt fields by powertrain:
 
@@ -1060,11 +1064,14 @@ Reminder calculations:
 
 Recommended first slice:
 
-- [ ] Vehicles list from Supabase.
-- [ ] Add vehicle form writing to Supabase.
-- [ ] Vehicle detail reading from Supabase.
-- [ ] Edit vehicle.
-- [ ] Delete/archive vehicle.
+- [x] Vehicles list from Supabase.
+- [x] Add vehicle form writing to Supabase.
+- [x] Vehicle detail reading from Supabase.
+- [x] Edit vehicle.
+- [x] Archive vehicle.
+- [x] Vehicle photo upload to private Supabase Storage.
+- [x] Vehicle photo signed URL rendering.
+- [ ] Verify Golf flow in the live UI.
 - [ ] RLS verification.
 
 Reason:
