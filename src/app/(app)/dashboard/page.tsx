@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         <MetricCard title="Vozidla celkem" value={String(data.vehicles.length)} description="Aktivní záznamy v garáži" icon={Car} />
         <MetricCard title="Měsíční náklady" value={formatCurrency(monthlyCost, currency)} description="Průměr ze skutečných záznamů" icon={ReceiptText} />
         <MetricCard title="Celkové vlastnické náklady" value={formatCurrency(totalCost, currency)} description="Výdaje, palivo, servis a ztráta hodnoty" icon={Gauge} />
-        <MetricCard title="Cena za kilometr" value={`${formatCurrency(costPerKm, currency)}/km`} description="Napříč všemi vozidly" icon={Fuel} />
+        <MetricCard title="Cena za kilometr" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Napříč všemi vozidly od koupě" icon={Fuel} />
         <MetricCard title="Nadcházející připomínky" value={String(countReminderStatus(data.reminders, "upcoming"))} description="Plánovaný servis a dokumenty" icon={Bell} />
         <MetricCard title="Po termínu" value={String(countReminderStatus(data.reminders, "overdue"))} description="Vyžaduje pozornost" icon={CalendarClock} />
         <MetricCard title="Dokumenty brzy expirují" value={String(data.documents.filter((document) => document.status === "expiring_soon").length)} description="Pojištění, STK/MOT a povolení" icon={FileText} />
@@ -110,7 +110,7 @@ function DashboardHero({
   return (
     <section className="relative min-h-[500px] overflow-hidden rounded-[32px] border border-border bg-[var(--surface-solid)] shadow-[0_32px_90px_rgba(0,0,0,0.36)] md:min-h-[430px] lg:min-h-[470px]">
       <div
-        className="absolute inset-0 bg-cover bg-[position:36%_center] md:bg-[position:30%_center] lg:bg-center"
+        className="absolute inset-0 bg-cover bg-[position:22%_center] md:bg-[position:18%_center] lg:bg-center"
         style={{ backgroundImage: "url('/pozadie/Garage_hero.png')" }}
         aria-hidden="true"
       />

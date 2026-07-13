@@ -6,11 +6,12 @@ import type {
   Vehicle,
 } from "@/types/domain";
 
-export function formatCurrency(value: number, currency = "EUR") {
+export function formatCurrency(value: number, currency = "EUR", fractionDigits = 0) {
   return new Intl.NumberFormat("cs-CZ", {
     style: "currency",
     currency,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
   }).format(value);
 }
 
@@ -28,6 +29,17 @@ export function sumEnergyCost(entries: EnergyEntry[]) {
 
 export function totalMileage(vehicles: Vehicle[]) {
   return vehicles.reduce((total, vehicle) => total + Number(vehicle.current_mileage), 0);
+}
+
+export function drivenMileage(vehicle: Vehicle) {
+  const currentMileage = Number(vehicle.current_mileage);
+  const purchaseMileage = vehicle.purchase_mileage == null ? 0 : Number(vehicle.purchase_mileage);
+
+  return Math.max(0, currentMileage - purchaseMileage);
+}
+
+export function totalDrivenMileage(vehicles: Vehicle[]) {
+  return vehicles.reduce((total, vehicle) => total + drivenMileage(vehicle), 0);
 }
 
 export function calculateDepreciation(vehicle: Vehicle) {
@@ -60,7 +72,7 @@ export function calculateTotalOwnershipCost(data: GarageData) {
 }
 
 export function calculateCostPerKm(data: GarageData) {
-  const mileage = totalMileage(data.vehicles);
+  const mileage = totalDrivenMileage(data.vehicles);
 
   if (mileage === 0) {
     return 0;

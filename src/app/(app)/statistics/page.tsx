@@ -16,7 +16,7 @@ export default async function StatisticsPage() {
       <PageHeader title="Statistiky" description="Pokročilá analytika skutečných nákladů, spotřeby, servisu, odpisů a porovnání vozidel." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Celkové vlastnické náklady" value={formatCurrency(calculateTotalOwnershipCost(data), currency)} description="TCO" icon={BarChart3} />
-        <MetricCard title="Cena za kilometr" value={`${formatCurrency(calculateCostPerKm(data), currency)}/km`} description="Napříč garáží" icon={BarChart3} />
+        <MetricCard title="Cena za kilometr" value={`${formatCurrency(calculateCostPerKm(data), currency, 2)}/km`} description="Napříč garáží od koupě" icon={BarChart3} />
         <MetricCard title="Měsíční průměr" value={formatCurrency(calculateAverageMonthlyCost(data), currency)} description="Z reálných záznamů" icon={BarChart3} />
         <MetricCard title="Počet vozidel" value={String(data.vehicles.length)} description="Pro porovnání" icon={BarChart3} />
       </div>

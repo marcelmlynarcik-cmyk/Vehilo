@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MetricCard } from "@/components/shared/metric-card";
-import { calculateDepreciation, calculateVehicleCost, formatCurrency, formatNumber } from "@/lib/calculations/costs";
+import { calculateDepreciation, calculateVehicleCost, drivenMileage, formatCurrency, formatNumber } from "@/lib/calculations/costs";
 import { loadGarageData } from "@/lib/data/garage";
 import type { EnergyEntry, Expense, ServiceEntry, VehicleDocument } from "@/types/domain";
 
@@ -31,10 +31,7 @@ export default async function VehicleDetailPage({
   const reminders = data.reminders.filter((entry) => entry.vehicle_id === vehicle.id);
   const documents = data.documents.filter((entry) => entry.vehicle_id === vehicle.id);
   const subtitle = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.engine].filter(Boolean).join(" ");
-  const drivenSincePurchase =
-    vehicle.purchase_mileage == null
-      ? vehicle.current_mileage
-      : Math.max(0, vehicle.current_mileage - vehicle.purchase_mileage);
+  const drivenSincePurchase = drivenMileage(vehicle);
   const costPerKm = drivenSincePurchase > 0 ? totalCost / drivenSincePurchase : 0;
 
   return (
@@ -96,7 +93,7 @@ export default async function VehicleDetailPage({
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Náklady celkem" value={formatCurrency(totalCost, vehicle.currency)} description="Výdaje, palivo, servis a ztráta hodnoty" icon={ReceiptText} />
-        <MetricCard title="Cena za km" value={formatCurrency(costPerKm, vehicle.currency)} description={`${formatNumber(drivenSincePurchase)} km od koupě`} icon={Gauge} />
+        <MetricCard title="Cena za km" value={`${formatCurrency(costPerKm, vehicle.currency, 2)}/km`} description={`${formatNumber(drivenSincePurchase)} km od koupě`} icon={Gauge} />
         <MetricCard title="Servisních záznamů" value={String(serviceEntries.length)} description="Historie údržby a oprav" icon={Wrench} />
         <MetricCard title="Tankování" value={String(energyEntries.length)} description={formatPowertrain(vehicle.powertrain_type)} icon={Fuel} />
       </div>
