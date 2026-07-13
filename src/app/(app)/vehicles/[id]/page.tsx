@@ -102,7 +102,8 @@ export default async function VehicleDetailPage({
       </div>
 
       <Tabs defaultValue="overview">
-        <TabsList className="grid h-auto grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+        <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+          <TabsList className="flex h-auto min-w-max gap-1 rounded-[18px] border border-border bg-[rgba(8,17,23,0.72)] p-1 [&_[data-slot=tabs-trigger]]:h-11 [&_[data-slot=tabs-trigger]]:shrink-0 [&_[data-slot=tabs-trigger]]:px-4 md:grid md:min-w-0 md:grid-cols-4 md:[&_[data-slot=tabs-trigger]]:px-2 lg:grid-cols-7">
           <TabsTrigger value="overview">Přehled</TabsTrigger>
           <TabsTrigger value="expenses">Výdaje</TabsTrigger>
           <TabsTrigger value="energy">Palivo</TabsTrigger>
@@ -110,7 +111,8 @@ export default async function VehicleDetailPage({
           <TabsTrigger value="reminders">Připomínky</TabsTrigger>
           <TabsTrigger value="documents">Dokumenty</TabsTrigger>
           <TabsTrigger value="statistics">Statistiky</TabsTrigger>
-        </TabsList>
+          </TabsList>
+        </div>
 
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-[1fr_360px]">

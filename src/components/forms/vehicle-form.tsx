@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { Vehicle } from "@/types/domain";
 
@@ -19,6 +19,16 @@ type VehiclePowertrain =
   | "electric"
   | "lpg"
   | "cng";
+
+const powertrainOptions = [
+  ["petrol", "Benzín"],
+  ["diesel", "Nafta"],
+  ["hybrid", "Hybrid"],
+  ["plug_in_hybrid", "Plug-in hybrid"],
+  ["electric", "Elektro"],
+  ["lpg", "LPG"],
+  ["cng", "CNG"],
+] as const satisfies readonly (readonly [VehiclePowertrain, string])[];
 
 interface VehicleFormProps {
   action: (formData: FormData) => void | Promise<void>;
@@ -94,16 +104,14 @@ export function VehicleForm({
               }}
             >
               <SelectTrigger id="powertrain_type" className="w-full">
-                <SelectValue placeholder="Vyberte pohon" />
+                <SelectDisplay value={powertrain} items={powertrainOptions} placeholder="Vyberte pohon" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="petrol">Benzín</SelectItem>
-                <SelectItem value="diesel">Nafta</SelectItem>
-                <SelectItem value="hybrid">Hybrid</SelectItem>
-                <SelectItem value="plug_in_hybrid">Plug-in hybrid</SelectItem>
-                <SelectItem value="electric">Elektro</SelectItem>
-                <SelectItem value="lpg">LPG</SelectItem>
-                <SelectItem value="cng">CNG</SelectItem>
+                {powertrainOptions.map(([itemValue, itemLabel]) => (
+                  <SelectItem key={itemValue} value={itemValue}>
+                    {itemLabel}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -315,7 +323,7 @@ function SelectWithLabel({
         }}
       >
         <SelectTrigger id={id} className="w-full">
-          <SelectValue placeholder={placeholder} />
+          <SelectDisplay value={value} items={items} placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
           {items.map(([itemValue, itemLabel]) => (
@@ -326,6 +334,24 @@ function SelectWithLabel({
         </SelectContent>
       </Select>
     </div>
+  );
+}
+
+function SelectDisplay({
+  value,
+  items,
+  placeholder,
+}: {
+  value: string;
+  items: readonly (readonly [string, string])[];
+  placeholder: string;
+}) {
+  const label = items.find(([itemValue]) => itemValue === value)?.[1];
+
+  return (
+    <span className={label ? "truncate" : "truncate text-muted-foreground"}>
+      {label ?? placeholder}
+    </span>
   );
 }
 

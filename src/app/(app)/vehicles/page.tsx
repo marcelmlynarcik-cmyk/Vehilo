@@ -159,16 +159,13 @@ function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) 
             <MiniStat icon={FileText} label="Dokumenty" value={String(documentCount)} tone="purple" />
           </div>
 
-          <div className="grid grid-cols-3 rounded-[20px] border border-border bg-[rgba(8,17,23,0.72)] p-1">
+          <div className="grid grid-cols-2 rounded-[20px] border border-border bg-[rgba(8,17,23,0.72)] p-1">
             <Button asChild size="sm" className="h-11 rounded-[16px]">
               <Link href={`/vehicles/${vehicle.id}`}>Detail</Link>
             </Button>
             <Button asChild size="sm" variant="ghost" className="h-11 rounded-[16px]">
               <Link href={`/vehicles/${vehicle.id}/edit`}>Upravit</Link>
             </Button>
-            <div className="flex h-11 items-center justify-center rounded-[16px] px-2 text-sm font-semibold text-muted-foreground">
-              {expenseCount} výdajů
-            </div>
           </div>
         </div>
       </CardContent>
