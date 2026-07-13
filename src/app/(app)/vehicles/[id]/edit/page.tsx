@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { archiveVehicle, updateVehicle } from "@/app/(app)/vehicles/actions";
 import { VehicleForm } from "@/components/forms/vehicle-form";
 import { PageHeader } from "@/components/shared/page-header";
-import { loadGarageData } from "@/lib/data/garage";
+import { loadVehicleFormContext } from "@/lib/data/vehicles";
 
 export default async function EditVehiclePage({
   params,
@@ -10,8 +10,7 @@ export default async function EditVehiclePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data } = await loadGarageData();
-  const vehicle = data.vehicles.find((item) => item.id === id);
+  const { profile, vehicle } = await loadVehicleFormContext(id);
 
   if (!vehicle) {
     notFound();
@@ -27,7 +26,7 @@ export default async function EditVehiclePage({
         action={updateVehicle}
         archiveAction={archiveVehicle}
         vehicle={vehicle}
-        defaultCurrency={data.profile?.currency ?? "CZK"}
+        defaultCurrency={profile?.currency ?? "CZK"}
         mode="edit"
       />
     </div>

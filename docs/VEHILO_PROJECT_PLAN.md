@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-12
+Last updated: 2026-07-13
 
 ## Project Summary
 
@@ -45,12 +45,14 @@ Current phase:
 - [x] Implement app shell baseline.
 - [ ] Implement first real data vertical slice.
 - [x] Add installable PWA shell, manifest, service worker, offline page and mobile icons.
+- [x] Imported the Golf vehicle data for the first real application record.
+- [x] Locked the current app visual direction; do not revisit general styling except for future light mode support.
 
 Next session priority:
 
 - Finish real authenticated CRUD for vehicles using the imported Golf record as the first application slice.
-- Refine the imported Golf vehicle metadata after user answers follow-up questions.
-- Keep the approved refreshed landing page design as the visual direction for the rest of the app.
+- Use the already imported Golf data as the baseline for real app screens.
+- Continue product work without reworking the established app visual design.
 
 GitHub status:
 
@@ -273,6 +275,11 @@ Examples:
 
 ## UX And Design Direction
 
+Status:
+
+- Current dark app visual direction is approved and should be treated as locked.
+- Future visual work should be limited to feature-specific UI needs and later light mode support.
+
 Target feeling:
 
 - Modern SaaS dashboard
@@ -293,7 +300,7 @@ Visual direction:
 Theme support:
 
 - [ ] Light mode
-- [ ] Dark mode
+- [x] Dark mode
 - [ ] System theme
 
 PWA support:

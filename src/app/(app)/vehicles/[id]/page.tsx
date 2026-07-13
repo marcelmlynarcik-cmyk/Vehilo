@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MetricCard } from "@/components/shared/metric-card";
 import { calculateDepreciation, calculateVehicleCost, drivenMileage, formatCurrency, formatNumber } from "@/lib/calculations/costs";
-import { loadGarageData } from "@/lib/data/garage";
+import { loadVehicleDetailData } from "@/lib/data/vehicles";
 import type { EnergyEntry, Expense, ServiceEntry, VehicleDocument } from "@/types/domain";
 
 export default async function VehicleDetailPage({
@@ -17,13 +17,13 @@ export default async function VehicleDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const { data } = await loadGarageData();
-  const vehicle = data.vehicles.find((item) => item.id === id);
+  const detail = await loadVehicleDetailData(id);
 
-  if (!vehicle) {
+  if (!detail) {
     notFound();
   }
 
+  const { data, vehicle } = detail;
   const totalCost = calculateVehicleCost(data, vehicle.id);
   const expenses = data.expenses.filter((entry) => entry.vehicle_id === vehicle.id);
   const energyEntries = data.energyEntries.filter((entry) => entry.vehicle_id === vehicle.id);

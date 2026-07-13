@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { randomUUID } from "crypto";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import type { PowertrainType, VehicleStatus } from "@/types/domain";
@@ -23,11 +24,31 @@ const transmissions = new Set(["manual", "automatic"]);
 export async function createVehicle(formData: FormData) {
   const { supabase, userId } = await requireAuthenticatedUser();
   const payload = buildVehiclePayload(formData, userId);
+  const photoFile = optionalImageFile(formData, "photo_file");
 
   const { data, error } = await supabase.from("vehicles").insert(payload).select("id").single();
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  if (photoFile) {
+    const photoPath = await uploadVehiclePhoto({
+      file: photoFile,
+      supabase,
+      userId,
+      vehicleId: data.id,
+    });
+
+    const { error: photoUpdateError } = await supabase
+      .from("vehicles")
+      .update({ photo_url: photoPath })
+      .eq("id", data.id)
+      .eq("user_id", userId);
+
+    if (photoUpdateError) {
+      throw new Error(photoUpdateError.message);
+    }
   }
 
   revalidateVehicleRoutes(data.id);
@@ -38,6 +59,7 @@ export async function updateVehicle(formData: FormData) {
   const { supabase, userId } = await requireAuthenticatedUser();
   const vehicleId = requiredText(formData, "id");
   const payload = buildVehiclePayload(formData, userId);
+  const photoFile = optionalImageFile(formData, "photo_file");
 
   const { error } = await supabase
     .from("vehicles")
@@ -47,6 +69,25 @@ export async function updateVehicle(formData: FormData) {
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  if (photoFile) {
+    const photoPath = await uploadVehiclePhoto({
+      file: photoFile,
+      supabase,
+      userId,
+      vehicleId,
+    });
+
+    const { error: photoUpdateError } = await supabase
+      .from("vehicles")
+      .update({ photo_url: photoPath })
+      .eq("id", vehicleId)
+      .eq("user_id", userId);
+
+    if (photoUpdateError) {
+      throw new Error(photoUpdateError.message);
+    }
   }
 
   revalidateVehicleRoutes(vehicleId);
@@ -128,8 +169,65 @@ function buildVehiclePayload(
     primary_driver: optionalText(formData, "primary_driver"),
     status,
     notes: optionalText(formData, "notes"),
-    photo_url: optionalText(formData, "photo_url"),
   };
+}
+
+function optionalImageFile(formData: FormData, key: string) {
+  const value = formData.get(key);
+
+  if (!(value instanceof File) || value.size === 0) {
+    return null;
+  }
+
+  if (!value.type.startsWith("image/")) {
+    throw new Error("Fotografie musí být obrázek.");
+  }
+
+  if (value.size > 8 * 1024 * 1024) {
+    throw new Error("Fotografie může mít maximálně 8 MB.");
+  }
+
+  return value;
+}
+
+async function uploadVehiclePhoto({
+  file,
+  supabase,
+  userId,
+  vehicleId,
+}: {
+  file: File;
+  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>;
+  userId: string;
+  vehicleId: string;
+}) {
+  const extension = extensionFromFile(file);
+  const path = `${userId}/vehicles/${vehicleId}/${randomUUID()}.${extension}`;
+  const { error } = await supabase.storage
+    .from("vehicle-photos")
+    .upload(path, file, {
+      cacheControl: "31536000",
+      contentType: file.type,
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return path;
+}
+
+function extensionFromFile(file: File) {
+  const subtype = file.type.split("/")[1]?.toLowerCase();
+  const extension = subtype?.replace(/[^a-z0-9]/g, "");
+
+  if (extension) {
+    return extension === "jpeg" ? "jpg" : extension;
+  }
+
+  const fallback = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "");
+  return fallback || "jpg";
 }
 
 function requiredText(formData: FormData, key: string) {

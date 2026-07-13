@@ -79,12 +79,12 @@ export async function loadGarageData(): Promise<GarageLoadResult> {
     documentsResult,
   ] = await Promise.all([
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle(),
-    supabase.from("vehicles").select("*").order("created_at", { ascending: false }),
-    supabase.from("expenses").select("*").order("date", { ascending: false }),
-    supabase.from("energy_entries").select("*").order("date", { ascending: false }),
-    supabase.from("service_entries").select("*").order("date", { ascending: false }),
-    supabase.from("reminders").select("*").order("created_at", { ascending: false }),
-    supabase.from("documents").select("*").order("created_at", { ascending: false }),
+    supabase.from("vehicles").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    supabase.from("expenses").select("*").eq("user_id", user.id).order("date", { ascending: false }),
+    supabase.from("energy_entries").select("*").eq("user_id", user.id).order("date", { ascending: false }),
+    supabase.from("service_entries").select("*").eq("user_id", user.id).order("date", { ascending: false }),
+    supabase.from("reminders").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    supabase.from("documents").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
   ]);
 
   const error =

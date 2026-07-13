@@ -63,7 +63,7 @@ export function VehicleForm({
       : "Vehilo použije správné jednotky paliva, energie a spotřeby podle typu pohonu.";
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} encType="multipart/form-data" className="space-y-5">
       {vehicle ? <input type="hidden" name="id" value={vehicle.id} /> : null}
       <FormSection title="Základní údaje">
         <div className="grid gap-4 md:grid-cols-2">
@@ -210,7 +210,6 @@ export function VehicleForm({
           <InputWithLabel label="Aktuální odhadovaná hodnota" name="current_value" type="number" step="0.01" defaultValue={vehicle?.current_value} />
           <InputWithLabel label="Pojišťovna" name="insurance_provider" defaultValue={vehicle?.insurance_provider} />
           <InputWithLabel label="Hlavní řidič" name="primary_driver" defaultValue={vehicle?.primary_driver} />
-          <InputWithLabel label="URL fotografie" name="photo_url" defaultValue={vehicle?.photo_url} />
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="notes">Poznámky</Label>
             <Textarea id="notes" name="notes" defaultValue={vehicle?.notes ?? ""} />
@@ -223,8 +222,9 @@ export function VehicleForm({
           <Upload className="mb-3 size-7 text-[var(--accent)]" aria-hidden="true" />
           <div className="font-semibold text-white">Nahrání fotografie vozidla</div>
           <div className="text-sm text-muted-foreground">
-            Upload do Supabase Storage navážeme v dalším kroku. Teď lze uložit externí URL fotografie.
+            Vyberte fotku z telefonu nebo počítače. Uloží se do privátního Supabase Storage.
           </div>
+          <Input id="vehicle_photo_file" name="photo_file" type="file" accept="image/*" className="mt-4 max-w-md" />
         </div>
       </FormSection>
 

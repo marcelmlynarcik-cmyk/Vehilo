@@ -18,12 +18,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
-import { loadGarageData } from "@/lib/data/garage";
+import { loadVehicleListData } from "@/lib/data/vehicles";
 import { calculateVehicleCost, formatCurrency, formatNumber } from "@/lib/calculations/costs";
 import type { GarageData, Vehicle } from "@/types/domain";
 
 export default async function VehiclesPage() {
-  const { data } = await loadGarageData();
+  const data = await loadVehicleListData();
   const activeVehicles = data.vehicles.filter((vehicle) => vehicle.status !== "archived");
   const archivedVehicles = data.vehicles.length - activeVehicles.length;
   const totalMileage = data.vehicles.reduce((total, vehicle) => total + vehicle.current_mileage, 0);
@@ -110,7 +110,6 @@ function VehiclesHero({
 function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) {
   const energyCount = data.energyEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
   const serviceCount = data.serviceEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
-  const expenseCount = data.expenses.filter((expense) => expense.vehicle_id === vehicle.id).length;
   const documentCount = data.documents.filter((document) => document.vehicle_id === vehicle.id).length;
   const subtitle = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.engine].filter(Boolean).join(" ");
 
