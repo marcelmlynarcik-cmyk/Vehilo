@@ -1,9 +1,9 @@
 import { Pencil, Plus, ReceiptText, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartCard } from "@/components/charts/basic-charts";
 import { ExpenseForm } from "@/components/forms/expense-form";
@@ -25,13 +25,20 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
   const currency = data.profile?.currency ?? "CZK";
   const defaultDate = formatDateInput(new Date());
   const openExpenseDialog = query.add === "expense";
-  const total = sumExpenses(data.expenses);
-  const currentMonthTotal = sumCurrentMonthExpenses(data.expenses);
-  const largestExpense = data.expenses.reduce<Expense | null>(
+  const filters = parseExpenseFilters(query);
+  const filteredExpenses = filterExpenses(data.expenses, filters);
+  const total = sumExpenses(filteredExpenses);
+  const currentMonthTotal = sumCurrentMonthExpenses(filteredExpenses);
+  const largestExpense = filteredExpenses.reduce<Expense | null>(
     (largest, expense) => (largest == null || Number(expense.amount) > Number(largest.amount) ? expense : largest),
     null,
   );
-  const costPerKm = calculateExpenseCostPerKm(data.expenses, data.vehicles);
+  const costPerKm = calculateExpenseCostPerKm(filteredExpenses, data.vehicles);
+  const expenseCategories = uniqueSorted(data.expenses.map((expense) => expense.category));
+  const expenseYears = uniqueSorted(data.expenses.map((expense) => expense.date.slice(0, 4))).reverse();
+  const monthlyExpenses = buildMonthlyExpenseSeries(filteredExpenses);
+  const categoryExpenses = buildCategoryExpenseSeries(filteredExpenses);
+  const cumulativeExpenses = buildCumulativeExpenseSeries(filteredExpenses);
 
   return (
     <div className="space-y-6">
@@ -50,16 +57,26 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         <CardHeader>
           <CardTitle>Filtry</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-5">
-          <Input placeholder="Hledat" />
-          <Select><SelectTrigger><SelectValue placeholder="Vozidlo" /></SelectTrigger><SelectContent><SelectItem value="all">Všechna vozidla</SelectItem></SelectContent></Select>
-          <Select><SelectTrigger><SelectValue placeholder="Kategorie" /></SelectTrigger><SelectContent><SelectItem value="all">Všechny kategorie</SelectItem></SelectContent></Select>
-          <Input type="month" />
-          <Input placeholder="Rok" />
+        <CardContent>
+          <form action="/expenses" className="grid gap-3 md:grid-cols-6">
+            <Input name="q" placeholder="Hledat" defaultValue={filters.q} />
+            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
+            <FilterSelect name="category" label="Kategorie" value={filters.category} options={expenseCategories.map((category): [string, string] => [category, category])} />
+            <Input name="month" type="month" defaultValue={filters.month} />
+            <FilterSelect name="year" label="Rok" value={filters.year} options={expenseYears.map((year): [string, string] => [year, year])} />
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1">Filtrovat</Button>
+              <Button asChild variant="outline" className="flex-1">
+                <Link href="/expenses">Reset</Link>
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
       {data.expenses.length === 0 ? (
         <EmptyState icon={ReceiptText} title="Zatím žádné výdaje" description="Po připojení Supabase a vytvoření prvního vozidla zde budete ukládat skutečné náklady." actionLabel="Přidat výdaj" />
+      ) : filteredExpenses.length === 0 ? (
+        <EmptyState icon={ReceiptText} title="Žádné výdaje pro tento filtr" description="Změňte filtr nebo resetujte výběr." />
       ) : (
         <Card id="records">
           <CardHeader>
@@ -67,7 +84,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
           </CardHeader>
           <CardContent className="space-y-3 p-4 md:p-0">
             <div className="grid gap-3 md:hidden">
-              {data.expenses.map((expense) => (
+              {filteredExpenses.map((expense) => (
                 <ExpenseMobileCard key={expense.id} expense={expense} vehicles={data.vehicles} currency={currency} />
               ))}
             </div>
@@ -85,7 +102,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.expenses.map((expense) => (
+                  {filteredExpenses.map((expense) => (
                     <TableRow key={expense.id}>
                       <TableCell>{formatDisplayDate(expense.date)}</TableCell>
                       <TableCell>{data.vehicles.find((vehicle) => vehicle.id === expense.vehicle_id)?.name ?? "Vozidlo"}</TableCell>
@@ -106,11 +123,39 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         </Card>
       )}
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Výdaje po měsících" type="bar" />
-        <ChartCard title="Výdaje podle kategorií" type="pie" />
-        <ChartCard title="Kumulativní náklady" type="area" />
+        <ChartCard title="Výdaje po měsících" type="bar" data={monthlyExpenses} />
+        <ChartCard title="Výdaje podle kategorií" type="pie" data={categoryExpenses} />
+        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeExpenses} />
       </div>
     </div>
+  );
+}
+
+function FilterSelect({
+  name,
+  label,
+  value,
+  options,
+}: {
+  name: string;
+  label: string;
+  value: string;
+  options: Array<[string, string]>;
+}) {
+  return (
+    <select
+      name={name}
+      defaultValue={value}
+      aria-label={label}
+      className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+    >
+      <option value="all">Všechny</option>
+      {options.map(([optionValue, optionLabel]) => (
+        <option key={optionValue} value={optionValue}>
+          {optionLabel}
+        </option>
+      ))}
+    </select>
   );
 }
 
@@ -254,4 +299,89 @@ function calculateExpenseCostPerKm(expenses: Expense[], vehicles: Vehicle[]) {
   }
 
   return sumExpenses(expenses) / totalDistance;
+}
+
+function parseExpenseFilters(query: Awaited<ExpensesPageProps["searchParams"]>) {
+  return {
+    q: getQueryValue(query.q),
+    vehicle: getQueryValue(query.vehicle, "all"),
+    category: getQueryValue(query.category, "all"),
+    month: getQueryValue(query.month),
+    year: getQueryValue(query.year, "all"),
+  };
+}
+
+function filterExpenses(expenses: Expense[], filters: ReturnType<typeof parseExpenseFilters>) {
+  const q = filters.q.toLowerCase();
+
+  return expenses.filter((expense) => {
+    if (filters.vehicle !== "all" && expense.vehicle_id !== filters.vehicle) {
+      return false;
+    }
+
+    if (filters.category !== "all" && expense.category !== filters.category) {
+      return false;
+    }
+
+    if (filters.month && !expense.date.startsWith(filters.month)) {
+      return false;
+    }
+
+    if (filters.year !== "all" && !expense.date.startsWith(filters.year)) {
+      return false;
+    }
+
+    if (!q) {
+      return true;
+    }
+
+    return [expense.category, expense.description, expense.notes ?? ""].some((value) => value.toLowerCase().includes(q));
+  });
+}
+
+function buildMonthlyExpenseSeries(expenses: Expense[]) {
+  return buildGroupedSeries(expenses, (expense) => expense.date.slice(0, 7), (expense) => Number(expense.amount));
+}
+
+function buildCategoryExpenseSeries(expenses: Expense[]) {
+  return buildGroupedSeries(expenses, (expense) => expense.category, (expense) => Number(expense.amount));
+}
+
+function buildCumulativeExpenseSeries(expenses: Expense[]) {
+  let runningTotal = 0;
+
+  return [...expenses]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map((expense) => {
+      runningTotal += Number(expense.amount);
+      return {
+        name: formatDisplayDate(expense.date),
+        value: Math.round(runningTotal * 100) / 100,
+      };
+    });
+}
+
+function buildGroupedSeries<T>(items: T[], getName: (item: T) => string, getValue: (item: T) => number) {
+  const grouped = new Map<string, number>();
+
+  for (const item of items) {
+    const name = getName(item);
+    grouped.set(name, (grouped.get(name) ?? 0) + getValue(item));
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+}
+
+function uniqueSorted(values: string[]) {
+  return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "cs-CZ"));
+}
+
+function getQueryValue(value: string | string[] | undefined, fallback = "") {
+  if (Array.isArray(value)) {
+    return value[0] ?? fallback;
+  }
+
+  return value ?? fallback;
 }

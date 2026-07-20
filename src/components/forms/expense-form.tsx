@@ -100,20 +100,6 @@ export function ExpenseForm({ action, vehicles, defaultDate, expense }: ExpenseF
         />
       </div>
 
-      <div className="grid min-w-0 gap-4 md:grid-cols-2">
-        <SelectWithLabel
-          label="Platba"
-          name="payment_method"
-          value={expense?.payment_method ?? ""}
-          items={[
-            ["Hotově", "Hotově"],
-            ["Kartou", "Kartou"],
-            ["Převodem", "Převodem"],
-          ]}
-          optional
-        />
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="expense_notes">Poznámky</Label>
         <Textarea id="expense_notes" name="notes" defaultValue={expense?.notes ?? ""} placeholder="Detail účelu, číslo dokladu nebo kontext." />

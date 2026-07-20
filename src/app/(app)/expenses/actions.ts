@@ -127,7 +127,7 @@ function buildExpensePayload(
     amount: positiveNumber(formData, "amount"),
     currency: optionalText(formData, "currency") ?? "CZK",
     mileage: optionalInteger(formData, "mileage"),
-    payment_method: optionalText(formData, "payment_method"),
+    payment_method: null,
     notes: optionalText(formData, "notes"),
   };
 }

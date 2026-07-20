@@ -56,9 +56,23 @@ Current phase:
 
 Next session priority:
 
-- Verify energy entry create/edit/delete on mobile against Supabase.
-- Continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
+- Finish Service filters and real service charts, mirroring the completed Expenses page behavior.
+- Verify Service chart aggregates against real Supabase data before considering them done.
+- Then continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
 - Continue product work without reworking the established app visual design.
+
+Latest progress:
+
+- [x] Fuel & Energy create/edit/delete is available from the page and quick add.
+- [x] Expense create/edit/delete is available from the page and quick add.
+- [x] Service create/edit/delete is available from the page and quick add.
+- [x] Expense and Service forms support a custom category/type directly while filling the form.
+- [x] Service type options are powertrain-aware, so EVs do not show combustion-only items like turbo or timing belt.
+- [x] STK is treated as an expense/document concept, not as a service type.
+- [x] Payment method was removed from the Expense form as unnecessary.
+- [x] Form fields were made visually clearer with stronger borders and contrast.
+- [x] Expense filters and Expense charts are wired to real data and verified against Supabase.
+- [ ] Service filters and Service charts still need to be completed and verified.
 
 GitHub status:
 
