@@ -12,7 +12,15 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatCurrency, sumEnergyCost } from "@/lib/calculations/costs";
-import { calculateCostPer100Km, calculateConsumptionSummaries, type ConsumptionSummary } from "@/lib/calculations/energy";
+import {
+  buildConsumptionTrendSeries,
+  buildMonthlyCostPer100KmSeries,
+  buildMonthlyEnergyCostSeries,
+  buildMonthlyUnitPriceSeries,
+  calculateCostPer100Km,
+  calculateConsumptionSummaries,
+  type ConsumptionSummary,
+} from "@/lib/calculations/energy";
 import { loadGarageData } from "@/lib/data/garage";
 import type { EnergyEntry, Vehicle } from "@/types/domain";
 import { createEnergyEntry, deleteEnergyEntry, updateEnergyEntry } from "./actions";
@@ -28,6 +36,10 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const defaultDate = formatDateInput(new Date());
   const openEnergyDialog = query.add === "energy";
   const consumptionSummaries = calculateConsumptionSummaries(data.energyEntries);
+  const consumptionTrend = buildConsumptionTrendSeries(data.energyEntries);
+  const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(data.energyEntries);
+  const monthlyUnitPrices = buildMonthlyUnitPriceSeries(data.energyEntries);
+  const monthlyCosts = buildMonthlyEnergyCostSeries(data.energyEntries);
 
   return (
     <div className="space-y-6">
@@ -64,9 +76,25 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <EnergyEntriesTable entries={data.energyEntries} vehicles={data.vehicles} currency={currency} />
       )}
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Trend spotřeby" type="line" />
-        <ChartCard title="Trend ceny paliva / energie" type="line" />
-        <ChartCard title="Měsíční náklady" type="bar" />
+        <ChartCard
+          title="Spotřeba mezi plnými záznamy"
+          type="line"
+          data={consumptionTrend}
+          emptyLabel="Čeká na další plnou nádrž"
+        />
+        <ChartCard
+          title="Cena na 100 km"
+          type="line"
+          data={monthlyCostPer100Km}
+          emptyLabel="Čeká na měsíce s více záznamy"
+        />
+        <ChartCard title="Měsíční náklady" type="bar" data={monthlyCosts} />
+        <ChartCard
+          title="Cena za litr / kWh"
+          type="line"
+          data={monthlyUnitPrices}
+          emptyLabel="Čeká na záznamy s množstvím"
+        />
       </div>
       <Card>
         <CardHeader><CardTitle>Formulář podle pohonu</CardTitle></CardHeader>

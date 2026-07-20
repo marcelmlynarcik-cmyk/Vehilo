@@ -28,6 +28,12 @@ We will not build Vehilo around mock data.
 
 Instead, we will build the product with real data persistence from the beginning using Supabase. Temporary seed data may be used only for development/testing, but the application architecture, forms, queries, validation, auth, policies and UI states must be designed for real user-owned data from day one.
 
+Analytics verification rule:
+
+- Every calculation, chart, metric card and statistics view must be verified against the user's real Supabase data before being considered complete.
+- Verification should include concrete source rows or aggregate SQL results from the live project, especially for imported Golf data and newly entered records.
+- Mock or empty-state testing is not enough for analytics work; it can supplement but not replace real-data validation.
+
 ## Collaboration Status
 
 Current phase:
@@ -1308,4 +1314,5 @@ For the first launchable prototype:
 - Added ownership-checked server action validation before inserting energy records and updating the vehicle current mileage when the new record has a higher odometer value.
 - Added a recent fuel/energy log table to the Fuel & Energy screen.
 - Added edit/delete actions for energy records and improved consumption summaries so they are grouped by vehicle, entry type and unit between full records.
+- Added permanent analytics verification rule: every calculation, chart, metric card and statistics view must be checked against real Supabase data before completion.
 - Remaining Phase 6 work: refined electric/PHEV/LPG/CNG statistics and real charts.
