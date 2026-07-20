@@ -101,6 +101,31 @@ export function calculateAverageMonthlyCost(data: GarageData) {
   return total / months;
 }
 
+export function calculateCurrentMonthCost(data: GarageData, date = new Date()) {
+  const month = formatMonthKey(date);
+  const expenses = data.expenses
+    .filter((expense) => expense.date.slice(0, 7) === month)
+    .reduce((total, expense) => total + Number(expense.amount), 0);
+  const energy = data.energyEntries
+    .filter((entry) => entry.date.slice(0, 7) === month)
+    .reduce((total, entry) => total + Number(entry.total_price), 0);
+  const services = data.serviceEntries
+    .filter((entry) => entry.date.slice(0, 7) === month)
+    .reduce((total, entry) => total + Number(entry.total_cost), 0);
+
+  return expenses + energy + services;
+}
+
+function formatMonthKey(date: Date) {
+  const formatter = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Prague",
+    year: "numeric",
+    month: "2-digit",
+  });
+
+  return formatter.format(date);
+}
+
 export function countReminderStatus(reminders: Reminder[], status: Reminder["status"]) {
   return reminders.filter((reminder) => reminder.status === status).length;
 }

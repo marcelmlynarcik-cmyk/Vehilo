@@ -19,6 +19,7 @@ import { loadGarageData } from "@/lib/data/garage";
 import {
   calculateAverageMonthlyCost,
   calculateCostPerKm,
+  calculateCurrentMonthCost,
   calculateTotalOwnershipCost,
   countReminderStatus,
   formatCurrency,
@@ -30,7 +31,8 @@ export default async function DashboardPage() {
   const { data } = await loadGarageData();
   const currency = data.profile?.currency ?? "CZK";
   const totalCost = calculateTotalOwnershipCost(data);
-  const monthlyCost = calculateAverageMonthlyCost(data);
+  const averageMonthlyCost = calculateAverageMonthlyCost(data);
+  const currentMonthCost = calculateCurrentMonthCost(data);
   const costPerKm = calculateCostPerKm(data);
   const garageMileage = totalMileage(data.vehicles);
 
@@ -39,14 +41,15 @@ export default async function DashboardPage() {
       <DashboardHero
         vehicleCount={data.vehicles.length}
         totalCost={formatCurrency(totalCost, currency)}
-        monthlyCost={formatCurrency(monthlyCost, currency)}
+        monthlyCost={formatCurrency(currentMonthCost, currency)}
         mileage={`${formatNumber(garageMileage)} km`}
         vehicles={data.vehicles.map((vehicle) => ({ id: vehicle.id, name: vehicle.name }))}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Vozidla celkem" value={String(data.vehicles.length)} description="Aktivní záznamy v garáži" icon={Car} />
-        <MetricCard title="Měsíční náklady" value={formatCurrency(monthlyCost, currency)} description="Průměr ze skutečných záznamů" icon={ReceiptText} />
+        <MetricCard title="Měsíční náklady" value={formatCurrency(currentMonthCost, currency)} description="Aktuální kalendářní měsíc" icon={ReceiptText} />
+        <MetricCard title="Měsíční průměr" value={formatCurrency(averageMonthlyCost, currency)} description="Od prvního záznamu" icon={ReceiptText} />
         <MetricCard title="Celkové vlastnické náklady" value={formatCurrency(totalCost, currency)} description="Výdaje, palivo, servis a ztráta hodnoty" icon={Gauge} />
         <MetricCard title="Cena za kilometr" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Napříč všemi vozidly od koupě" icon={Fuel} />
         <MetricCard title="Nadcházející připomínky" value={String(countReminderStatus(data.reminders, "upcoming"))} description="Plánovaný servis a dokumenty" icon={Bell} />
@@ -66,7 +69,7 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {[
-          "Průměrné měsíční náklady se dopočítají ze skutečných výdajů.",
+          "Měsíční náklady ukazují skutečné výdaje v aktuálním kalendářním měsíci.",
           "Podíl paliva a energie se bude počítat ze záznamů v Supabase.",
           "Nejbližší urgentní připomínka se zobrazí po vytvoření připomínek.",
         ].map((insight) => (
