@@ -68,13 +68,6 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(data.energyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
         <MetricCard title="Záznamy" value={String(data.energyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
-      {data.energyEntries.length === 0 ? (
-        <div id="records">
-          <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
-        </div>
-      ) : (
-        <EnergyEntriesTable entries={data.energyEntries} vehicles={data.vehicles} currency={currency} />
-      )}
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard
           title="Spotřeba mezi plnými záznamy"
@@ -96,6 +89,13 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
           emptyLabel="Čeká na záznamy s množstvím"
         />
       </div>
+      {data.energyEntries.length === 0 ? (
+        <div id="records">
+          <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
+        </div>
+      ) : (
+        <EnergyEntriesTable entries={data.energyEntries} vehicles={data.vehicles} currency={currency} />
+      )}
       <Card>
         <CardHeader><CardTitle>Formulář podle pohonu</CardTitle></CardHeader>
         <CardContent className="grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
@@ -147,6 +147,8 @@ function EnergyEntriesTable({
   currency: string;
 }) {
   const vehicleNames = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle.name]));
+  const visibleEntries = entries.slice(0, 10);
+  const hiddenEntries = entries.slice(10);
 
   return (
     <Card id="records">
@@ -167,7 +169,7 @@ function EnergyEntriesTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {entries.slice(0, 12).map((entry) => (
+            {visibleEntries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell>{formatDisplayDate(entry.date)}</TableCell>
                 <TableCell>{vehicleNames.get(entry.vehicle_id) ?? "Vozidlo"}</TableCell>
@@ -187,6 +189,46 @@ function EnergyEntriesTable({
             ))}
           </TableBody>
         </Table>
+        {hiddenEntries.length > 0 ? (
+          <details className="group border-t border-border">
+            <summary className="cursor-pointer list-none px-4 py-4 text-sm font-semibold text-[var(--accent)]">
+              Zobrazit dalších {hiddenEntries.length} záznamů
+            </summary>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Datum</TableHead>
+                  <TableHead>Vozidlo</TableHead>
+                  <TableHead>Typ</TableHead>
+                  <TableHead className="text-right">Množství</TableHead>
+                  <TableHead className="text-right">Cena</TableHead>
+                  <TableHead className="text-right">Nájezd</TableHead>
+                  <TableHead className="text-right">Akce</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {hiddenEntries.map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell>{formatDisplayDate(entry.date)}</TableCell>
+                    <TableCell>{vehicleNames.get(entry.vehicle_id) ?? "Vozidlo"}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{formatEntryType(entry)}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatNumber(entry.quantity)} {formatUnit(entry.quantity_unit)}
+                    </TableCell>
+                    <TableCell className="text-right">{formatCurrency(entry.total_price, currency)}</TableCell>
+                    <TableCell className="text-right">{formatNumber(entry.mileage)} km</TableCell>
+                    <TableCell className="flex justify-end gap-2">
+                      <EditEnergyEntryDialog entry={entry} vehicles={vehicles} />
+                      <DeleteEnergyEntryDialog entry={entry} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </details>
+        ) : null}
       </CardContent>
     </Card>
   );

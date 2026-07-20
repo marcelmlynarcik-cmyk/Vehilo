@@ -32,6 +32,8 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
   const thisYearTotal = data.serviceEntries.reduce((total, entry) => {
     return entry.date.startsWith(String(new Date().getFullYear())) ? total + Number(entry.total_cost) : total;
   }, 0);
+  const visibleServiceEntries = data.serviceEntries.slice(0, 10);
+  const hiddenServiceEntries = data.serviceEntries.slice(10);
 
   return (
     <div className="space-y-6">
@@ -47,6 +49,10 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
         <MetricCard title="Další servis" value="-" description="Dle připomínek" icon={Wrench} />
         <MetricCard title="Nejdražší servis" value={formatCurrency(largestService?.total_cost ?? 0, currency)} description={largestService?.description ?? "Zatím bez dat"} icon={Wrench} />
       </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <ChartCard title="Servisní náklady podle roku" type="bar" />
+        <ChartCard title="Servisní náklady podle typu" type="pie" />
+      </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         {data.serviceEntries.length === 0 ? (
           <EmptyState icon={Wrench} title="Servisní historie je prázdná" description="Po připojení Supabase zde vznikne časová osa oprav, údržby a EV kontrol." actionLabel="Přidat servis" />
@@ -56,9 +62,21 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
               <CardTitle>Servisní záznamy</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 p-4">
-              {data.serviceEntries.map((entry) => (
+              {visibleServiceEntries.map((entry) => (
                 <ServiceRow key={entry.id} entry={entry} vehicles={data.vehicles} currency={currency} />
               ))}
+              {hiddenServiceEntries.length > 0 ? (
+                <details className="group border-t border-border pt-3">
+                  <summary className="cursor-pointer list-none py-2 text-sm font-semibold text-[var(--accent)]">
+                    Zobrazit dalších {hiddenServiceEntries.length} záznamů
+                  </summary>
+                  <div className="mt-3 grid gap-3">
+                    {hiddenServiceEntries.map((entry) => (
+                      <ServiceRow key={entry.id} entry={entry} vehicles={data.vehicles} currency={currency} />
+                    ))}
+                  </div>
+                </details>
+              ) : null}
             </CardContent>
           </Card>
         )}
@@ -70,10 +88,6 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
             ))}
           </CardContent>
         </Card>
-      </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="Servisní náklady podle roku" type="bar" />
-        <ChartCard title="Servisní náklady podle typu" type="pie" />
       </div>
     </div>
   );

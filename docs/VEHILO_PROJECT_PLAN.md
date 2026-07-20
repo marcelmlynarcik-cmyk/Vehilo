@@ -72,6 +72,10 @@ Latest progress:
 - [x] Payment method was removed from the Expense form as unnecessary.
 - [x] Form fields were made visually clearer with stronger borders and contrast.
 - [x] Expense filters and Expense charts are wired to real data and verified against Supabase.
+- [x] On mobile, filters and charts should appear before long record lists so they are not buried below history.
+- [x] Long record lists now show the latest 10 records first, with older records available through native expansion.
+- [x] Mobile bottom navigation was tightened so the bar is anchored to the bottom instead of visually floating with safe-area padding.
+- [x] Mobile navigation now includes a hamburger Menu sheet with access to all sections, including Expenses, Fuel & Energy and Service.
 - [ ] Service filters and Service charts still need to be completed and verified.
 
 GitHub status:

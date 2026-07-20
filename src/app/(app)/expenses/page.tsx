@@ -39,6 +39,8 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
   const monthlyExpenses = buildMonthlyExpenseSeries(filteredExpenses);
   const categoryExpenses = buildCategoryExpenseSeries(filteredExpenses);
   const cumulativeExpenses = buildCumulativeExpenseSeries(filteredExpenses);
+  const visibleExpenses = filteredExpenses.slice(0, 10);
+  const hiddenExpenses = filteredExpenses.slice(10);
 
   return (
     <div className="space-y-6">
@@ -47,12 +49,6 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         description="Sledujte servis, pojištění, dálniční známky, opravy, parkování, mýto a další náklady."
         actions={<ExpenseDialog vehicles={data.vehicles} defaultDate={defaultDate} defaultOpen={openExpenseDialog} />}
       />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Výdaje celkem" value={formatCurrency(total, currency)} description="Ze skutečných záznamů" icon={ReceiptText} />
-        <MetricCard title="Tento měsíc" value={formatCurrency(currentMonthTotal, currency)} description="Podle data výdaje" icon={ReceiptText} />
-        <MetricCard title="Největší výdaj" value={formatCurrency(largestExpense?.amount ?? 0, currency)} description={largestExpense?.description ?? "Zatím bez dat"} icon={ReceiptText} />
-        <MetricCard title="Náklad na km" value={`${formatCurrency(costPerKm, currency)}/km`} description="Od nákupu po aktuální nájezd" icon={ReceiptText} />
-      </div>
       <Card>
         <CardHeader>
           <CardTitle>Filtry</CardTitle>
@@ -73,6 +69,17 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
           </form>
         </CardContent>
       </Card>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ChartCard title="Výdaje po měsících" type="bar" data={monthlyExpenses} />
+        <ChartCard title="Výdaje podle kategorií" type="pie" data={categoryExpenses} />
+        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeExpenses} />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <MetricCard title="Výdaje celkem" value={formatCurrency(total, currency)} description="Ze skutečných záznamů" icon={ReceiptText} />
+        <MetricCard title="Tento měsíc" value={formatCurrency(currentMonthTotal, currency)} description="Podle data výdaje" icon={ReceiptText} />
+        <MetricCard title="Největší výdaj" value={formatCurrency(largestExpense?.amount ?? 0, currency)} description={largestExpense?.description ?? "Zatím bez dat"} icon={ReceiptText} />
+        <MetricCard title="Náklad na km" value={`${formatCurrency(costPerKm, currency)}/km`} description="Od nákupu po aktuální nájezd" icon={ReceiptText} />
+      </div>
       {data.expenses.length === 0 ? (
         <EmptyState icon={ReceiptText} title="Zatím žádné výdaje" description="Po připojení Supabase a vytvoření prvního vozidla zde budete ukládat skutečné náklady." actionLabel="Přidat výdaj" />
       ) : filteredExpenses.length === 0 ? (
@@ -84,7 +91,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
           </CardHeader>
           <CardContent className="space-y-3 p-4 md:p-0">
             <div className="grid gap-3 md:hidden">
-              {filteredExpenses.map((expense) => (
+              {visibleExpenses.map((expense) => (
                 <ExpenseMobileCard key={expense.id} expense={expense} vehicles={data.vehicles} currency={currency} />
               ))}
             </div>
@@ -102,7 +109,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredExpenses.map((expense) => (
+                  {visibleExpenses.map((expense) => (
                     <TableRow key={expense.id}>
                       <TableCell>{formatDisplayDate(expense.date)}</TableCell>
                       <TableCell>{data.vehicles.find((vehicle) => vehicle.id === expense.vehicle_id)?.name ?? "Vozidlo"}</TableCell>
@@ -119,14 +126,52 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
                 </TableBody>
               </Table>
             </div>
+            {hiddenExpenses.length > 0 ? (
+              <details className="group border-t border-border md:mx-0">
+                <summary className="cursor-pointer list-none px-1 py-4 text-sm font-semibold text-[var(--accent)] md:px-4">
+                  Zobrazit dalších {hiddenExpenses.length} záznamů
+                </summary>
+                <div className="grid gap-3 md:hidden">
+                  {hiddenExpenses.map((expense) => (
+                    <ExpenseMobileCard key={expense.id} expense={expense} vehicles={data.vehicles} currency={currency} />
+                  ))}
+                </div>
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Datum</TableHead>
+                        <TableHead>Vozidlo</TableHead>
+                        <TableHead>Kategorie</TableHead>
+                        <TableHead>Popis</TableHead>
+                        <TableHead className="text-right">Nájezd</TableHead>
+                        <TableHead className="text-right">Částka</TableHead>
+                        <TableHead className="text-right">Akce</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {hiddenExpenses.map((expense) => (
+                        <TableRow key={expense.id}>
+                          <TableCell>{formatDisplayDate(expense.date)}</TableCell>
+                          <TableCell>{data.vehicles.find((vehicle) => vehicle.id === expense.vehicle_id)?.name ?? "Vozidlo"}</TableCell>
+                          <TableCell>{expense.category}</TableCell>
+                          <TableCell>{expense.description}</TableCell>
+                          <TableCell className="text-right">{expense.mileage ? `${formatNumber(expense.mileage)} km` : "-"}</TableCell>
+                          <TableCell className="text-right">{formatCurrency(expense.amount, expense.currency)}</TableCell>
+                          <TableCell className="flex justify-end gap-2">
+                            <EditExpenseDialog expense={expense} vehicles={data.vehicles} />
+                            <DeleteExpenseDialog expense={expense} />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </details>
+            ) : null}
           </CardContent>
         </Card>
       )}
-      <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Výdaje po měsících" type="bar" data={monthlyExpenses} />
-        <ChartCard title="Výdaje podle kategorií" type="pie" data={categoryExpenses} />
-        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeExpenses} />
-      </div>
     </div>
   );
 }
