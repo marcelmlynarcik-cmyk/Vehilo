@@ -23,8 +23,8 @@ import {
 
 const actions = [
   { label: "Přidat tankování / nabíjení", icon: Fuel, href: "/fuel-energy?add=energy" },
-  { label: "Přidat výdaj", icon: ReceiptText },
-  { label: "Přidat servis", icon: Wrench },
+  { label: "Přidat výdaj", icon: ReceiptText, href: "/expenses?add=expense" },
+  { label: "Přidat servis", icon: Wrench, href: "/service?add=service" },
   { label: "Přidat připomínku", icon: Bell },
   { label: "Přidat vozidlo", icon: Car },
   { label: "Přidat dokument", icon: FileText },
@@ -51,7 +51,7 @@ export function QuickAdd() {
         <SheetHeader className="text-left">
           <SheetTitle>Přidat do Vehilo</SheetTitle>
           <SheetDescription>
-            Po připojení Supabase zde budete vytvářet skutečné záznamy.
+            Vyberte typ záznamu a Vehilo otevře správný formulář.
           </SheetDescription>
         </SheetHeader>
         <div className="grid gap-2 px-5 pb-5 sm:grid-cols-2">
