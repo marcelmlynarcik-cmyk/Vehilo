@@ -50,8 +50,8 @@ Current phase:
 
 Next session priority:
 
-- Verify adding a real fuel/energy entry from the Fuel & Energy screen against Supabase.
-- Continue Phase 6 with edit/delete for energy entries and more accurate consumption calculations.
+- Verify energy entry create/edit/delete on mobile against Supabase.
+- Continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
 - Continue product work without reworking the established app visual design.
 
 GitHub status:
@@ -1091,8 +1091,8 @@ Vehicles are the root entity for almost every other feature.
 
 ### Phase 6 - Fuel & Energy Core
 
-- [ ] Energy entries CRUD.
-- [ ] Powertrain-adaptive forms.
+- [x] Energy entries CRUD.
+- [x] Powertrain-adaptive forms.
 - [ ] Fuel calculations.
 - [ ] Electric calculations.
 - [ ] Plug-in hybrid calculations.
@@ -1307,4 +1307,5 @@ For the first launchable prototype:
 - Added a powertrain-aware fuel/charging form for first real entries, including today's date default, mileage, quantity, total/unit price, full tank/full charge and station/location fields.
 - Added ownership-checked server action validation before inserting energy records and updating the vehicle current mileage when the new record has a higher odometer value.
 - Added a recent fuel/energy log table to the Fuel & Energy screen.
-- Remaining Phase 6 work: edit/delete energy entries, refined full-tank consumption calculations, electric/PHEV/LPG/CNG calculations and real charts.
+- Added edit/delete actions for energy records and improved consumption summaries so they are grouped by vehicle, entry type and unit between full records.
+- Remaining Phase 6 work: refined electric/PHEV/LPG/CNG statistics and real charts.

@@ -110,6 +110,39 @@ export async function updateEnergyEntry(formData: FormData) {
   redirect("/fuel-energy#records");
 }
 
+export async function deleteEnergyEntry(formData: FormData) {
+  const { supabase, userId } = await requireAuthenticatedUser();
+  const entryId = requiredText(formData, "id");
+
+  const { data: currentEntry, error: currentEntryError } = await supabase
+    .from("energy_entries")
+    .select("id,vehicle_id")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .single();
+
+  if (currentEntryError || !currentEntry) {
+    throw new Error("Záznam pro smazání nebyl nalezen.");
+  }
+
+  const { error } = await supabase
+    .from("energy_entries")
+    .delete()
+    .eq("id", entryId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/fuel-energy");
+  revalidatePath(`/vehicles/${currentEntry.vehicle_id}`);
+  revalidatePath("/vehicles");
+  revalidatePath("/dashboard");
+  revalidatePath("/statistics");
+  redirect("/fuel-energy#records");
+}
+
 async function requireAuthenticatedUser() {
   const supabase = await getSupabaseServerClient();
 

@@ -1,4 +1,4 @@
-import { BatteryCharging, Fuel, Pencil, Plus, Zap } from "lucide-react";
+import { BatteryCharging, Fuel, Pencil, Plus, Trash2, Zap } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,10 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatCurrency, sumEnergyCost } from "@/lib/calculations/costs";
-import { calculateCostPer100Km, calculateConsumptionPer100Km } from "@/lib/calculations/energy";
+import { calculateCostPer100Km, calculateConsumptionSummaries, type ConsumptionSummary } from "@/lib/calculations/energy";
 import { loadGarageData } from "@/lib/data/garage";
 import type { EnergyEntry, Vehicle } from "@/types/domain";
-import { createEnergyEntry, updateEnergyEntry } from "./actions";
+import { createEnergyEntry, deleteEnergyEntry, updateEnergyEntry } from "./actions";
 
 type FuelEnergyPageProps = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -27,6 +27,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const currency = data.profile?.currency ?? "CZK";
   const defaultDate = formatDateInput(new Date());
   const openEnergyDialog = query.add === "energy";
+  const consumptionSummaries = calculateConsumptionSummaries(data.energyEntries);
 
   return (
     <div className="space-y-6">
@@ -51,7 +52,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(data.energyEntries), currency)} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
-        <MetricCard title="Průměrná spotřeba" value={`${calculateConsumptionPer100Km(data.energyEntries).toFixed(1)} /100 km`} description="Podle jednotky záznamu" icon={Zap} />
+        <MetricCard title="Průměrná spotřeba" value={formatConsumptionSummaries(consumptionSummaries)} description="Mezi plnými záznamy" icon={Zap} />
         <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(data.energyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
         <MetricCard title="Záznamy" value={String(data.energyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
@@ -150,8 +151,9 @@ function EnergyEntriesTable({
                 </TableCell>
                 <TableCell className="text-right">{formatCurrency(entry.total_price, currency)}</TableCell>
                 <TableCell className="text-right">{formatNumber(entry.mileage)} km</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="flex justify-end gap-2">
                   <EditEnergyEntryDialog entry={entry} vehicles={vehicles} />
+                  <DeleteEnergyEntryDialog entry={entry} />
                 </TableCell>
               </TableRow>
             ))}
@@ -182,6 +184,32 @@ function EditEnergyEntryDialog({ entry, vehicles }: { entry: EnergyEntry; vehicl
   );
 }
 
+function DeleteEnergyEntryDialog({ entry }: { entry: EnergyEntry }) {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="destructive" size="sm" />}>
+        <Trash2 className="mr-2 size-4" aria-hidden="true" />
+        Smazat
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Smazat záznam?</DialogTitle>
+          <DialogDescription>
+            Tento záznam paliva nebo energie se odstraní ze statistik a historie vozidla.
+          </DialogDescription>
+        </DialogHeader>
+        <form action={deleteEnergyEntry} className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <input type="hidden" name="id" value={entry.id} />
+          <Button variant="destructive" type="submit" className="gap-2">
+            <Trash2 className="size-4" aria-hidden="true" />
+            Smazat záznam
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function formatDateInput(date: Date) {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Prague",
@@ -207,6 +235,16 @@ function formatNumber(value: number) {
 
 function formatUnit(value: string) {
   return value === "liters" ? "l" : value;
+}
+
+function formatConsumptionSummaries(summaries: ConsumptionSummary[]) {
+  if (summaries.length === 0) {
+    return "0 /100 km";
+  }
+
+  return summaries
+    .map((summary) => `${summary.value.toFixed(1)} ${formatUnit(summary.unit)}/100 km`)
+    .join(" + ");
 }
 
 function formatEntryType(entry: EnergyEntry) {
