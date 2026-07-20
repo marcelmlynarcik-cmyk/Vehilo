@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-13
+Last updated: 2026-07-20
 
 ## Project Summary
 
@@ -50,8 +50,8 @@ Current phase:
 
 Next session priority:
 
-- Verify the real Golf vehicle flow across vehicles list, detail, edit and photo upload/removal.
-- Use the already imported Golf data as the baseline for real app screens.
+- Verify adding a real fuel/energy entry from the Fuel & Energy screen against Supabase.
+- Continue Phase 6 with edit/delete for energy entries and more accurate consumption calculations.
 - Continue product work without reworking the established app visual design.
 
 GitHub status:
@@ -1300,3 +1300,11 @@ For the first launchable prototype:
 - Updated key dashboard, statistics, vehicle, expense, fuel and service summaries to use the profile currency instead of hardcoded EUR.
 - Added PWA manifest, Android install metadata, iOS Apple web app metadata, Apple touch icon, iPhone/iPad startup images, service worker registration and an offline fallback page.
 - Current next implementation point is validating the PWA setup, pushing the changes and then continuing the real vehicles CRUD slice.
+
+### 2026-07-20
+
+- Started Phase 6 Fuel & Energy Core with real creation of `energy_entries` through the Fuel & Energy screen.
+- Added a powertrain-aware fuel/charging form for first real entries, including today's date default, mileage, quantity, total/unit price, full tank/full charge and station/location fields.
+- Added ownership-checked server action validation before inserting energy records and updating the vehicle current mileage when the new record has a higher odometer value.
+- Added a recent fuel/energy log table to the Fuel & Energy screen.
+- Remaining Phase 6 work: edit/delete energy entries, refined full-tank consumption calculations, electric/PHEV/LPG/CNG calculations and real charts.
