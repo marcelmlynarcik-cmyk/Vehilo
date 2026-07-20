@@ -183,12 +183,12 @@ function SelectWithLabel({
   allowCustom?: boolean;
   customPlaceholder?: string;
 }) {
+  const noneValue = "__none";
   const customValue = "__custom";
   const valueInItems = value === "" || items.some(([itemValue]) => itemValue === value);
   const initialSelectValue = valueInItems ? value : customValue;
   const [internalValue, setInternalValue] = useState(initialSelectValue || noneValue);
   const [customInputValue, setCustomInputValue] = useState(valueInItems ? "" : value);
-  const noneValue = "__none";
   const selectedValue = onValueChange ? (valueInItems ? value : customValue) : internalValue || noneValue;
   const formValue = selectedValue === noneValue ? "" : selectedValue === customValue ? customInputValue.trim() : selectedValue;
   const id = `expense_${name ?? label.toLowerCase().replace(/\s+/g, "_")}`;
