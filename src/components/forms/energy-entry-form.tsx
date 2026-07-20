@@ -70,13 +70,13 @@ export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: Energy
   }
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} className="w-full min-w-0 space-y-5 overflow-x-hidden">
       {entry ? <input type="hidden" name="id" value={entry.id} /> : null}
       <input type="hidden" name="vehicle_id" value={selectedVehicle?.id ?? ""} />
       <input type="hidden" name="entry_type" value={entryType} />
       <input type="hidden" name="quantity_unit" value={quantityUnit} />
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SelectWithLabel
           label="Vozidlo"
           value={vehicleId}
@@ -102,7 +102,7 @@ export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: Energy
         />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <InputWithLabel
           label={isCharging ? `Množství (${unitLabels[quantityUnit]})` : `Natankováno (${unitLabels[quantityUnit]})`}
           name="quantity"
@@ -160,7 +160,7 @@ export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: Energy
 
 function FuelFields({ entry, entryType }: { entry?: EnergyEntry; entryType: EnergyEntryType }) {
   return (
-    <div className="grid gap-4 md:grid-cols-[1fr_220px]">
+    <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1fr)_220px]">
       <InputWithLabel
         label={entryType === "lpg" || entryType === "cng" ? "Plnicí stanice" : "Čerpací stanice"}
         name="fuel_station"
@@ -173,7 +173,7 @@ function FuelFields({ entry, entryType }: { entry?: EnergyEntry; entryType: Ener
 
 function ChargingFields({ entry }: { entry?: EnergyEntry }) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-4">
       <InputWithLabel label="Místo nabíjení" name="charging_location" defaultValue={entry?.charging_location} />
       <SelectWithLabel
         label="Typ nabíjení"
@@ -224,7 +224,7 @@ function InputWithLabel({
   const id = `energy_${name}`;
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       <Label htmlFor={id}>
         {label}
         {required ? <span className="text-destructive">*</span> : null}

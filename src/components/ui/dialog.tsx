@@ -53,7 +53,7 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
-          "fixed bottom-0 left-0 z-50 grid max-h-[calc(100dvh-1rem)] w-full gap-4 overflow-y-auto rounded-t-[28px] border border-border bg-popover p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-popover-foreground shadow-[0_-26px_80px_rgba(0,0,0,0.5)] duration-150 outline-none sm:top-1/2 sm:left-1/2 sm:bottom-auto sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[24px] sm:pb-5 data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-4 sm:data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-4 sm:data-closed:zoom-out-95",
+          "fixed right-0 bottom-0 left-0 z-50 grid max-h-[calc(100dvh-1rem)] w-full max-w-[100dvw] touch-pan-y gap-4 overflow-x-hidden overflow-y-auto overscroll-x-none rounded-t-[28px] border border-border bg-popover p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-popover-foreground shadow-[0_-26px_80px_rgba(0,0,0,0.5)] duration-150 outline-none sm:top-1/2 sm:left-1/2 sm:right-auto sm:bottom-auto sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-[24px] sm:pb-5 data-open:animate-in data-open:fade-in-0 data-open:slide-in-from-bottom-4 sm:data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:slide-out-to-bottom-4 sm:data-closed:zoom-out-95",
           className
         )}
         {...props}
