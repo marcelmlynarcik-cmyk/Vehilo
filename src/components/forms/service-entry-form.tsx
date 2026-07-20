@@ -243,8 +243,9 @@ function SelectWithLabel({
       <Select
         value={selectedValue}
         onValueChange={(nextValue) => {
-          const nextFormValue = nextValue === customValue ? "" : nextValue;
-          setInternalValue(nextValue);
+          const resolvedValue = nextValue ?? customValue;
+          const nextFormValue = resolvedValue === customValue ? "" : resolvedValue;
+          setInternalValue(resolvedValue);
           onValueChange?.(nextFormValue);
         }}
       >
