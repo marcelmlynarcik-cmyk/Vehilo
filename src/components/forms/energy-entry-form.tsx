@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { EnergyEntryType, PowertrainType, QuantityUnit, Vehicle } from "@/types/domain";
+import type { EnergyEntry, EnergyEntryType, PowertrainType, QuantityUnit, Vehicle } from "@/types/domain";
 
 type EnergyVehicle = Pick<
   Vehicle,
@@ -33,29 +33,33 @@ interface EnergyEntryFormProps {
   action: (formData: FormData) => void | Promise<void>;
   vehicles: EnergyVehicle[];
   defaultDate: string;
+  entry?: EnergyEntry;
 }
 
-export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFormProps) {
-  const [vehicleId, setVehicleId] = useState(vehicles[0]?.id ?? "");
+export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: EnergyEntryFormProps) {
+  const [vehicleId, setVehicleId] = useState(entry?.vehicle_id ?? vehicles[0]?.id ?? "");
+  const [quantityValue, setQuantityValue] = useState(entry ? formatDecimalInput(entry.quantity) : "");
+  const [unitPriceValue, setUnitPriceValue] = useState(entry ? formatDecimalInput(entry.unit_price ?? entry.total_price / entry.quantity) : "");
   const selectedVehicle = useMemo(
     () => vehicles.find((vehicle) => vehicle.id === vehicleId) ?? vehicles[0] ?? null,
     [vehicleId, vehicles],
   );
   const [entryType, setEntryType] = useState<EnergyEntryType>(
-    selectedVehicle ? defaultEntryType(selectedVehicle.powertrain_type) : "fuel",
+    entry?.entry_type ?? (selectedVehicle ? defaultEntryType(selectedVehicle.powertrain_type) : "fuel"),
   );
 
   useEffect(() => {
-    if (selectedVehicle) {
+    if (selectedVehicle && !entryTypesForPowertrain(selectedVehicle.powertrain_type).includes(entryType)) {
       setEntryType(defaultEntryType(selectedVehicle.powertrain_type));
     }
-  }, [selectedVehicle]);
+  }, [entryType, selectedVehicle]);
 
   const availableEntryTypes = selectedVehicle
     ? entryTypesForPowertrain(selectedVehicle.powertrain_type)
     : (["fuel"] satisfies EnergyEntryType[]);
   const quantityUnit = defaultQuantityUnit(entryType);
   const isCharging = entryType === "charging";
+  const totalPrice = calculateTotalPrice(quantityValue, unitPriceValue);
 
   if (vehicles.length === 0) {
     return (
@@ -67,6 +71,7 @@ export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFo
 
   return (
     <form action={action} className="space-y-5">
+      {entry ? <input type="hidden" name="id" value={entry.id} /> : null}
       <input type="hidden" name="vehicle_id" value={selectedVehicle?.id ?? ""} />
       <input type="hidden" name="entry_type" value={entryType} />
       <input type="hidden" name="quantity_unit" value={quantityUnit} />
@@ -92,7 +97,7 @@ export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFo
           label="Nájezd"
           name="mileage"
           type="number"
-          defaultValue={selectedVehicle?.current_mileage}
+          defaultValue={entry?.mileage ?? selectedVehicle?.current_mileage}
           required
         />
       </div>
@@ -103,19 +108,32 @@ export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFo
           name="quantity"
           type="number"
           step="0.001"
+          value={quantityValue}
+          onChange={setQuantityValue}
           required
         />
-        <InputWithLabel label="Celková cena" name="total_price" type="number" step="0.01" required />
         <InputWithLabel
           label={isCharging ? `Cena za ${unitLabels[quantityUnit]}` : `Cena za ${unitLabels[quantityUnit]}`}
           name="unit_price"
           type="number"
           step="0.001"
+          value={unitPriceValue}
+          onChange={setUnitPriceValue}
+          required
+        />
+        <InputWithLabel
+          label="Celková cena"
+          name="total_price"
+          type="number"
+          step="0.01"
+          value={totalPrice}
+          readOnly
+          required
         />
         <SelectWithLabel
           label="Typ jízdy"
           name="driving_type"
-          value=""
+          value={entry?.driving_type ?? ""}
           items={[
             ["city", "Město"],
             ["mixed", "Kombinovaně"],
@@ -126,11 +144,11 @@ export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFo
         />
       </div>
 
-      {isCharging ? <ChargingFields /> : <FuelFields entryType={entryType} />}
+      {isCharging ? <ChargingFields entry={entry} /> : <FuelFields entry={entry} entryType={entryType} />}
 
       <div className="space-y-2">
         <Label htmlFor="energy_notes">Poznámky</Label>
-        <Textarea id="energy_notes" name="notes" placeholder="Například aditivum, sleva, počasí nebo styl jízdy." />
+        <Textarea id="energy_notes" name="notes" defaultValue={entry?.notes ?? ""} placeholder="Například aditivum, sleva, počasí nebo styl jízdy." />
       </div>
 
       <div className="flex justify-end">
@@ -140,26 +158,27 @@ export function EnergyEntryForm({ action, vehicles, defaultDate }: EnergyEntryFo
   );
 }
 
-function FuelFields({ entryType }: { entryType: EnergyEntryType }) {
+function FuelFields({ entry, entryType }: { entry?: EnergyEntry; entryType: EnergyEntryType }) {
   return (
     <div className="grid gap-4 md:grid-cols-[1fr_220px]">
       <InputWithLabel
         label={entryType === "lpg" || entryType === "cng" ? "Plnicí stanice" : "Čerpací stanice"}
         name="fuel_station"
+        defaultValue={entry?.fuel_station}
       />
-      <CheckField name="full_tank" label="Plná nádrž" defaultChecked />
+      <CheckField name="full_tank" label="Plná nádrž" defaultChecked={entry?.full_tank ?? true} />
     </div>
   );
 }
 
-function ChargingFields() {
+function ChargingFields({ entry }: { entry?: EnergyEntry }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <InputWithLabel label="Místo nabíjení" name="charging_location" />
+      <InputWithLabel label="Místo nabíjení" name="charging_location" defaultValue={entry?.charging_location} />
       <SelectWithLabel
         label="Typ nabíjení"
         name="charging_type"
-        value=""
+        value={entry?.charging_type ?? ""}
         items={[
           ["home", "Domácí"],
           ["workplace", "Práce"],
@@ -169,10 +188,10 @@ function ChargingFields() {
         ]}
         optional
       />
-      <InputWithLabel label="Poskytovatel" name="charging_provider" />
-      <CheckField name="full_charge" label="Plné nabití" />
-      <InputWithLabel label="Baterie před (%)" name="battery_before_percent" type="number" min="0" max="100" />
-      <InputWithLabel label="Baterie po (%)" name="battery_after_percent" type="number" min="0" max="100" />
+      <InputWithLabel label="Poskytovatel" name="charging_provider" defaultValue={entry?.charging_provider} />
+      <CheckField name="full_charge" label="Plné nabití" defaultChecked={entry?.full_charge ?? false} />
+      <InputWithLabel label="Baterie před (%)" name="battery_before_percent" type="number" min="0" max="100" defaultValue={entry?.battery_before_percent} />
+      <InputWithLabel label="Baterie po (%)" name="battery_after_percent" type="number" min="0" max="100" defaultValue={entry?.battery_after_percent} />
     </div>
   );
 }
@@ -186,6 +205,9 @@ function InputWithLabel({
   min,
   max,
   defaultValue,
+  value,
+  onChange,
+  readOnly = false,
 }: {
   label: string;
   name: string;
@@ -195,6 +217,9 @@ function InputWithLabel({
   min?: string;
   max?: string;
   defaultValue?: string | number | null;
+  value?: string;
+  onChange?: (value: string) => void;
+  readOnly?: boolean;
 }) {
   const id = `energy_${name}`;
 
@@ -212,7 +237,10 @@ function InputWithLabel({
         step={step}
         min={min}
         max={max}
-        defaultValue={defaultValue ?? ""}
+        readOnly={readOnly}
+        value={value}
+        onChange={onChange ? (event) => onChange(event.target.value) : undefined}
+        defaultValue={value === undefined ? defaultValue ?? "" : undefined}
       />
     </div>
   );
@@ -362,4 +390,28 @@ function defaultQuantityUnit(entryType: EnergyEntryType): QuantityUnit {
   }
 
   return "liters";
+}
+
+function calculateTotalPrice(quantityValue: string, unitPriceValue: string) {
+  const quantity = parseDecimal(quantityValue);
+  const unitPrice = parseDecimal(unitPriceValue);
+
+  if (quantity == null || unitPrice == null) {
+    return "";
+  }
+
+  return (Math.round(quantity * unitPrice * 100) / 100).toFixed(2);
+}
+
+function parseDecimal(value: string) {
+  if (!value.trim()) {
+    return null;
+  }
+
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatDecimalInput(value: number) {
+  return Number.isFinite(Number(value)) ? String(Number(value)) : "";
 }

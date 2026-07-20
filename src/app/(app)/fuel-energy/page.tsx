@@ -1,4 +1,4 @@
-import { BatteryCharging, Fuel, Plus, Zap } from "lucide-react";
+import { BatteryCharging, Fuel, Pencil, Plus, Zap } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,19 +15,25 @@ import { formatCurrency, sumEnergyCost } from "@/lib/calculations/costs";
 import { calculateCostPer100Km, calculateConsumptionPer100Km } from "@/lib/calculations/energy";
 import { loadGarageData } from "@/lib/data/garage";
 import type { EnergyEntry, Vehicle } from "@/types/domain";
-import { createEnergyEntry } from "./actions";
+import { createEnergyEntry, updateEnergyEntry } from "./actions";
 
-export default async function FuelEnergyPage() {
+type FuelEnergyPageProps = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export default async function FuelEnergyPage({ searchParams }: FuelEnergyPageProps) {
   const { data } = await loadGarageData();
+  const query = await searchParams;
   const currency = data.profile?.currency ?? "CZK";
   const defaultDate = formatDateInput(new Date());
+  const openEnergyDialog = query.add === "energy";
 
   return (
     <div className="space-y-6">
       <PageHeader
         title="Palivo a energie"
         description="Vehilo se přizpůsobí benzínu, naftě, hybridům, plug-in hybridům, elektromobilům, LPG i CNG."
-        actions={<EnergyEntryDialog vehicles={data.vehicles} defaultDate={defaultDate} />}
+        actions={<EnergyEntryDialog vehicles={data.vehicles} defaultDate={defaultDate} defaultOpen={openEnergyDialog} />}
       />
       <Alert>
         <Zap className="size-4" aria-hidden="true" />
@@ -50,7 +56,9 @@ export default async function FuelEnergyPage() {
         <MetricCard title="Záznamy" value={String(data.energyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
       {data.energyEntries.length === 0 ? (
-        <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
+        <div id="records">
+          <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
+        </div>
       ) : (
         <EnergyEntriesTable entries={data.energyEntries} vehicles={data.vehicles} currency={currency} />
       )}
@@ -72,9 +80,17 @@ export default async function FuelEnergyPage() {
   );
 }
 
-function EnergyEntryDialog({ vehicles, defaultDate }: { vehicles: Vehicle[]; defaultDate: string }) {
+function EnergyEntryDialog({
+  vehicles,
+  defaultDate,
+  defaultOpen,
+}: {
+  vehicles: Vehicle[];
+  defaultDate: string;
+  defaultOpen: boolean;
+}) {
   return (
-    <Dialog>
+    <Dialog defaultOpen={defaultOpen}>
       <DialogTrigger render={<Button />}>
         <Plus className="mr-2 size-4" aria-hidden="true" />
         Přidat tankování / nabíjení
@@ -104,7 +120,7 @@ function EnergyEntriesTable({
   const vehicleNames = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle.name]));
 
   return (
-    <Card>
+    <Card id="records">
       <CardHeader>
         <CardTitle>Poslední tankování a nabíjení</CardTitle>
       </CardHeader>
@@ -118,6 +134,7 @@ function EnergyEntriesTable({
               <TableHead className="text-right">Množství</TableHead>
               <TableHead className="text-right">Cena</TableHead>
               <TableHead className="text-right">Nájezd</TableHead>
+              <TableHead className="text-right">Akce</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -133,12 +150,35 @@ function EnergyEntriesTable({
                 </TableCell>
                 <TableCell className="text-right">{formatCurrency(entry.total_price, currency)}</TableCell>
                 <TableCell className="text-right">{formatNumber(entry.mileage)} km</TableCell>
+                <TableCell className="text-right">
+                  <EditEnergyEntryDialog entry={entry} vehicles={vehicles} />
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
+  );
+}
+
+function EditEnergyEntryDialog({ entry, vehicles }: { entry: EnergyEntry; vehicles: Vehicle[] }) {
+  return (
+    <Dialog>
+      <DialogTrigger render={<Button variant="outline" size="sm" />}>
+        <Pencil className="mr-2 size-4" aria-hidden="true" />
+        Upravit
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Upravit záznam</DialogTitle>
+          <DialogDescription>
+            Změny se uloží do stejného záznamu a přepočítají celkovou cenu podle množství a ceny za jednotku.
+          </DialogDescription>
+        </DialogHeader>
+        <EnergyEntryForm action={updateEnergyEntry} vehicles={vehicles} defaultDate={entry.date} entry={entry} />
+      </DialogContent>
+    </Dialog>
   );
 }
 

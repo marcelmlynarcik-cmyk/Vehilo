@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   BatteryCharging,
   Bell,
@@ -21,13 +22,13 @@ import {
 } from "@/components/ui/sheet";
 
 const actions = [
-  { label: "Přidat tankování / nabíjení", icon: Fuel },
+  { label: "Přidat tankování / nabíjení", icon: Fuel, href: "/fuel-energy?add=energy" },
   { label: "Přidat výdaj", icon: ReceiptText },
   { label: "Přidat servis", icon: Wrench },
   { label: "Přidat připomínku", icon: Bell },
   { label: "Přidat vozidlo", icon: Car },
   { label: "Přidat dokument", icon: FileText },
-  { label: "Přidat nabíjení", icon: BatteryCharging },
+  { label: "Přidat nabíjení", icon: BatteryCharging, href: "/fuel-energy?add=energy" },
 ];
 
 export function QuickAdd() {
@@ -57,15 +58,30 @@ export function QuickAdd() {
           {actions.map((action) => {
             const Icon = action.icon;
 
-            return (
+            const content = (
+              <>
+                <Icon className="size-4" aria-hidden="true" />
+                {action.label}
+              </>
+            );
+
+            return action.href ? (
+              <Button
+                key={action.label}
+                asChild
+                variant="outline"
+                className="h-14 justify-start gap-3 rounded-[16px]"
+              >
+                <Link href={action.href}>{content}</Link>
+              </Button>
+            ) : (
               <Button
                 key={action.label}
                 variant="outline"
                 className="h-14 justify-start gap-3 rounded-[16px]"
                 type="button"
               >
-                <Icon className="size-4" aria-hidden="true" />
-                {action.label}
+                {content}
               </Button>
             );
           })}

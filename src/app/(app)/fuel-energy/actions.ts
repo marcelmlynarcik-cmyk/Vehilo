@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { Database } from "@/types/database";
 import type { EnergyEntryType, PowertrainType, QuantityUnit } from "@/types/domain";
@@ -47,6 +48,66 @@ export async function createEnergyEntry(formData: FormData) {
   revalidatePath("/vehicles");
   revalidatePath("/dashboard");
   revalidatePath("/statistics");
+  redirect("/fuel-energy#records");
+}
+
+export async function updateEnergyEntry(formData: FormData) {
+  const { supabase, userId } = await requireAuthenticatedUser();
+  const entryId = requiredText(formData, "id");
+  const vehicleId = requiredText(formData, "vehicle_id");
+
+  const { data: currentEntry, error: currentEntryError } = await supabase
+    .from("energy_entries")
+    .select("id,vehicle_id")
+    .eq("id", entryId)
+    .eq("user_id", userId)
+    .single();
+
+  if (currentEntryError || !currentEntry) {
+    throw new Error("Záznam pro úpravu nebyl nalezen.");
+  }
+
+  const { data: vehicle, error: vehicleError } = await supabase
+    .from("vehicles")
+    .select("id,powertrain_type,fuel_type,current_mileage")
+    .eq("id", vehicleId)
+    .eq("user_id", userId)
+    .single();
+
+  if (vehicleError || !vehicle) {
+    throw new Error("Vozidlo pro tento záznam nebylo nalezeno.");
+  }
+
+  const payload = buildEnergyPayload(formData, userId, vehicle);
+  const { error } = await supabase
+    .from("energy_entries")
+    .update(payload)
+    .eq("id", entryId)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (payload.mileage > Number(vehicle.current_mileage ?? 0)) {
+    const { error: mileageError } = await supabase
+      .from("vehicles")
+      .update({ current_mileage: payload.mileage })
+      .eq("id", vehicle.id)
+      .eq("user_id", userId);
+
+    if (mileageError) {
+      throw new Error(mileageError.message);
+    }
+  }
+
+  revalidatePath("/fuel-energy");
+  revalidatePath(`/vehicles/${vehicle.id}`);
+  revalidatePath(`/vehicles/${currentEntry.vehicle_id}`);
+  revalidatePath("/vehicles");
+  revalidatePath("/dashboard");
+  revalidatePath("/statistics");
+  redirect("/fuel-energy#records");
 }
 
 async function requireAuthenticatedUser() {
