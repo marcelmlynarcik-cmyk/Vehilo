@@ -56,10 +56,27 @@ Current phase:
 
 Next session priority:
 
+- Fix the mobile UX issues captured at the end of 2026-07-20 before continuing new feature work.
 - Finish Service filters and real service charts, mirroring the completed Expenses page behavior.
 - Verify Service chart aggregates against real Supabase data before considering them done.
 - Then continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
 - Continue product work without reworking the established app visual design.
+
+Tomorrow mobile/UX fixes:
+
+- [ ] Expense filters on mobile need visible labels/placeholders; users should not have to open a dropdown to know what it filters.
+- [ ] Fix the mobile Expense filter text field that stretches outside the viewport.
+- [ ] Reduce unnecessary left padding in charts on mobile.
+- [ ] Investigate and fix Expense cost per km showing `0 Kč/km`; verify the calculation against real Supabase mileage and expense data.
+- [ ] Hamburger menu should close after selecting a navigation item.
+- [ ] Fuel & Energy chart tooltips must use Czech labels instead of generic `value`.
+- [ ] Fuel & Energy unit labels must match the selected vehicle/powertrain; diesel should not show `kWh` in the price-per-unit chart.
+- [ ] Vehicle filters must display the vehicle name after selection, not the raw vehicle UUID.
+- [ ] Vehicle detail cost cards should include Expenses, not only fuel/service related cards.
+- [ ] Vehicle detail cost cards should be clickable and navigate to the relevant filtered records.
+- [ ] Vehicle detail tab bar (`Přehled`, `Výdaje`, `Palivo`, etc.) must stop floating/moving vertically while swiping on mobile.
+- [ ] Record cards on Expenses, Fuel & Energy and Service pages should be clickable to open a record detail view.
+- [ ] Define and implement record detail views for Expense, Fuel/Energy and Service entries.
 
 Latest progress:
 
