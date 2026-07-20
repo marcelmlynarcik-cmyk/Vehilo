@@ -246,11 +246,13 @@ function SelectWithLabel({
       <Select
         value={selectedValue}
         onValueChange={(nextValue) => {
-          if (nextValue === noneValue && !optional) {
+          const resolvedValue = nextValue ?? noneValue;
+
+          if (resolvedValue === noneValue && !optional) {
             return;
           }
 
-          const nextFormValue = nextValue === noneValue ? "" : nextValue;
+          const nextFormValue = resolvedValue === noneValue ? "" : resolvedValue;
 
           setInternalValue(nextFormValue);
           onValueChange?.(nextFormValue);
