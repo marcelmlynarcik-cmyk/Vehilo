@@ -20,7 +20,7 @@ export default async function ServiceDetailPage({
     notFound();
   }
 
-  const { entry, vehicle } = detail;
+  const { entry, vehicle, invoiceUrl } = detail;
 
   return (
     <div className="space-y-6">
@@ -66,6 +66,21 @@ export default async function ServiceDetailPage({
           <DetailRow label="Záruka do km" value={entry.warranty_until_mileage ? `${formatNumber(entry.warranty_until_mileage)} km` : null} />
         </CardContent>
       </Card>
+
+      {invoiceUrl ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Příloha</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href={invoiceUrl} target="_blank" rel="noreferrer">
+                Otevřít fakturu / dokument / fotku
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {entry.notes ? (
         <Card>

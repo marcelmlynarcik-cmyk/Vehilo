@@ -50,7 +50,7 @@ export function ExpenseForm({ action, vehicles, defaultDate, expense }: ExpenseF
   }
 
   return (
-    <form action={action} className="w-full min-w-0 space-y-5 overflow-x-hidden">
+    <form action={action} encType="multipart/form-data" className="w-full min-w-0 space-y-5 overflow-x-hidden">
       {expense ? <input type="hidden" name="id" value={expense.id} /> : null}
       <input type="hidden" name="vehicle_id" value={selectedVehicle?.id ?? ""} />
       <input type="hidden" name="currency" value={currency} />
@@ -103,6 +103,20 @@ export function ExpenseForm({ action, vehicles, defaultDate, expense }: ExpenseF
       <div className="space-y-2">
         <Label htmlFor="expense_notes">Poznámky</Label>
         <Textarea id="expense_notes" name="notes" defaultValue={expense?.notes ?? ""} placeholder="Detail účelu, číslo dokladu nebo kontext." />
+      </div>
+
+      <div className="space-y-3 rounded-[18px] border border-border bg-[rgba(8,17,23,0.42)] p-4">
+        <div>
+          <Label htmlFor="expense_receipt_file">Doklad / fotka</Label>
+          <p className="mt-1 text-xs text-muted-foreground">PDF nebo obrázek, maximálně 10 MB.</p>
+        </div>
+        <Input id="expense_receipt_file" name="receipt_file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif" />
+        {expense?.receipt_url ? (
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input type="checkbox" name="remove_receipt" value="true" className="size-4 accent-[var(--accent)]" />
+            Odstranit stávající přílohu
+          </label>
+        ) : null}
       </div>
 
       <div className="flex justify-end">

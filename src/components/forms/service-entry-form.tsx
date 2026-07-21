@@ -97,7 +97,7 @@ export function ServiceEntryForm({ action, vehicles, defaultDate, entry }: Servi
   }
 
   return (
-    <form action={action} className="w-full min-w-0 space-y-5 overflow-x-hidden">
+    <form action={action} encType="multipart/form-data" className="w-full min-w-0 space-y-5 overflow-x-hidden">
       {entry ? <input type="hidden" name="id" value={entry.id} /> : null}
       <input type="hidden" name="vehicle_id" value={selectedVehicle?.id ?? ""} />
       <input type="hidden" name="currency" value={currency} />
@@ -157,6 +157,20 @@ export function ServiceEntryForm({ action, vehicles, defaultDate, entry }: Servi
       <div className="space-y-2">
         <Label htmlFor="service_notes">Poznámky</Label>
         <Textarea id="service_notes" name="notes" defaultValue={entry?.notes ?? ""} placeholder="Co přesně se dělalo, značky dílů nebo souvislost s poruchou." />
+      </div>
+
+      <div className="space-y-3 rounded-[18px] border border-border bg-[rgba(8,17,23,0.42)] p-4">
+        <div>
+          <Label htmlFor="service_invoice_file">Faktura / dokument / fotka</Label>
+          <p className="mt-1 text-xs text-muted-foreground">PDF nebo obrázek, maximálně 10 MB.</p>
+        </div>
+        <Input id="service_invoice_file" name="invoice_file" type="file" accept="application/pdf,image/jpeg,image/png,image/webp,image/heic,image/heif" />
+        {entry?.invoice_url ? (
+          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <input type="checkbox" name="remove_invoice" value="true" className="size-4 accent-[var(--accent)]" />
+            Odstranit stávající přílohu
+          </label>
+        ) : null}
       </div>
 
       <div className="flex justify-end">

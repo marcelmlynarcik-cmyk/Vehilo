@@ -77,8 +77,8 @@ Tomorrow mobile/UX fixes:
 - [ ] Vehicle detail tab bar (`Přehled`, `Výdaje`, `Palivo`, etc.) must stop floating/moving vertically while swiping on mobile.
 - [x] Record cards on Expenses, Fuel & Energy and Service pages should be clickable to open a record detail view.
 - [x] Define and implement record detail views for Expense, Fuel/Energy and Service entries.
-- [ ] Expense entries must support uploading a receipt/document/photo attachment.
-- [ ] Service entries must support uploading an invoice/document/photo attachment.
+- [x] Expense entries must support uploading a receipt/document/photo attachment.
+- [x] Service entries must support uploading an invoice/document/photo attachment.
 
 Latest progress:
 

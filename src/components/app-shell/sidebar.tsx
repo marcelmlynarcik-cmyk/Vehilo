@@ -9,10 +9,14 @@ import { VehiloLogo } from "@/components/app-shell/logo";
 import { navigationItems } from "@/components/app-shell/navigation";
 import { QuickAdd } from "@/components/app-shell/quick-add";
 import { SignOutButton } from "@/components/app-shell/sign-out-button";
+import type { Profile } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
-export function Sidebar() {
+export function Sidebar({ profile }: { profile: Profile | null }) {
   const pathname = usePathname();
+  const displayName = profile?.name || profile?.email || "Uživatel Vehilo";
+  const accountLabel = profile?.email || "Přihlášený účet";
+  const initials = getInitials(displayName);
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-[272px] shrink-0 border-r border-sidebar-border bg-sidebar px-4 py-5 backdrop-blur-[22px] lg:flex lg:flex-col">
@@ -50,11 +54,11 @@ export function Sidebar() {
         <Separator className="mb-4" />
         <div className="flex items-center gap-3 rounded-[18px] border border-border bg-card p-3 shadow-[var(--shadow-card)]">
           <Avatar className="size-10 border border-border">
-            <AvatarFallback className="bg-[rgba(39,211,162,0.14)] text-[#9ff5dc]">VH</AvatarFallback>
+            <AvatarFallback className="bg-[rgba(39,211,162,0.14)] text-[#9ff5dc]">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <div className="truncate text-sm font-medium">Vehilo user</div>
-            <div className="truncate text-xs text-muted-foreground">Google účet</div>
+            <div className="truncate text-sm font-medium">{displayName}</div>
+            <div className="truncate text-xs text-muted-foreground">{accountLabel}</div>
           </div>
         </div>
         <div className="mt-2">
@@ -63,4 +67,19 @@ export function Sidebar() {
       </div>
     </aside>
   );
+}
+
+function getInitials(value: string) {
+  const words = value
+    .replace(/@.*/, "")
+    .split(/\s+/)
+    .map((word) => word.trim())
+    .filter(Boolean);
+
+  const initials = words
+    .slice(0, 2)
+    .map((word) => word[0]?.toUpperCase())
+    .join("");
+
+  return initials || "VH";
 }

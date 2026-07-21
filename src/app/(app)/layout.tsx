@@ -19,6 +19,7 @@ export default async function ProtectedAppLayout({
       configured={garage.configured}
       authenticated={garage.authenticated}
       error={garage.error}
+      profile={garage.data.profile}
     >
       {children}
     </AppShell>

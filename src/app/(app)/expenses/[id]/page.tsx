@@ -20,7 +20,7 @@ export default async function ExpenseDetailPage({
     notFound();
   }
 
-  const { expense, vehicle } = detail;
+  const { expense, vehicle, receiptUrl } = detail;
 
   return (
     <div className="space-y-6">
@@ -64,6 +64,21 @@ export default async function ExpenseDetailPage({
           <DetailRow label="Doklad" value={expense.receipt_url ? "Přiložen" : null} />
         </CardContent>
       </Card>
+
+      {receiptUrl ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Příloha</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Button asChild>
+              <Link href={receiptUrl} target="_blank" rel="noreferrer">
+                Otevřít doklad / fotku
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      ) : null}
 
       {expense.notes ? (
         <Card>

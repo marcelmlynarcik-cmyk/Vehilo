@@ -4,18 +4,20 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MobileNav } from "@/components/app-shell/mobile-nav";
 import { Sidebar } from "@/components/app-shell/sidebar";
 import { QuickAdd } from "@/components/app-shell/quick-add";
+import type { Profile } from "@/types/domain";
 
 interface AppShellProps {
   children: ReactNode;
   configured: boolean;
   authenticated: boolean;
+  profile: Profile | null;
   error?: string;
 }
 
-export function AppShell({ children, configured, authenticated, error }: AppShellProps) {
+export function AppShell({ children, configured, authenticated, profile, error }: AppShellProps) {
   return (
     <div className="flex min-h-dvh text-foreground">
-      <Sidebar />
+      <Sidebar profile={profile} />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 border-b border-border bg-[rgba(5,11,16,0.82)] px-4 py-3 backdrop-blur-[18px] lg:px-8">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">

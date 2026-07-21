@@ -28,7 +28,9 @@ export async function loadExpenseDetailData(expenseId: string) {
   const expense = expenseResult.data as Expense;
   const vehicle = await loadVehicle(expense.vehicle_id, userId);
 
-  return { expense, vehicle };
+  const receiptUrl = await createSignedRecordUrl("receipts", expense.receipt_url);
+
+  return { expense, vehicle, receiptUrl };
 }
 
 export async function loadEnergyEntryDetailData(entryId: string) {
@@ -86,7 +88,9 @@ export async function loadServiceEntryDetailData(entryId: string) {
   const entry = entryResult.data as ServiceEntry;
   const vehicle = await loadVehicle(entry.vehicle_id, userId);
 
-  return { entry, vehicle };
+  const invoiceUrl = await createSignedRecordUrl("service-invoices", entry.invoice_url);
+
+  return { entry, vehicle, invoiceUrl };
 }
 
 async function loadVehicle(vehicleId: string, userId: string) {
@@ -108,6 +112,32 @@ async function loadVehicle(vehicleId: string, userId: string) {
   }
 
   return (vehicleResult.data ?? null) as Vehicle | null;
+}
+
+async function createSignedRecordUrl(bucket: "receipts" | "service-invoices", path: string | null) {
+  if (!path) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  const supabase = await getSupabaseServerClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data, error } = await supabase.storage
+    .from(bucket)
+    .createSignedUrl(path, 60 * 10);
+
+  if (error || !data?.signedUrl) {
+    return null;
+  }
+
+  return data.signedUrl;
 }
 
 async function getAuthenticatedContext() {
