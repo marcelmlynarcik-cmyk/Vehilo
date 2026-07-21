@@ -58,7 +58,7 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
               <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} position={{ x: 8, y: 8 }} />
+              <Tooltip wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} position={{ x: 8, y: 8 }} />
               <Line type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} dot={false} />
             </LineChart>
           ) : type === "bar" ? (
@@ -66,7 +66,7 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
               <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ fill: "rgba(56, 189, 248, 0.08)" }} position={{ x: 8, y: 8 }} />
+              <Tooltip wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ fill: "rgba(56, 189, 248, 0.08)" }} position={{ x: 8, y: 8 }} />
               <Bar dataKey="value" name={valueLabel} fill="#38bdf8" radius={[8, 8, 0, 0]} />
             </BarChart>
           ) : type === "area" ? (
@@ -74,12 +74,12 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
               <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} position={{ x: 8, y: 8 }} />
+              <Tooltip wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} position={{ x: 8, y: 8 }} />
               <Area type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} fill="#2dd4a3" fillOpacity={0.18} />
             </AreaChart>
           ) : (
             <PieChart>
-              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} position={{ x: 8, y: 8 }} />
+              <Tooltip wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} />} position={{ x: 8, y: 8 }} />
               <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88} paddingAngle={2}>
                 {chartData.map((entry, index) => (
                   <Cell key={String(entry.name)} fill={chartColors[index % chartColors.length]} />
@@ -114,22 +114,19 @@ function ChartTooltip({
 
   return (
     <div
-      className="max-w-[min(280px,calc(100vw-2rem))] rounded-[14px] border border-[rgba(148,163,184,0.22)] bg-[#0d171e] p-3 text-sm text-[#f8fafc] shadow-[0_18px_45px_rgba(0,0,0,0.32)] sm:max-w-[320px]"
+      className="pointer-events-auto max-w-[min(280px,calc(100vw-2rem))] rounded-[14px] border border-[rgba(148,163,184,0.22)] bg-[#0d171e] p-3 text-sm text-[#f8fafc] shadow-[0_18px_45px_rgba(0,0,0,0.32)] sm:max-w-[320px]"
     >
       <div className="font-semibold">{label ?? point?.name}</div>
       <div className="mt-1 text-xs text-muted-foreground">
         {valueLabel}: <span className="tabular-num text-foreground">{value}{point?.unit ? ` ${point.unit}` : ""}</span>
       </div>
       {details.length > 0 ? (
-        <div className="mt-3 max-h-44 space-y-1 overflow-y-auto border-t border-border pt-2">
-          {details.slice(0, 12).map((detail) => (
-            <div key={detail} className="text-xs leading-snug text-muted-foreground">
+        <div className="pointer-events-auto mt-3 max-h-44 touch-pan-y space-y-1 overflow-y-auto overscroll-contain border-t border-border pt-2 [scrollbar-width:thin]">
+          {details.map((detail, index) => (
+            <div key={`${detail}-${index}`} className="text-xs leading-snug text-muted-foreground">
               {detail}
             </div>
           ))}
-          {details.length > 12 ? (
-            <div className="text-xs text-muted-foreground">+ dalších {details.length - 12}</div>
-          ) : null}
         </div>
       ) : null}
     </div>
