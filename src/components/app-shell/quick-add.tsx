@@ -61,7 +61,9 @@ export function QuickAdd() {
             const content = (
               <>
                 <Icon className="size-4" aria-hidden="true" />
-                {action.label}
+                <span className="min-w-0 whitespace-normal break-words text-left leading-tight">
+                  {action.label}
+                </span>
               </>
             );
 
@@ -70,7 +72,7 @@ export function QuickAdd() {
                 key={action.label}
                 asChild
                 variant="outline"
-                className="h-14 justify-start gap-3 rounded-[16px]"
+                className="h-auto min-h-14 min-w-0 justify-start gap-3 rounded-[16px] px-3 py-2"
               >
                 <Link href={action.href}>{content}</Link>
               </Button>
@@ -78,7 +80,7 @@ export function QuickAdd() {
               <Button
                 key={action.label}
                 variant="outline"
-                className="h-14 justify-start gap-3 rounded-[16px]"
+                className="h-auto min-h-14 min-w-0 justify-start gap-3 rounded-[16px] px-3 py-2"
                 type="button"
               >
                 {content}
