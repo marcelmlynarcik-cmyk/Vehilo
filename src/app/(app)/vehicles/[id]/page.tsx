@@ -33,6 +33,9 @@ export default async function VehicleDetailPage({
   const subtitle = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.engine].filter(Boolean).join(" ");
   const drivenSincePurchase = drivenMileage(vehicle);
   const costPerKm = drivenSincePurchase > 0 ? totalCost / drivenSincePurchase : 0;
+  const expenseTotal = sumExpenses(expenses);
+  const energyTotal = sumEnergy(energyEntries);
+  const serviceTotal = sumService(serviceEntries);
 
   return (
     <div className="space-y-6">
@@ -92,14 +95,20 @@ export default async function VehicleDetailPage({
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Náklady celkem" value={formatCurrency(totalCost, vehicle.currency)} description="Výdaje, palivo, servis a ztráta hodnoty" icon={ReceiptText} />
+        <Link href={`/expenses?vehicle=${vehicle.id}`}>
+          <MetricCard title="Výdaje" value={formatCurrency(expenseTotal, vehicle.currency)} description={`${expenses.length} záznamů`} icon={ReceiptText} />
+        </Link>
+        <Link href="/fuel-energy">
+          <MetricCard title="Palivo a energie" value={formatCurrency(energyTotal, vehicle.currency)} description={`${energyEntries.length} záznamů`} icon={Fuel} />
+        </Link>
+        <Link href={`/service?vehicle=${vehicle.id}`}>
+          <MetricCard title="Servis" value={formatCurrency(serviceTotal, vehicle.currency)} description={`${serviceEntries.length} záznamů`} icon={Wrench} />
+        </Link>
         <MetricCard title="Cena za km" value={`${formatCurrency(costPerKm, vehicle.currency, 2)}/km`} description={`${formatNumber(drivenSincePurchase)} km od koupě`} icon={Gauge} />
-        <MetricCard title="Servisních záznamů" value={String(serviceEntries.length)} description="Historie údržby a oprav" icon={Wrench} />
-        <MetricCard title="Tankování" value={String(energyEntries.length)} description={formatPowertrain(vehicle.powertrain_type)} icon={Fuel} />
       </div>
 
       <Tabs defaultValue="overview">
-        <div className="-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+        <div className="-mx-4 touch-pan-x overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
           <TabsList className="flex h-auto min-w-max gap-1 rounded-[18px] border border-border bg-[rgba(8,17,23,0.72)] p-1 [&_[data-slot=tabs-trigger]]:h-11 [&_[data-slot=tabs-trigger]]:shrink-0 [&_[data-slot=tabs-trigger]]:px-4 md:grid md:min-w-0 md:grid-cols-4 md:[&_[data-slot=tabs-trigger]]:px-2 lg:grid-cols-7">
           <TabsTrigger value="overview">Přehled</TabsTrigger>
           <TabsTrigger value="expenses">Výdaje</TabsTrigger>

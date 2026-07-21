@@ -1,8 +1,11 @@
 import { CalendarClock, Pencil, Plus, Trash2, Wrench } from "lucide-react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ChartCard } from "@/components/charts/basic-charts";
 import { ServiceEntryForm } from "@/components/forms/service-entry-form";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -21,19 +24,25 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
   const { data } = await loadGarageData();
   const query = await searchParams;
   const currency = data.profile?.currency ?? "CZK";
-  const serviceTotal = data.serviceEntries.reduce((total, entry) => total + Number(entry.total_cost), 0);
   const defaultDate = formatDateInput(new Date());
   const openServiceDialog = query.add === "service";
-  const latestService = data.serviceEntries[0] ?? null;
-  const largestService = data.serviceEntries.reduce<ServiceEntry | null>(
+  const filters = parseServiceFilters(query);
+  const filteredServiceEntries = filterServiceEntries(data.serviceEntries, filters);
+  const serviceTotal = filteredServiceEntries.reduce((total, entry) => total + Number(entry.total_cost), 0);
+  const latestService = filteredServiceEntries[0] ?? null;
+  const largestService = filteredServiceEntries.reduce<ServiceEntry | null>(
     (largest, entry) => (largest == null || Number(entry.total_cost) > Number(largest.total_cost) ? entry : largest),
     null,
   );
-  const thisYearTotal = data.serviceEntries.reduce((total, entry) => {
+  const thisYearTotal = filteredServiceEntries.reduce((total, entry) => {
     return entry.date.startsWith(String(new Date().getFullYear())) ? total + Number(entry.total_cost) : total;
   }, 0);
-  const visibleServiceEntries = data.serviceEntries.slice(0, 10);
-  const hiddenServiceEntries = data.serviceEntries.slice(10);
+  const serviceTypes = uniqueSorted(data.serviceEntries.map((entry) => entry.service_type));
+  const serviceYears = uniqueSorted(data.serviceEntries.map((entry) => entry.date.slice(0, 4))).reverse();
+  const visibleServiceEntries = filteredServiceEntries.slice(0, 10);
+  const hiddenServiceEntries = filteredServiceEntries.slice(10);
+  const yearlyServiceCosts = buildYearlyServiceSeries(filteredServiceEntries);
+  const serviceTypeCosts = buildServiceTypeSeries(filteredServiceEntries);
 
   return (
     <div className="space-y-6">
@@ -42,6 +51,25 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
         description="Kompletní servisní historie, práce, díly, záruky, faktury a plánované úkony."
         actions={<ServiceDialog vehicles={data.vehicles} defaultDate={defaultDate} defaultOpen={openServiceDialog} />}
       />
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtry</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action="/service" className="grid min-w-0 gap-3 md:grid-cols-5">
+            <FilterInput name="q" label="Hledání" placeholder="Popis, typ, servis" defaultValue={filters.q} />
+            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
+            <FilterSelect name="type" label="Typ servisu" value={filters.type} options={serviceTypes.map((type): [string, string] => [type, type])} />
+            <FilterSelect name="year" label="Rok" value={filters.year} options={serviceYears.map((year): [string, string] => [year, year])} />
+            <div className="flex items-end gap-2">
+              <Button type="submit" className="flex-1">Filtrovat</Button>
+              <Button asChild variant="outline" className="flex-1">
+                <Link href="/service">Reset</Link>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Servis letos" value={formatCurrency(thisYearTotal, currency)} description="Podle data servisu" icon={Wrench} />
         <MetricCard title="Celkem servis" value={formatCurrency(serviceTotal, currency)} description="Všechny servisní záznamy" icon={Wrench} />
@@ -50,12 +78,14 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
         <MetricCard title="Nejdražší servis" value={formatCurrency(largestService?.total_cost ?? 0, currency)} description={largestService?.description ?? "Zatím bez dat"} icon={Wrench} />
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartCard title="Servisní náklady podle roku" type="bar" />
-        <ChartCard title="Servisní náklady podle typu" type="pie" />
+        <ChartCard title="Servisní náklady podle roku" type="bar" data={yearlyServiceCosts} valueLabel="Náklady" />
+        <ChartCard title="Servisní náklady podle typu" type="pie" data={serviceTypeCosts} valueLabel="Náklady" />
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         {data.serviceEntries.length === 0 ? (
           <EmptyState icon={Wrench} title="Servisní historie je prázdná" description="Po připojení Supabase zde vznikne časová osa oprav, údržby a EV kontrol." actionLabel="Přidat servis" />
+        ) : filteredServiceEntries.length === 0 ? (
+          <EmptyState icon={Wrench} title="Žádný servis pro tento filtr" description="Změňte filtr nebo resetujte výběr." />
         ) : (
           <Card id="records">
             <CardHeader>
@@ -145,6 +175,63 @@ function ServiceRow({ entry, vehicles, currency }: { entry: ServiceEntry; vehicl
   );
 }
 
+function FilterSelect({
+  name,
+  label,
+  value,
+  options,
+}: {
+  name: string;
+  label: string;
+  value: string;
+  options: Array<[string, string]>;
+}) {
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <Label htmlFor={`service-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
+      <select
+        id={`service-filter-${name}`}
+        name={name}
+        defaultValue={value}
+        aria-label={label}
+        className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+      >
+        <option value="all">Všechny</option>
+        {options.map(([optionValue, optionLabel]) => (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function FilterInput({
+  name,
+  label,
+  placeholder,
+  defaultValue,
+}: {
+  name: string;
+  label: string;
+  placeholder: string;
+  defaultValue: string;
+}) {
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <Label htmlFor={`service-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
+      <Input
+        id={`service-filter-${name}`}
+        name={name}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        className="w-full min-w-0"
+      />
+    </div>
+  );
+}
+
 function EditServiceDialog({ entry, vehicles }: { entry: ServiceEntry; vehicles: Vehicle[] }) {
   return (
     <Dialog>
@@ -206,4 +293,76 @@ function formatDisplayDate(date: string) {
 
 function formatNumber(value: number) {
   return new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 0 }).format(Number(value));
+}
+
+function parseServiceFilters(query: Awaited<ServicePageProps["searchParams"]>) {
+  return {
+    q: getQueryValue(query.q),
+    vehicle: getQueryValue(query.vehicle, "all"),
+    type: getQueryValue(query.type, "all"),
+    year: getQueryValue(query.year, "all"),
+  };
+}
+
+function filterServiceEntries(entries: ServiceEntry[], filters: ReturnType<typeof parseServiceFilters>) {
+  const q = filters.q.toLowerCase();
+
+  return entries.filter((entry) => {
+    if (filters.vehicle !== "all" && entry.vehicle_id !== filters.vehicle) {
+      return false;
+    }
+
+    if (filters.type !== "all" && entry.service_type !== filters.type) {
+      return false;
+    }
+
+    if (filters.year !== "all" && !entry.date.startsWith(filters.year)) {
+      return false;
+    }
+
+    if (!q) {
+      return true;
+    }
+
+    return [
+      entry.service_type,
+      entry.provider ?? "",
+      entry.description,
+      entry.parts_changed ?? "",
+      entry.notes ?? "",
+    ].some((value) => value.toLowerCase().includes(q));
+  });
+}
+
+function buildYearlyServiceSeries(entries: ServiceEntry[]) {
+  return buildGroupedSeries(entries, (entry) => entry.date.slice(0, 4), (entry) => Number(entry.total_cost));
+}
+
+function buildServiceTypeSeries(entries: ServiceEntry[]) {
+  return buildGroupedSeries(entries, (entry) => entry.service_type, (entry) => Number(entry.total_cost));
+}
+
+function buildGroupedSeries<T>(items: T[], getName: (item: T) => string, getValue: (item: T) => number) {
+  const grouped = new Map<string, number>();
+
+  for (const item of items) {
+    const name = getName(item);
+    grouped.set(name, (grouped.get(name) ?? 0) + getValue(item));
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+}
+
+function uniqueSorted(values: string[]) {
+  return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "cs-CZ"));
+}
+
+function getQueryValue(value: string | string[] | undefined, fallback = "") {
+  if (Array.isArray(value)) {
+    return value[0] ?? fallback;
+  }
+
+  return value ?? fallback;
 }

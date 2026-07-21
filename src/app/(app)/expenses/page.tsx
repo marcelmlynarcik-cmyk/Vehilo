@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartCard } from "@/components/charts/basic-charts";
 import { ExpenseForm } from "@/components/forms/expense-form";
@@ -54,11 +55,11 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
           <CardTitle>Filtry</CardTitle>
         </CardHeader>
         <CardContent>
-          <form action="/expenses" className="grid gap-3 md:grid-cols-6">
-            <Input name="q" placeholder="Hledat" defaultValue={filters.q} />
+          <form action="/expenses" className="grid min-w-0 gap-3 md:grid-cols-6">
+            <FilterInput name="q" label="Hledání" placeholder="Popis, kategorie, poznámka" defaultValue={filters.q} />
             <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
             <FilterSelect name="category" label="Kategorie" value={filters.category} options={expenseCategories.map((category): [string, string] => [category, category])} />
-            <Input name="month" type="month" defaultValue={filters.month} />
+            <FilterInput name="month" label="Měsíc" type="month" defaultValue={filters.month} />
             <FilterSelect name="year" label="Rok" value={filters.year} options={expenseYears.map((year): [string, string] => [year, year])} />
             <div className="flex gap-2">
               <Button type="submit" className="flex-1">Filtrovat</Button>
@@ -70,15 +71,15 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         </CardContent>
       </Card>
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Výdaje po měsících" type="bar" data={monthlyExpenses} />
-        <ChartCard title="Výdaje podle kategorií" type="pie" data={categoryExpenses} />
-        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeExpenses} />
+        <ChartCard title="Výdaje po měsících" type="bar" data={monthlyExpenses} valueLabel="Náklady" />
+        <ChartCard title="Výdaje podle kategorií" type="pie" data={categoryExpenses} valueLabel="Náklady" />
+        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeExpenses} valueLabel="Náklady" />
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Výdaje celkem" value={formatCurrency(total, currency)} description="Ze skutečných záznamů" icon={ReceiptText} />
         <MetricCard title="Tento měsíc" value={formatCurrency(currentMonthTotal, currency)} description="Podle data výdaje" icon={ReceiptText} />
         <MetricCard title="Největší výdaj" value={formatCurrency(largestExpense?.amount ?? 0, currency)} description={largestExpense?.description ?? "Zatím bez dat"} icon={ReceiptText} />
-        <MetricCard title="Náklad na km" value={`${formatCurrency(costPerKm, currency)}/km`} description="Od nákupu po aktuální nájezd" icon={ReceiptText} />
+        <MetricCard title="Náklad na km" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Jen vozidla ve filtrovaných výdajích" icon={ReceiptText} />
       </div>
       {data.expenses.length === 0 ? (
         <EmptyState icon={ReceiptText} title="Zatím žádné výdaje" description="Po připojení Supabase a vytvoření prvního vozidla zde budete ukládat skutečné náklady." actionLabel="Přidat výdaj" />
@@ -188,19 +189,51 @@ function FilterSelect({
   options: Array<[string, string]>;
 }) {
   return (
-    <select
-      name={name}
-      defaultValue={value}
-      aria-label={label}
-      className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-    >
-      <option value="all">Všechny</option>
-      {options.map(([optionValue, optionLabel]) => (
-        <option key={optionValue} value={optionValue}>
-          {optionLabel}
-        </option>
-      ))}
-    </select>
+    <div className="min-w-0 space-y-1.5">
+      <Label htmlFor={`expense-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
+      <select
+        id={`expense-filter-${name}`}
+        name={name}
+        defaultValue={value}
+        aria-label={label}
+        className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+      >
+        <option value="all">Všechny</option>
+        {options.map(([optionValue, optionLabel]) => (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function FilterInput({
+  name,
+  label,
+  type = "text",
+  placeholder,
+  defaultValue,
+}: {
+  name: string;
+  label: string;
+  type?: string;
+  placeholder?: string;
+  defaultValue: string;
+}) {
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <Label htmlFor={`expense-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
+      <Input
+        id={`expense-filter-${name}`}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        defaultValue={defaultValue}
+        className="w-full min-w-0"
+      />
+    </div>
   );
 }
 
@@ -331,8 +364,10 @@ function sumCurrentMonthExpenses(expenses: Expense[]) {
 }
 
 function calculateExpenseCostPerKm(expenses: Expense[], vehicles: Vehicle[]) {
+  const vehicleIds = new Set(expenses.map((expense) => expense.vehicle_id));
+  const relevantVehicles = vehicles.filter((vehicle) => vehicleIds.has(vehicle.id));
   const distanceByVehicle = new Map(
-    vehicles.map((vehicle) => [
+    relevantVehicles.map((vehicle) => [
       vehicle.id,
       Math.max(0, Number(vehicle.current_mileage) - Number(vehicle.purchase_mileage ?? vehicle.current_mileage)),
     ]),

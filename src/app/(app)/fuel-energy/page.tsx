@@ -40,6 +40,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(data.energyEntries);
   const monthlyUnitPrices = buildMonthlyUnitPriceSeries(data.energyEntries);
   const monthlyCosts = buildMonthlyEnergyCostSeries(data.energyEntries);
+  const unitPriceTitle = formatUnitPriceTitle(data.energyEntries);
 
   return (
     <div className="space-y-6">
@@ -74,19 +75,22 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
           type="line"
           data={consumptionTrend}
           emptyLabel="Čeká na další plnou nádrž"
+          valueLabel="Spotřeba"
         />
         <ChartCard
           title="Cena na 100 km"
           type="line"
           data={monthlyCostPer100Km}
           emptyLabel="Čeká na měsíce s více záznamy"
+          valueLabel="Náklady"
         />
-        <ChartCard title="Měsíční náklady" type="bar" data={monthlyCosts} />
+        <ChartCard title="Měsíční náklady" type="bar" data={monthlyCosts} valueLabel="Náklady" />
         <ChartCard
-          title="Cena za litr / kWh"
+          title={unitPriceTitle}
           type="line"
           data={monthlyUnitPrices}
           emptyLabel="Čeká na záznamy s množstvím"
+          valueLabel="Cena za jednotku"
         />
       </div>
       {data.energyEntries.length === 0 ? (
@@ -304,7 +308,14 @@ function formatNumber(value: number) {
 }
 
 function formatUnit(value: string) {
-  return value === "liters" ? "l" : value;
+  const labels: Record<string, string> = {
+    liters: "l",
+    gallons: "gal",
+    kWh: "kWh",
+    kg: "kg",
+  };
+
+  return labels[value] ?? value;
 }
 
 function formatConsumptionSummaries(summaries: ConsumptionSummary[]) {
@@ -330,4 +341,30 @@ function formatEntryType(entry: EnergyEntry) {
 
   const label = labels[entry.entry_type] ?? "Záznam";
   return entry.full_tank ? `${label} - plná` : label;
+}
+
+function formatUnitPriceTitle(entries: EnergyEntry[]) {
+  const units = [...new Set(entries.map((entry) => entry.quantity_unit))].sort();
+
+  if (units.length === 0) {
+    return "Cena za jednotku";
+  }
+
+  const labels = units.map((unit) => {
+    if (unit === "liters") {
+      return "litr";
+    }
+
+    if (unit === "kWh") {
+      return "kWh";
+    }
+
+    if (unit === "kg") {
+      return "kg";
+    }
+
+    return "galon";
+  });
+
+  return `Cena za ${labels.join(" / ")}`;
 }

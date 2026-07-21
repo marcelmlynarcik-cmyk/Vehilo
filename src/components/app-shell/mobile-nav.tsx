@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -72,8 +73,10 @@ export function MobileNav() {
 }
 
 function MobileMenu({ pathname }: { pathname: string }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
           <Button
@@ -105,7 +108,7 @@ function MobileMenu({ pathname }: { pathname: string }) {
                   active && "border-[rgba(45,212,163,0.34)] bg-[rgba(39,211,162,0.12)] text-foreground"
                 )}
               >
-                <Link href={item.href}>
+                <Link href={item.href} onClick={() => setOpen(false)}>
                   <Icon className={cn("size-4", active && "text-[var(--accent)]")} aria-hidden="true" />
                   {item.label}
                 </Link>

@@ -50,7 +50,7 @@ export default async function DashboardPage() {
         <MetricCard title="Vozidla celkem" value={String(data.vehicles.length)} description="Aktivní záznamy v garáži" icon={Car} />
         <MetricCard title="Měsíční náklady" value={formatCurrency(currentMonthCost, currency)} description="Aktuální kalendářní měsíc" icon={ReceiptText} />
         <MetricCard title="Měsíční průměr" value={formatCurrency(averageMonthlyCost, currency)} description="Od prvního záznamu" icon={ReceiptText} />
-        <MetricCard title="Celkové vlastnické náklady" value={formatCurrency(totalCost, currency)} description="Výdaje, palivo, servis a ztráta hodnoty" icon={Gauge} />
+        <MetricCard title="Celkové náklady" value={formatCurrency(totalCost, currency)} description="Výdaje, palivo a servis" icon={Gauge} />
         <MetricCard title="Cena za kilometr" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Napříč všemi vozidly od koupě" icon={Fuel} />
         <MetricCard title="Nadcházející připomínky" value={String(countReminderStatus(data.reminders, "upcoming"))} description="Plánovaný servis a dokumenty" icon={Bell} />
         <MetricCard title="Po termínu" value={String(countReminderStatus(data.reminders, "overdue"))} description="Vyžaduje pozornost" icon={CalendarClock} />
@@ -59,12 +59,12 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Měsíční výdaje" type="bar" />
-        <ChartCard title="Výdaje podle kategorií" type="pie" />
-        <ChartCard title="Kumulativní vlastnické náklady" type="area" />
-        <ChartCard title="Trend nákladů na palivo a energii" type="line" />
-        <ChartCard title="Trend spotřeby" type="line" />
-        <ChartCard title="Výdaje podle vozidel" type="bar" />
+        <ChartCard title="Měsíční výdaje" type="bar" valueLabel="Náklady" />
+        <ChartCard title="Výdaje podle kategorií" type="pie" valueLabel="Náklady" />
+        <ChartCard title="Kumulativní náklady" type="area" valueLabel="Náklady" />
+        <ChartCard title="Trend nákladů na palivo a energii" type="line" valueLabel="Náklady" />
+        <ChartCard title="Trend spotřeby" type="line" valueLabel="Spotřeba" />
+        <ChartCard title="Výdaje podle vozidel" type="bar" valueLabel="Náklady" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

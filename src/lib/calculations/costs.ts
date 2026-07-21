@@ -27,6 +27,14 @@ export function sumEnergyCost(entries: EnergyEntry[]) {
   return entries.reduce((total, entry) => total + Number(entry.total_price), 0);
 }
 
+export function sumServiceCost(entries: GarageData["serviceEntries"]) {
+  return entries.reduce((total, entry) => total + Number(entry.total_cost), 0);
+}
+
+export function calculateRecordedCost(data: GarageData) {
+  return sumExpenses(data.expenses) + sumEnergyCost(data.energyEntries) + sumServiceCost(data.serviceEntries);
+}
+
 export function totalMileage(vehicles: Vehicle[]) {
   return vehicles.reduce((total, vehicle) => total + Number(vehicle.current_mileage), 0);
 }
@@ -54,21 +62,12 @@ export function calculateVehicleCost(data: GarageData, vehicleId: string) {
   const expenses = data.expenses.filter((expense) => expense.vehicle_id === vehicleId);
   const energy = data.energyEntries.filter((entry) => entry.vehicle_id === vehicleId);
   const services = data.serviceEntries.filter((entry) => entry.vehicle_id === vehicleId);
-  const vehicle = data.vehicles.find((item) => item.id === vehicleId);
 
-  return (
-    sumExpenses(expenses) +
-    sumEnergyCost(energy) +
-    services.reduce((total, entry) => total + Number(entry.total_cost), 0) +
-    (vehicle ? calculateDepreciation(vehicle) : 0)
-  );
+  return sumExpenses(expenses) + sumEnergyCost(energy) + sumServiceCost(services);
 }
 
 export function calculateTotalOwnershipCost(data: GarageData) {
-  return data.vehicles.reduce(
-    (total, vehicle) => total + calculateVehicleCost(data, vehicle.id),
-    0,
-  );
+  return calculateRecordedCost(data);
 }
 
 export function calculateCostPerKm(data: GarageData) {

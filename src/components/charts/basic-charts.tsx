@@ -40,9 +40,10 @@ interface ChartCardProps {
   type: "line" | "bar" | "pie" | "area";
   data?: ChartDatum[];
   emptyLabel?: string;
+  valueLabel?: string;
 }
 
-export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat" }: ChartCardProps) {
+export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", valueLabel = "Hodnota" }: ChartCardProps) {
   const chartData = data && data.length > 0 ? data : emptySeries;
   const hasData = chartData !== emptySeries;
 
@@ -59,28 +60,28 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat" }: 
         ) : null}
         <ResponsiveContainer width="100%" height="100%">
           {type === "line" ? (
-            <LineChart data={chartData}>
+            <LineChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis tickLine={false} axisLine={false} tick={axisStyle} />
+              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
-              <Line type="monotone" dataKey="value" stroke="#2dd4a3" strokeWidth={3} dot={false} />
+              <Line type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} dot={false} />
             </LineChart>
           ) : type === "bar" ? (
-            <BarChart data={chartData}>
+            <BarChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis tickLine={false} axisLine={false} tick={axisStyle} />
+              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(56, 189, 248, 0.08)" }} />
-              <Bar dataKey="value" fill="#38bdf8" radius={[8, 8, 0, 0]} />
+              <Bar dataKey="value" name={valueLabel} fill="#38bdf8" radius={[8, 8, 0, 0]} />
             </BarChart>
           ) : type === "area" ? (
-            <AreaChart data={chartData}>
+            <AreaChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis tickLine={false} axisLine={false} tick={axisStyle} />
+              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
               <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
-              <Area type="monotone" dataKey="value" stroke="#2dd4a3" strokeWidth={3} fill="#2dd4a3" fillOpacity={0.18} />
+              <Area type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} fill="#2dd4a3" fillOpacity={0.18} />
             </AreaChart>
           ) : (
             <PieChart>
