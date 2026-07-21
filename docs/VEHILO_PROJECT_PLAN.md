@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-20
+Last updated: 2026-07-21
 
 ## Project Summary
 
@@ -1296,6 +1296,675 @@ For the first launchable prototype:
 - [ ] Loading states exist for slow queries.
 - [ ] Basic error handling exists.
 - [ ] README explains setup.
+
+## Paid Subscription Launch Readiness
+
+This section prepares Vehilo for future public operation as a paid monthly PWA service for consumers in the Czech Republic.
+
+Important boundary:
+
+- This is a product, engineering, security and compliance planning backlog, not legal or tax advice.
+- Legal documents must be written or reviewed before launch by a Czech lawyer.
+- Tax, accounting, VAT and document-format decisions must be checked before launch with a Czech accountant.
+- No production code, database schema, payment integration or legal text should be implemented from this section until the relevant task is explicitly selected for implementation.
+- Operator identity values must be configurable, not hardcoded in multiple places. Do not invent or commit name, IČO, address, trade-register text, VAT status or other legal identity values until confirmed.
+
+Commercial assumptions for planning:
+
+- Target launch market: Czech Republic.
+- Target users: private individuals / consumers.
+- Product: Vehilo PWA for vehicle, cost, fuel/charging, service, document and reminder management.
+- Initial price: `30 Kč` per user per month.
+- Billing model: monthly auto-renewing subscription.
+- Trial: 14 days.
+- Currency: CZK.
+- Payments: external payment gateway, provider not selected yet.
+- Card numbers and payment credentials must never be stored in Vehilo database.
+
+### Current Audit Snapshot
+
+Project structure:
+
+- Next.js App Router app with public landing page at `src/app/page.tsx`.
+- Protected app group under `src/app/(app)` with dashboard, vehicles, expenses, fuel-energy, service, reminders, documents, statistics and settings.
+- UI components live under `src/components`, domain types under `src/types`, Supabase clients under `src/lib/supabase`, data loaders under `src/lib/data`, calculations under `src/lib/calculations`.
+- Main planning source is this document: `docs/VEHILO_PROJECT_PLAN.md`.
+
+Database and storage:
+
+- Supabase schema exists in `supabase/schema.sql`.
+- Current app tables: `profiles`, `vehicles`, `expenses`, `energy_entries`, `service_entries`, `reminders`, `documents`.
+- RLS is enabled on current user-owned public tables.
+- Owner-scoped policies use `(select auth.uid()) = user_id` or profile `id`.
+- Private Storage buckets exist for `vehicle-photos`, `receipts`, `service-invoices` and `documents`.
+- Storage policies restrict objects by first path segment matching the authenticated user id.
+- No subscription, payment, legal-document, consent, export, account-deletion, webhook or audit-log tables exist yet.
+
+Authentication:
+
+- Google OAuth is the primary sign-in method.
+- Supabase SSR client handles auth cookies.
+- Auth callback exchanges OAuth code and redirects to the app.
+- Settings page can update profile name and preferences.
+- Email/password, password reset, active session management, MFA, account deletion and export flows are not implemented.
+
+PWA:
+
+- Manifest exists at `public/manifest.json` with `standalone` display and Czech metadata.
+- Service worker exists at `public/sw.js`.
+- Service worker registers only in production through `ServiceWorkerProvider`.
+- Offline fallback page exists.
+- Current service worker caches static app assets and does not intentionally cache user API responses.
+- No update notification, background sync, push subscriptions, stale-version handling or local sensitive-data wipe flow exists yet.
+
+External services currently visible in the project:
+
+- Vercel: hosting and deployment.
+- GitHub: source repository.
+- Supabase: Auth, Postgres and Storage.
+- Google OAuth: identity provider.
+- No payment gateway, transactional email provider, analytics, marketing tracking, error monitoring, push notification provider or AI service is currently integrated in code.
+
+Cookies and local storage:
+
+- Supabase auth cookies are used through `@supabase/ssr`.
+- The current app code search found no explicit `localStorage`, `sessionStorage`, `indexedDB`, analytics SDK, marketing SDK, error tracking SDK or push notification use.
+- Service worker cache is used for offline fallback and static assets.
+
+Existing partial coverage:
+
+- Private user data model and RLS already cover core garage records.
+- Private Supabase Storage buckets and signed/private file paths already support vehicle photos, receipts and service invoices.
+- Public landing page and protected app shell already exist.
+- Settings page already has profile and preference editing.
+- PWA manifest, icons, service worker registration and offline fallback already exist.
+
+Largest gaps before paid public launch:
+
+- No legal pages, operator identity configuration or legal-document version acceptance.
+- No privacy/GDPR process for export, deletion, retention, processors or incident response.
+- No subscription model, checkout, billing status, payment history, cancellation or webhook processing.
+- No transactional email system.
+- No admin/support tooling or audit logs.
+- No staging environment/payment sandbox plan is documented as launch-ready.
+- PWA offline and push behavior is not yet safe enough for reminders and paid production use.
+
+### Task Format For This Section
+
+Each task below uses this compact format:
+
+- Name: task title.
+- Description: what must be planned or built later.
+- Reason: why it matters.
+- Priority: `P0 – Launch blocker`, `P1 – Nutné krátko po spustení`, `P2 – Dôležité zlepšenie`, or `P3 – Budúce rozšírenie`.
+- Phase: A-G.
+- Dependencies: required earlier decisions or work.
+- Impacted parts: likely files, modules, services or documents.
+- Risk: legal, security, privacy, billing, UX or operational risk.
+- Acceptance: clear done criteria.
+- Status: planned / in progress / done.
+- Blocks launch: yes/no.
+
+### Phase A - Audit Aktuálneho Stavu
+
+- Name: Complete launch audit baseline.
+  Description: Record current architecture, auth, database, storage, PWA behavior, external services, legal pages and plan status in this document.
+  Reason: Paid launch work needs a stable baseline before adding subscription and legal workflows.
+  Priority: P0 – Launch blocker.
+  Phase: A.
+  Dependencies: Current repository audit.
+  Impacted parts: `docs/VEHILO_PROJECT_PLAN.md`, `README.md`, `src/app`, `supabase/schema.sql`, `public/manifest.json`, `public/sw.js`.
+  Risk: Missing launch blockers if the current state is assumed instead of audited.
+  Acceptance: Audit snapshot lists current implemented features, gaps, external providers and PWA/storage/auth state.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: External provider inventory audit.
+  Description: Create and maintain a central inventory of all real providers used by Vehilo.
+  Reason: Privacy policy, DPA tracking, incident response and vendor risk management depend on knowing every processor/subprocessor.
+  Priority: P0 – Launch blocker.
+  Phase: A.
+  Dependencies: Provider selection for payments, email, analytics, monitoring and push.
+  Impacted parts: `docs`, future provider config, Vercel, Supabase, Google OAuth, GitHub, future payment/email/monitoring/push providers.
+  Risk: Undocumented processors and cross-border transfers.
+  Acceptance: Inventory includes company name, purpose, data types, processing country, DPA availability/link, terms link, retention, opt-out/shutdown option and incident contact/procedure for hosting, database, auth, storage, payments, email, analytics, monitoring, push, AI and backups as applicable.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Cookies and storage audit.
+  Description: Audit cookies, Local Storage, Session Storage, IndexedDB, service worker cache, analytics, marketing tools, error tracking and user monitoring.
+  Reason: Consent and cookie policy must distinguish necessary PWA/auth storage from analytics/marketing storage.
+  Priority: P0 – Launch blocker.
+  Phase: A.
+  Dependencies: Final provider choices and final PWA behavior.
+  Impacted parts: `src/lib/supabase`, `src/components/providers/service-worker-provider.tsx`, `public/sw.js`, future analytics/error monitoring modules.
+  Risk: Non-technical tracking before valid consent or caching sensitive data locally.
+  Acceptance: Documented categories for technical and non-technical storage, plus decision whether consent banner is required.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Supabase security audit.
+  Description: Audit all RLS policies, Storage policies, database functions, grants and server operations before paid launch.
+  Reason: Consumers must not be able to read or mutate another user's vehicles, files, subscriptions or account records.
+  Priority: P0 – Launch blocker.
+  Phase: A.
+  Dependencies: Final schema for subscriptions/legal/account deletion; Supabase advisors.
+  Impacted parts: `supabase/schema.sql`, future migrations, `src/lib/data`, server actions.
+  Risk: BOLA/IDOR, public file exposure, service-role leakage, stale policies.
+  Acceptance: Tests prove each user can only access own rows/files; storage signed URLs are time-limited; no service key is exposed in frontend; logs do not contain secrets or sensitive document contents.
+  Status: planned.
+  Blocks launch: yes.
+
+### Phase B - Právny A Dátový Základ
+
+- Name: Central operator identity configuration.
+  Description: Design a single configurable source for operator identity values: name/business name, IČO, registered office/place of business, contact email, optional phone, trade-register entry text and VAT payer status.
+  Reason: Public pages, emails, invoices, terms and privacy documents need consistent operator details without hardcoding values across the app.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Confirmed legal operator details and accounting/VAT status.
+  Impacted parts: future `src/lib/legal` or config module, legal pages, email templates, invoice/receipt generation, admin settings.
+  Risk: Incorrect or inconsistent legal identity shown to consumers.
+  Acceptance: One configurable source feeds all operator displays; no duplicate hardcoded identity values; placeholders remain until verified.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Public legal information pages.
+  Description: Plan publicly reachable Czech pages/sections for Kontakt, Provozovatel and Právní informace.
+  Reason: Consumers must clearly know who operates the service and how to contact the operator.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Central operator identity configuration.
+  Impacted parts: future public routes under `src/app`, landing footer/navigation, SEO metadata.
+  Risk: Missing operator transparency; consumer trust and compliance issue.
+  Acceptance: Pages are accessible without login and render only configured verified operator values.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Terms of service page and legal review.
+  Description: Create a public Czech terms page covering service description, device/internet requirements, supported browsers/devices, price, billing period, trial, auto-renewal, next payment date, cancellation, refunds, consumer withdrawal, complaints, outages/maintenance, updates, user-entered data responsibility, account termination, post-subscription data handling, ADR and operator contact.
+  Reason: A paid consumer subscription needs clear contractual terms before checkout.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Operator identity, subscription process, cancellation process, refund policy, legal review.
+  Impacted parts: future `/obchodni-podminky` route, checkout page, legal acceptance records, email templates.
+  Risk: Invalid or unclear consumer contract terms.
+  Acceptance: Lawyer-reviewed Czech terms are public, versioned and linked from checkout and footer.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Legal document versioning and acceptance.
+  Description: Plan version tracking for terms and privacy policy including version number, effective date, user acceptance date and accepted version per user.
+  Reason: Vehilo must prove which legal text a user accepted before using paid service.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Database model design for `legal_documents` and `legal_acceptances`.
+  Impacted parts: future DB schema, checkout, account settings, admin legal document management.
+  Risk: Unable to evidence valid acceptance after disputes or legal changes.
+  Acceptance: Every required legal document has a version and each user's acceptance is recorded immutably enough for audit.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Privacy policy page and GDPR review.
+  Description: Create public Czech privacy policy covering profile/name/email/auth data, vehicles, license plate, VIN, service records, costs, fuel/charging, photos, receipts, invoices, service documents, subscription data, logs, IP/device/browser info and support communication data.
+  Reason: Users need transparent information about personal data processing before using the service.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Provider inventory, retention policy, security architecture, legal review.
+  Impacted parts: future `/ochrana-osobnich-udaju` route, checkout, account settings, support process.
+  Risk: GDPR transparency and lawful-basis failures.
+  Acceptance: Policy documents purposes, legal bases, retention periods, processors, non-EU transfers, user rights, GDPR contact process, export/correction/restriction/deletion/security incident handling; reviewed before launch.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Consent and cookie policy.
+  Description: Plan cookie/storage policy, consent banner only if non-technical tools are added, consent evidence, preference changes and pre-consent blocking of analytics/marketing scripts.
+  Reason: Technical auth/PWA storage should be separated from optional analytics/marketing.
+  Priority: P0 – Launch blocker if non-technical tracking is used; otherwise P1.
+  Phase: B.
+  Dependencies: Cookies/storage audit and final analytics/marketing provider choice.
+  Impacted parts: future consent module, public cookie page, analytics integration, settings/privacy UI.
+  Risk: Invalid consent or overblocking necessary app functions.
+  Acceptance: Technical storage is documented; optional tracking is disabled until valid consent; user can later change consent.
+  Status: planned.
+  Blocks launch: conditional.
+
+- Name: Processor and DPA register.
+  Description: Maintain central register of processors/subprocessors and DPA status for Vercel, Supabase, Google OAuth, payment gateway, email service, monitoring, analytics, push and backups.
+  Reason: GDPR documentation and incident response require processor visibility.
+  Priority: P0 – Launch blocker.
+  Phase: B.
+  Dependencies: Provider inventory.
+  Impacted parts: docs, privacy policy, vendor contracts.
+  Risk: Using processors without reviewed terms/DPA.
+  Acceptance: Each production provider has documented purpose, data categories, DPA/terms URL, transfer basis if outside EEA, retention and incident contact.
+  Status: planned.
+  Blocks launch: yes.
+
+### Phase C - Bezpečnosť A Používateľské Práva
+
+- Name: Account deletion process.
+  Description: Plan a separate account deletion flow with consequences, identity re-verification, severe-action confirmation, optional waiting period, cancellation window, subscription cancellation, data deletion/anonymization, Storage cleanup, backups handling, legally retained records and final confirmation.
+  Reason: Deleting an account is different from canceling a subscription and must not break database integrity or other users' data.
+  Priority: P0 – Launch blocker.
+  Phase: C.
+  Dependencies: Retention policy, subscription model, payment provider rules, auth/session management.
+  Impacted parts: future settings/privacy UI, DB entities `account_deletion_requests`, storage cleanup jobs, auth admin integration, email templates.
+  Risk: Accidental deletion, incomplete deletion, legal retention conflicts.
+  Acceptance: User can request deletion securely; process records state; files are removed or anonymized; required accounting records are retained; completion email is sent.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: User data export.
+  Description: Plan authenticated export of profile, vehicles, fuel/charging, expenses, service records, reminders, document metadata, subscription history and preferences, with JSON, CSV and ZIP options where appropriate.
+  Reason: Users need practical data portability and support for GDPR access/export requests.
+  Priority: P0 – Launch blocker.
+  Phase: C.
+  Dependencies: Export request model, retention policy, Storage access rules.
+  Impacted parts: future settings/privacy UI, server export jobs, Storage ZIP packaging, `data_export_requests`.
+  Risk: Export leaking another user's data or exposing stale signed URLs.
+  Acceptance: Export is available only to authenticated owner; includes expected categories; downloads expire; export request is logged.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Retention policy.
+  Description: Define retention for active user data, post-cancellation data, post-account-deletion data, payment records, accounting documents, security logs, app logs, webhook events, exports, backups, failed registrations, unverified accounts, consents and legal acceptances.
+  Reason: Data should not be kept forever by accident, and legal records must be kept where required.
+  Priority: P0 – Launch blocker.
+  Phase: C.
+  Dependencies: Legal/accounting review and database model.
+  Impacted parts: docs, future config, cleanup jobs, privacy policy, backup policy.
+  Risk: Over-retention, premature deletion of legally required records, scattered hardcoded retention periods.
+  Acceptance: Retention periods are documented and centrally configurable where possible; policy is reflected in privacy text and cleanup jobs.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Backup and recovery plan.
+  Description: Plan database backups, document Storage backups, retention periods, encryption, restore tests, recovery runbook, responsibility owner, personal-data deletion from backups and protection against accidental bulk deletion.
+  Reason: Paid users need recoverable service, not just enabled backups.
+  Priority: P0 – Launch blocker.
+  Phase: C.
+  Dependencies: Supabase plan capabilities, Storage backup strategy, retention policy.
+  Impacted parts: Supabase, Storage, operations docs, incident response.
+  Risk: Data loss or inability to prove restore capability.
+  Acceptance: Documented restore procedure exists and has been tested on non-production data; backup retention and encryption are verified.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Monitoring, logging and incident response.
+  Description: Plan monitoring for app/server/database/webhook/email/security/performance/availability failures and an incident process covering identification, containment, data impact evaluation, internal documentation, user notification, ÚOOÚ assessment, fix and post-incident review.
+  Reason: Paid production service needs operational visibility and privacy-safe incident handling.
+  Priority: P0 – Launch blocker for incident response baseline; P1 for advanced monitoring.
+  Phase: C.
+  Dependencies: Provider choices for monitoring and email.
+  Impacted parts: future monitoring provider, logs, admin dashboards, support process.
+  Risk: Silent failures, sensitive data in logs, missed breach notifications.
+  Acceptance: Logs are minimized and exclude passwords, tokens, payment data and document contents; alerting exists for critical failures; incident runbook is documented.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Authentication and account security roadmap.
+  Description: Audit and plan email verification, secure email change, password change/reset if email auth is added, brute-force protection, rate limiting, active sessions, sign out from all devices, suspicious-login alerts, future MFA and account recovery.
+  Reason: Account takeover would expose vehicle data, documents and billing state.
+  Priority: P0 – Launch blocker for current Google-auth hardening; P2/P3 for optional MFA and extra auth methods.
+  Phase: C.
+  Dependencies: Auth method decisions, Supabase Auth configuration.
+  Impacted parts: Supabase Auth settings, `src/app/auth`, settings account UI, email templates.
+  Risk: Account takeover, stale sessions, insecure recovery.
+  Acceptance: Current login method is reviewed; sensitive account actions require fresh auth or equivalent; session and recovery behavior is documented.
+  Status: planned.
+  Blocks launch: yes.
+
+### Phase D - Predplatné A Platby
+
+- Name: Payment gateway selection.
+  Description: Choose a payment provider for CZK monthly consumer subscriptions and document supported trial, recurring billing, refunds, receipts/invoices, webhook signing, customer portal, DPA and Czech/EU suitability.
+  Reason: Provider capabilities shape subscription model, checkout, cancellation and accounting.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Accounting/legal review and provider inventory.
+  Impacted parts: future billing integration, provider inventory, privacy policy, checkout.
+  Risk: Choosing a gateway that cannot support required consumer/legal/accounting flows.
+  Acceptance: Selected gateway is documented with sandbox setup, DPA/terms, supported events, fee/accounting implications and fallback plan.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Payment gateway abstraction.
+  Description: Plan a gateway abstraction so app logic is not tightly coupled to one provider.
+  Reason: The provider is not selected yet and future migration should not rewrite subscription business logic.
+  Priority: P1 – Nutné krátko po spustení.
+  Phase: D.
+  Dependencies: Subscription domain model.
+  Impacted parts: future `src/lib/billing`, route handlers, webhook processors, tests.
+  Risk: Lock-in and duplicated payment-state logic.
+  Acceptance: Billing domain uses internal subscription/payment states and maps provider events through adapter functions.
+  Status: planned.
+  Blocks launch: no, if a well-isolated first provider integration is acceptable.
+
+- Name: Subscription state model.
+  Description: Plan states for no subscription, trialing, active, payment pending, payment failed, past due, canceled at period end, ended, paused and refunded.
+  Reason: Access control and user billing UI need a precise state machine.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Payment provider event model, database model.
+  Impacted parts: future `subscriptions`, access middleware/server checks, settings billing UI.
+  Risk: Incorrect access after failed/canceled/refunded payment.
+  Acceptance: State transition table exists and is covered by tests for trial, renewals, failed payments, cancellation, reactivation and refund.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Subscription database model design.
+  Description: Design but do not yet create entities for `plans`, `subscriptions`, `subscription_events`, `payments`, `invoices` or `receipts`, `legal_documents`, `legal_acceptances`, `consent_records`, `data_export_requests`, `account_deletion_requests`, `webhook_events` and `audit_logs`.
+  Reason: Paid operation requires auditability without schema changes being made prematurely.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Provider choice, legal acceptance requirements, retention policy.
+  Impacted parts: future migrations, `src/types/database.ts`, billing data loaders.
+  Risk: Data model that cannot handle price changes, trials, refunds or audit history.
+  Acceptance: Design accounts for timezone, CZK, future currencies/prices, price changes without breaking existing subscriptions, trial, promos, refunds, history and auditability.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Order page / checkout pre-confirmation.
+  Description: Plan clear order page before subscription activation showing product name, 30 Kč/month price, whether price is final, 14-day trial, first payment date, monthly auto-renewal, cancellation method, main service features and links to terms/privacy.
+  Reason: Consumer must understand that confirming creates a payment obligation after trial/checkout rules.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Terms, privacy policy, payment provider, operator identity.
+  Impacted parts: future checkout route, billing UI, legal acceptances.
+  Risk: Invalid or unclear consumer order flow.
+  Acceptance: Payment button text clearly indicates payment obligation, e.g. `Objednat a zaplatit 30 Kč`; ambiguous labels like `Pokračovat`, `Dokončit`, `Aktivovat účet` or `Registrovat se` are not used for paid confirmation.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Checkout consent and acceptance records.
+  Description: Plan required checkboxes/records for accepting terms, acknowledging privacy policy and optionally explicit request to start service before withdrawal period ends; marketing consent must be optional.
+  Reason: Legal acceptance must be evidenced and marketing consent must not gate service.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Legal document versioning and checkout page.
+  Impacted parts: checkout UI, `legal_acceptances`, `consent_records`.
+  Risk: Invalid consent, bundling marketing with service.
+  Acceptance: Required legal acceptances are stored with document version/time/user/IP or relevant metadata; marketing consent is separate and optional.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: User billing dashboard.
+  Description: Plan account UI showing tariff, price, subscription status, start, trial end, next payment date, auto-renewal info, payment history, cancellation, payment-method update via gateway and downloadable documents if provider/system supports them.
+  Reason: Users need transparent subscription self-service.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Subscription model, payment provider, email/document strategy.
+  Impacted parts: future settings billing section, data loaders, provider portal links.
+  Risk: Users cannot manage recurring charges.
+  Acceptance: User can see current billing state and initiate cancellation/payment method update without support contact.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Subscription cancellation flow.
+  Description: Plan direct in-app cancellation separate from account deletion, with explanation of stopped future payments, paid access end date, data handling and retention, in-app confirmation, email confirmation and reactivation before period end.
+  Reason: Cancellation must be simple and transparent for monthly recurring service.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Payment provider customer/subscription APIs and email service.
+  Impacted parts: billing UI, webhook processing, transactional emails.
+  Risk: Dark pattern cancellation, disputes, unintended account deletion.
+  Acceptance: User can cancel and reactivate; app and email confirmations are sent; access remains correct through period end.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Payment receipts and accounting documents.
+  Description: Plan payment document generation/access containing operator, IČO, service label, payment date, price, billing period, currency, document number and VAT text based on confirmed tax status.
+  Reason: Paid users may need receipts and operator must keep accounting evidence.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Accountant review, VAT status, payment provider capabilities.
+  Impacted parts: billing UI, email templates, future `invoices`/`receipts` table.
+  Risk: Incorrect tax document format or VAT handling.
+  Acceptance: Accountant-approved document format and retention are documented before real payments.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Payment webhook processing.
+  Description: Plan secure webhook handling with signature verification, idempotency, event id storage, duplicate protection, logging, retries, separate receive/process stages, periodic subscription reconciliation, out-of-order event handling, alerts and manual resync.
+  Reason: Subscription state must never depend only on frontend-submitted data.
+  Priority: P0 – Launch blocker.
+  Phase: D.
+  Dependencies: Payment gateway selection and database model.
+  Impacted parts: future route handlers/API, `webhook_events`, worker/queue strategy, billing service.
+  Risk: Duplicate charges, wrong subscription state, replay attacks.
+  Acceptance: Webhook tests cover duplicate events, out-of-order events, DB failure during processing and manual reconciliation.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Transactional email system.
+  Description: Plan templates for account creation, email verification, trial start, trial ending, paid activation, successful payment, failed payment, retry, cancellation, end of subscription, refund, terms/privacy changes, export request, deletion request, deletion completed and security alerts.
+  Reason: Billing, legal changes and account security need reliable user communication.
+  Priority: P0 – Launch blocker for billing/legal/security emails; P1 for less critical templates.
+  Phase: D.
+  Dependencies: Email provider selection, operator identity, legal documents, subscription flow.
+  Impacted parts: future email provider integration, templates, support process.
+  Risk: Users miss billing/cancellation/security/legal notices.
+  Acceptance: Required templates exist in Czech, include correct operator identity, and are sent in test environment.
+  Status: planned.
+  Blocks launch: yes.
+
+### Phase E - PWA Pripravenosť
+
+- Name: PWA launch hardening.
+  Description: Verify manifest, app name, short name, icons, maskable icons, theme/background colors, display mode, install behavior, responsive mobile/tablet/PC behavior, iOS Safari, Android Chrome and desktop browser behavior.
+  Reason: Vehilo is sold as a PWA and must install and behave predictably.
+  Priority: P0 – Launch blocker.
+  Phase: E.
+  Dependencies: Final icons/assets and production domain.
+  Impacted parts: `public/manifest.json`, `src/app/layout.tsx`, PWA assets.
+  Risk: Poor install experience or broken platform-specific behavior.
+  Acceptance: PWA install and launch tested on iOS Safari, Android Chrome and desktop browsers.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Service worker update and offline safety.
+  Description: Plan update notification, safe reload without losing entered data, offline fallback, offline behavior, cache strategy, no long-term caching of sensitive API responses, stale-version detection and recovery from corrupted local cache.
+  Reason: PWA caching can break paid app data integrity if not deliberately managed.
+  Priority: P0 – Launch blocker.
+  Phase: E.
+  Dependencies: Final service worker strategy and form persistence decisions.
+  Impacted parts: `public/sw.js`, `ServiceWorkerProvider`, forms, data mutation flows.
+  Risk: Serving stale app versions, caching sensitive data, data loss during updates.
+  Acceptance: User data/API responses are not cached unnecessarily; app can recover from offline/cache issues; new version UX is tested.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Offline mutation and sync strategy.
+  Description: Decide whether Vehilo will support offline edits; if yes, plan sync queue, duplicate-submit protection and conflict handling; if no, make offline write limitations explicit.
+  Reason: Vehicle costs and reminders may be entered on mobile with unstable connection.
+  Priority: P1 – Nutné krátko po spustení unless advertised as offline-write capable.
+  Phase: E.
+  Dependencies: Product decision on offline writes.
+  Impacted parts: forms, server actions, service worker, future local queue.
+  Risk: Duplicate records or lost edits.
+  Acceptance: Offline behavior is documented and tested; duplicate submissions are prevented.
+  Status: planned.
+  Blocks launch: conditional.
+
+- Name: Push notification system for reminders.
+  Description: Plan contextual permission request, pre-permission explanation, consent storage/revocation, multiple devices, expiring subscriptions, token cleanup on logout, invalid token cleanup, notification type settings, quiet hours, timezone, deep links and non-sensitive lock-screen copy.
+  Reason: Reminders are a core Vehilo feature and push must be privacy-safe.
+  Priority: P1 – Nutné krátko po spustení; P0 if push is promised at launch.
+  Phase: E.
+  Dependencies: Push provider selection, reminder scheduler, privacy policy update.
+  Impacted parts: reminders, settings notifications, service worker, provider inventory, privacy policy.
+  Risk: Sending sensitive data to lock screen or retaining stale device tokens.
+  Acceptance: Service reminders are separate from marketing notifications; user can disable notification types; provider is documented in privacy policy.
+  Status: planned.
+  Blocks launch: conditional.
+
+### Phase F - Testovanie A Launch Readiness
+
+- Name: Environment separation.
+  Description: Plan development, test/staging and production environments with separate databases or data separation, payment keys, webhooks, env vars, URLs, analytics and email configuration.
+  Reason: Production payments and user data must not be tested on live users.
+  Priority: P0 – Launch blocker.
+  Phase: F.
+  Dependencies: Vercel/Supabase/payment/email provider setup.
+  Impacted parts: Vercel projects/env, Supabase projects, payment sandbox/live config, email sandbox.
+  Risk: Mixing test and production data/payments.
+  Acceptance: Each environment has documented URLs, keys, webhooks and data boundaries; production payment testing uses an approved minimal-value process only after launch blockers are closed.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Subscription and legal E2E test plan.
+  Description: Create unit, integration, E2E, security and manual legal/UX tests for full subscription lifecycle.
+  Reason: Billing bugs are high-risk and hard to fix after real payments.
+  Priority: P0 – Launch blocker.
+  Phase: F.
+  Dependencies: Checkout, webhook, subscription, cancellation, export and deletion flows.
+  Impacted parts: test suite, payment sandbox, staging environment.
+  Risk: Broken billing state, legal acceptance gaps, data rights failures.
+  Acceptance: Tests cover new user without subscription, trial activation, first successful/failed payment, recurring success/failure, retry, cancel during trial, cancel active, reactivation, refund, duplicate webhook, out-of-order webhook, DB outage during webhook, email change, account deletion, export, expired subscription without data loss, resubscribe, offline PWA behavior, service worker update, multiple devices and push opt-out.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Availability and user-facing error states.
+  Description: Plan clear handling of database outage, payment gateway outage, email outage, login outage, sync failure, upload failure, damaged file, duplicate payment, delayed webhook, expired session and no internet.
+  Reason: Paid users need understandable recovery paths.
+  Priority: P0 – Launch blocker for critical paid/login/data-write flows; P1 for status page polish.
+  Phase: F.
+  Dependencies: Monitoring, payment/email providers, PWA offline plan.
+  Impacted parts: UI error states, support docs, status component/page.
+  Risk: Users retry payments/uploads incorrectly or lose trust.
+  Acceptance: Critical errors show localized Czech messages with next action; support/status path is documented.
+  Status: planned.
+  Blocks launch: yes.
+
+- Name: Launch blocker checklist closure.
+  Description: Complete the legal/accounting/security/technical checklist before enabling first real payments.
+  Reason: Real recurring consumer payments should not start until non-negotiable obligations are closed.
+  Priority: P0 – Launch blocker.
+  Phase: F.
+  Dependencies: All P0 tasks.
+  Impacted parts: docs, legal pages, billing, auth, backups, monitoring, tests.
+  Risk: Launching paid service without legal, tax or security readiness.
+  Acceptance: Every item in the Launch Blocker Checklist below is checked and evidence is linked in the plan.
+  Status: planned.
+  Blocks launch: yes.
+
+### Phase G - Úlohy Po Spustení
+
+- Name: Secure administration and support tooling.
+  Description: Plan admin tools for user lookup, subscription state, payment history without card data, resending transactional emails, manual payment sync, support notes, refund workflow via provider, legal document management, plans/prices and anonymized operational stats.
+  Reason: Support will need safe operational tools after launch.
+  Priority: P1 – Nutné krátko po spustení.
+  Phase: G.
+  Dependencies: Audit logs, role model, support process.
+  Impacted parts: future admin routes, audit logs, payment provider, support docs.
+  Risk: Overbroad admin access to personal documents or unaudited changes.
+  Acceptance: Admin operations are role-protected and audited; personal documents are not accessible without legitimate reason and audit trail.
+  Status: planned.
+  Blocks launch: no, unless manual support is required for launch operations.
+
+- Name: Growth roadmap.
+  Description: Plan post-launch monitoring, customer support, product metrics, additional tariffs, family accounts, business/fleet accounts, additional currencies, expansion outside Czech Republic, OSS/international VAT analysis and multilingual legal documents.
+  Reason: These are valuable but should not block the first Czech consumer launch.
+  Priority: P3 – Budúce rozšírenie.
+  Phase: G.
+  Dependencies: Stable paid launch and legal/accounting review for new markets.
+  Impacted parts: billing model, roles, organizations, translations, legal docs.
+  Risk: Premature scope expansion before core subscription is stable.
+  Acceptance: Growth items remain separate from launch blockers and are reprioritized after production usage data.
+  Status: planned.
+  Blocks launch: no.
+
+### Launch Blocker Checklist Before Real Payments
+
+All items below are `P0 – Launch blocker` and must be closed before activating first real recurring payments:
+
+- [ ] Complete current architecture/auth/database/storage/PWA/external-service audit.
+- [ ] Confirm active trade/business authorization and correct business activity with Czech professional advice.
+- [ ] Confirm IČO and operator identity values.
+- [ ] Confirm CSSZ notification obligations with Czech accountant or relevant authority.
+- [ ] Confirm health insurance notification obligations with Czech accountant or relevant insurer.
+- [ ] Confirm tax regime and whether the operator is a VAT payer or non-payer.
+- [ ] Check identified-person-to-VAT risk, especially for foreign providers and cross-border services, with accountant.
+- [ ] Check all foreign suppliers and DPA/transfer implications.
+- [ ] Confirm receipt/invoice/accounting document format and retention with Czech accountant.
+- [ ] Implement central configurable operator identity source.
+- [ ] Publish Contact/Operator/Legal information pages.
+- [ ] Publish lawyer-reviewed Czech terms of service.
+- [ ] Publish lawyer-reviewed Czech privacy policy.
+- [ ] Complete processor/subprocessor register and DPA review.
+- [ ] Complete cookie/storage audit and implement consent handling if non-technical technologies are used.
+- [ ] Implement legal document versioning and user acceptance records.
+- [ ] Select payment gateway and verify sandbox/live capabilities.
+- [ ] Design and implement subscription database model.
+- [ ] Implement checkout with clear payment-obligation button and legal checkboxes.
+- [ ] Implement billing dashboard with subscription status, next payment and cancellation.
+- [ ] Implement direct cancellation, email confirmation and reactivation before period end.
+- [ ] Implement webhook signature verification, idempotency, retry and reconciliation.
+- [ ] Implement payment receipt/invoice access or provider document access.
+- [ ] Implement required transactional billing/legal/security emails.
+- [ ] Implement account deletion process.
+- [ ] Implement user data export.
+- [ ] Define and implement retention policy.
+- [ ] Complete Supabase RLS, Storage, function and server-action authorization audit.
+- [ ] Verify secrets are not in Git and service-role keys are never exposed to frontend.
+- [ ] Separate development, staging/test and production environments.
+- [ ] Complete backup and restore plan, including tested restore.
+- [ ] Complete monitoring/logging baseline and incident response runbook.
+- [ ] Complete PWA install/update/offline cache safety tests.
+- [ ] Complete subscription lifecycle E2E tests in sandbox.
+- [ ] Complete security audit for user data isolation and billing operations.
+- [ ] Complete legal review of documents and checkout/withdrawal/complaints/auto-renewal flow.
+- [ ] Complete accounting review of billing, VAT and payment documents.
+- [ ] Run production payment test with approved minimal amount only after all previous blockers are closed.
+
+### Recommended Implementation Order For Paid Launch
+
+1. Close Phase A audit tasks and provider inventory.
+2. Decide operator identity source and payment/email/monitoring provider shortlist.
+3. Draft database model for legal, consent, subscription, payments, exports, deletion, webhooks and audit logs.
+4. Complete legal/accounting review inputs before writing final legal texts.
+5. Build public legal pages, legal versioning and acceptance records.
+6. Build subscription state model, checkout and billing account UI.
+7. Build webhook pipeline, payment reconciliation and transactional emails.
+8. Build cancellation, export, deletion and retention processes.
+9. Harden Supabase RLS/Storage/auth, PWA offline/update behavior and environment separation.
+10. Run full sandbox E2E, security, legal UX and accounting launch checks.
+
+### Likely Future Files And Modules
+
+- `docs/VEHILO_PROJECT_PLAN.md`
+- `README.md`
+- `supabase/schema.sql` and future migrations
+- `src/types/database.ts`
+- future `src/lib/legal/*`
+- future `src/lib/billing/*`
+- future `src/lib/email/*`
+- future `src/lib/audit/*`
+- future `src/app/(legal)/*` or public legal routes
+- future `src/app/(app)/settings/billing/*`
+- future payment webhook route handlers
+- future admin/support routes
+- `src/lib/supabase/server.ts`
+- `src/app/auth/*`
+- `src/components/providers/service-worker-provider.tsx`
+- `public/sw.js`
+- `public/manifest.json`
+
+### Open Decisions For Paid Launch
+
+- Confirm legal operator: individual or company, exact public identity values and trade-register wording.
+- Confirm VAT status and whether identified-person registration is triggered by providers or sales flows.
+- Choose payment gateway.
+- Choose transactional email provider.
+- Decide whether analytics/error monitoring will be used at launch and under what consent basis.
+- Decide whether push notifications are part of first paid launch or shortly after.
+- Decide whether offline writes are supported at launch or explicitly out of scope.
+- Decide staging architecture: separate Supabase project or strict data isolation.
+- Decide how long data remains after subscription cancellation.
+- Decide waiting period for account deletion.
+- Decide whether document downloads are generated by Vehilo or delegated to payment provider.
+- Decide support/admin role model and whether manual support can access user documents.
 
 ## Open Questions
 
