@@ -58,7 +58,7 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
         <CardContent>
           <form action="/service" className="grid min-w-0 gap-3 md:grid-cols-5">
             <FilterInput name="q" label="Hledání" placeholder="Popis, typ, servis" defaultValue={filters.q} />
-            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
+            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} allLabel="Všechna vozidla" options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
             <FilterSelect name="type" label="Typ servisu" value={filters.type} options={serviceTypes.map((type): [string, string] => [type, type])} />
             <FilterSelect name="year" label="Rok" value={filters.year} options={serviceYears.map((year): [string, string] => [year, year])} />
             <div className="flex items-end gap-2">
@@ -180,11 +180,13 @@ function FilterSelect({
   label,
   value,
   options,
+  allLabel = "Všechny",
 }: {
   name: string;
   label: string;
   value: string;
   options: Array<[string, string]>;
+  allLabel?: string;
 }) {
   return (
     <div className="min-w-0 space-y-1.5">
@@ -196,7 +198,7 @@ function FilterSelect({
         aria-label={label}
         className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
       >
-        <option value="all">Všechny</option>
+        <option value="all">{allLabel}</option>
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>
             {optionLabel}
@@ -335,7 +337,23 @@ function filterServiceEntries(entries: ServiceEntry[], filters: ReturnType<typeo
 }
 
 function buildYearlyServiceSeries(entries: ServiceEntry[]) {
-  return buildGroupedSeries(entries, (entry) => entry.date.slice(0, 4), (entry) => Number(entry.total_cost));
+  const grouped = new Map<string, { value: number; details: string[] }>();
+
+  for (const entry of entries) {
+    const year = entry.date.slice(0, 4);
+    const group = grouped.get(year) ?? { value: 0, details: [] };
+    group.value += Number(entry.total_cost);
+    group.details.push(`${formatDisplayDate(entry.date)} · ${entry.service_type} · ${entry.description} · ${formatCurrency(entry.total_cost, entry.currency)}`);
+    grouped.set(year, group);
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, group]) => ({
+      name,
+      value: Math.round(group.value * 100) / 100,
+      details: group.details,
+    }));
 }
 
 function buildServiceTypeSeries(entries: ServiceEntry[]) {

@@ -138,14 +138,14 @@ function DashboardHero({
             Sledujte náklady, servis, palivo, energii a připomínky pro všechna vozidla na jednom místě.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Select defaultValue="all">
+            <Select defaultValue="Všechna vozidla">
               <SelectTrigger className="w-full bg-[rgba(8,17,23,0.82)] sm:w-60">
                 <SelectValue placeholder="Vozidlo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Všechna vozidla</SelectItem>
+                <SelectItem value="Všechna vozidla">Všechna vozidla</SelectItem>
                 {vehicles.map((vehicle) => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                  <SelectItem key={vehicle.id} value={vehicle.name}>
                     {vehicle.name}
                   </SelectItem>
                 ))}

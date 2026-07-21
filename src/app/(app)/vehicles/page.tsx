@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { loadVehicleListData } from "@/lib/data/vehicles";
-import { calculateVehicleCost, formatCurrency, formatNumber } from "@/lib/calculations/costs";
+import { formatCurrency, formatNumber } from "@/lib/calculations/costs";
 import type { GarageData, Vehicle } from "@/types/domain";
 
 export default async function VehiclesPage() {
@@ -108,6 +108,7 @@ function VehiclesHero({
 }
 
 function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) {
+  const expenses = data.expenses.filter((expense) => expense.vehicle_id === vehicle.id);
   const energyCount = data.energyEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
   const serviceCount = data.serviceEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
   const documentCount = data.documents.filter((document) => document.vehicle_id === vehicle.id).length;
@@ -152,10 +153,10 @@ function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) 
           <div className="h-px bg-border" />
 
           <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-            <MiniStat icon={ReceiptText} label="Náklady" value={formatCurrency(calculateVehicleCost(data, vehicle.id), vehicle.currency)} tone="green" />
-            <MiniStat icon={Fuel} label="Tankování" value={String(energyCount)} tone="blue" />
-            <MiniStat icon={Wrench} label="Servis" value={String(serviceCount)} tone="amber" />
-            <MiniStat icon={FileText} label="Dokumenty" value={String(documentCount)} tone="purple" />
+            <MiniStat href={`/expenses?vehicle=${vehicle.id}`} icon={ReceiptText} label="Výdaje" value={formatCurrency(sumExpenses(expenses), vehicle.currency)} tone="green" />
+            <MiniStat href={`/fuel-energy?vehicle=${vehicle.id}`} icon={Fuel} label="Tankování" value={String(energyCount)} tone="blue" />
+            <MiniStat href={`/service?vehicle=${vehicle.id}`} icon={Wrench} label="Servis" value={String(serviceCount)} tone="amber" />
+            <MiniStat href={`/documents?vehicle=${vehicle.id}`} icon={FileText} label="Dokumenty" value={String(documentCount)} tone="purple" />
           </div>
 
           <div className="grid grid-cols-2 rounded-[20px] border border-border bg-[rgba(8,17,23,0.72)] p-1">
@@ -213,11 +214,13 @@ function VehicleFact({ icon: Icon, label, value }: { icon: LucideIcon; label: st
 }
 
 function MiniStat({
+  href,
   icon: Icon,
   label,
   value,
   tone,
 }: {
+  href: string;
   icon: LucideIcon;
   label: string;
   value: string;
@@ -231,12 +234,16 @@ function MiniStat({
   }[tone];
 
   return (
-    <div className="min-h-[92px] rounded-[16px] border border-border bg-[rgba(8,17,23,0.56)] p-3">
+    <Link href={href} className="block min-h-[92px] rounded-[16px] border border-border bg-[rgba(8,17,23,0.56)] p-3 transition-colors hover:border-[rgba(45,212,163,0.34)] hover:bg-[rgba(13,23,30,0.82)]">
       <Icon className={`mb-2 size-4 ${toneClass}`} aria-hidden="true" />
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="tabular-num mt-1 truncate font-bold text-white">{value}</div>
-    </div>
+    </Link>
   );
+}
+
+function sumExpenses(expenses: GarageData["expenses"]) {
+  return expenses.reduce((total, expense) => total + Number(expense.amount), 0);
 }
 
 function formatPowertrain(value: string) {

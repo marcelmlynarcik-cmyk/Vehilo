@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartCard } from "@/components/charts/basic-charts";
 import { EnergyEntryForm } from "@/components/forms/energy-entry-form";
@@ -35,12 +35,16 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const currency = data.profile?.currency ?? "CZK";
   const defaultDate = formatDateInput(new Date());
   const openEnergyDialog = query.add === "energy";
-  const consumptionSummaries = calculateConsumptionSummaries(data.energyEntries);
-  const consumptionTrend = buildConsumptionTrendSeries(data.energyEntries);
-  const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(data.energyEntries);
-  const monthlyUnitPrices = buildMonthlyUnitPriceSeries(data.energyEntries);
-  const monthlyCosts = buildMonthlyEnergyCostSeries(data.energyEntries);
-  const unitPriceTitle = formatUnitPriceTitle(data.energyEntries);
+  const selectedVehicle = getQueryValue(query.vehicle, "all");
+  const filteredEnergyEntries = selectedVehicle === "all"
+    ? data.energyEntries
+    : data.energyEntries.filter((entry) => entry.vehicle_id === selectedVehicle);
+  const consumptionSummaries = calculateConsumptionSummaries(filteredEnergyEntries);
+  const consumptionTrend = buildConsumptionTrendSeries(filteredEnergyEntries);
+  const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries);
+  const monthlyUnitPrices = buildMonthlyUnitPriceSeries(filteredEnergyEntries);
+  const monthlyCosts = buildMonthlyEnergyCostSeries(filteredEnergyEntries);
+  const unitPriceTitle = formatUnitPriceTitle(filteredEnergyEntries);
 
   return (
     <div className="space-y-6">
@@ -54,20 +58,24 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <AlertTitle>Vehilo přizpůsobuje sledování podle typu pohonu.</AlertTitle>
         <AlertDescription>Spotřeba se pro vyšší přesnost počítá pouze mezi plnými tankováními nebo plnými nabitími.</AlertDescription>
       </Alert>
-      <div className="flex max-w-sm">
-        <Select defaultValue="all">
-          <SelectTrigger><SelectValue placeholder="Vozidlo" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Všechna vozidla</SelectItem>
-            {data.vehicles.map((vehicle) => <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </div>
+      <form action="/fuel-energy" className="flex max-w-sm flex-col gap-1.5">
+        <Label htmlFor="fuel-energy-vehicle-filter" className="text-xs text-muted-foreground">Vozidlo</Label>
+        <select
+          id="fuel-energy-vehicle-filter"
+          name="vehicle"
+          defaultValue={selectedVehicle}
+          className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+        >
+          <option value="all">Všechna vozidla</option>
+          {data.vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.name}</option>)}
+        </select>
+        <Button type="submit" className="mt-1">Filtrovat</Button>
+      </form>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(data.energyEntries), currency)} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
+        <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(filteredEnergyEntries), currency)} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
         <MetricCard title="Průměrná spotřeba" value={formatConsumptionSummaries(consumptionSummaries)} description="Mezi plnými záznamy" icon={Zap} />
-        <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(data.energyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
-        <MetricCard title="Záznamy" value={String(data.energyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
+        <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(filteredEnergyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
+        <MetricCard title="Záznamy" value={String(filteredEnergyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard
@@ -97,8 +105,12 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <div id="records">
           <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
         </div>
+      ) : filteredEnergyEntries.length === 0 ? (
+        <div id="records">
+          <EmptyState icon={Fuel} title="Žádné záznamy pro toto vozidlo" description="Změňte filtr nebo přidejte tankování či nabíjení." />
+        </div>
       ) : (
-        <EnergyEntriesTable entries={data.energyEntries} vehicles={data.vehicles} currency={currency} />
+        <EnergyEntriesTable entries={filteredEnergyEntries} vehicles={data.vehicles} currency={currency} />
       )}
       <Card>
         <CardHeader><CardTitle>Formulář podle pohonu</CardTitle></CardHeader>
@@ -367,4 +379,12 @@ function formatUnitPriceTitle(entries: EnergyEntry[]) {
   });
 
   return `Cena za ${labels.join(" / ")}`;
+}
+
+function getQueryValue(value: string | string[] | undefined, fallback = "") {
+  if (Array.isArray(value)) {
+    return value[0] ?? fallback;
+  }
+
+  return value ?? fallback;
 }

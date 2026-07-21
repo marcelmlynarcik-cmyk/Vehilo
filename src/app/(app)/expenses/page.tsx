@@ -57,7 +57,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         <CardContent>
           <form action="/expenses" className="grid min-w-0 gap-3 md:grid-cols-6">
             <FilterInput name="q" label="Hledání" placeholder="Popis, kategorie, poznámka" defaultValue={filters.q} />
-            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
+            <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} allLabel="Všechna vozidla" options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
             <FilterSelect name="category" label="Kategorie" value={filters.category} options={expenseCategories.map((category): [string, string] => [category, category])} />
             <FilterInput name="month" label="Měsíc" type="month" defaultValue={filters.month} />
             <FilterSelect name="year" label="Rok" value={filters.year} options={expenseYears.map((year): [string, string] => [year, year])} />
@@ -182,11 +182,13 @@ function FilterSelect({
   label,
   value,
   options,
+  allLabel = "Všechny",
 }: {
   name: string;
   label: string;
   value: string;
   options: Array<[string, string]>;
+  allLabel?: string;
 }) {
   return (
     <div className="min-w-0 space-y-1.5">
@@ -198,7 +200,7 @@ function FilterSelect({
         aria-label={label}
         className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
       >
-        <option value="all">Všechny</option>
+        <option value="all">{allLabel}</option>
         {options.map(([optionValue, optionLabel]) => (
           <option key={optionValue} value={optionValue}>
             {optionLabel}
@@ -223,7 +225,7 @@ function FilterInput({
   defaultValue: string;
 }) {
   return (
-    <div className="min-w-0 space-y-1.5">
+    <div className="max-w-full min-w-0 overflow-hidden space-y-1.5">
       <Label htmlFor={`expense-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
       <Input
         id={`expense-filter-${name}`}
@@ -231,7 +233,7 @@ function FilterInput({
         type={type}
         placeholder={placeholder}
         defaultValue={defaultValue}
-        className="w-full min-w-0"
+        className="block w-full max-w-full min-w-0"
       />
     </div>
   );
@@ -420,7 +422,23 @@ function filterExpenses(expenses: Expense[], filters: ReturnType<typeof parseExp
 }
 
 function buildMonthlyExpenseSeries(expenses: Expense[]) {
-  return buildGroupedSeries(expenses, (expense) => expense.date.slice(0, 7), (expense) => Number(expense.amount));
+  const grouped = new Map<string, { value: number; details: string[] }>();
+
+  for (const expense of expenses) {
+    const month = expense.date.slice(0, 7);
+    const group = grouped.get(month) ?? { value: 0, details: [] };
+    group.value += Number(expense.amount);
+    group.details.push(`${formatDisplayDate(expense.date)} · ${expense.category} · ${expense.description} · ${formatCurrency(expense.amount, expense.currency)}`);
+    grouped.set(month, group);
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, group]) => ({
+      name,
+      value: Math.round(group.value * 100) / 100,
+      details: group.details,
+    }));
 }
 
 function buildCategoryExpenseSeries(expenses: Expense[]) {

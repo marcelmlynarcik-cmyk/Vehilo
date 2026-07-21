@@ -22,18 +22,12 @@ type ChartDatum = {
   name: string;
   value: number;
   unit?: string;
+  details?: string[];
 };
 
 const emptySeries: ChartDatum[] = [{ name: "Bez dat", value: 0 }];
 const chartColors = ["#2dd4a3", "#38bdf8", "#f6b93b", "#a78bfa", "#fb7185"];
 const axisStyle = { fill: "#73808c", fontSize: 12 };
-const tooltipStyle = {
-  background: "#0d171e",
-  border: "1px solid rgba(148, 163, 184, 0.22)",
-  borderRadius: "14px",
-  color: "#f8fafc",
-  boxShadow: "0 18px 45px rgba(0, 0, 0, 0.32)",
-};
 
 interface ChartCardProps {
   title: string;
@@ -60,32 +54,32 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
         ) : null}
         <ResponsiveContainer width="100%" height="100%">
           {type === "line" ? (
-            <LineChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
+            <LineChart data={chartData} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
+              <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
+              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
               <Line type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} dot={false} />
             </LineChart>
           ) : type === "bar" ? (
-            <BarChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
+            <BarChart data={chartData} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(56, 189, 248, 0.08)" }} />
+              <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
+              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ fill: "rgba(56, 189, 248, 0.08)" }} />
               <Bar dataKey="value" name={valueLabel} fill="#38bdf8" radius={[8, 8, 0, 0]} />
             </BarChart>
           ) : type === "area" ? (
-            <AreaChart data={chartData} margin={{ left: -14, right: 8, top: 8, bottom: 0 }}>
+            <AreaChart data={chartData} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
-              <YAxis width={42} tickLine={false} axisLine={false} tick={axisStyle} />
-              <Tooltip contentStyle={tooltipStyle} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
+              <YAxis width={54} tickLine={false} axisLine={false} tick={axisStyle} />
+              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} />
               <Area type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} fill="#2dd4a3" fillOpacity={0.18} />
             </AreaChart>
           ) : (
             <PieChart>
-              <Tooltip contentStyle={tooltipStyle} />
+              <Tooltip content={<ChartTooltip valueLabel={valueLabel} />} />
               <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88} paddingAngle={2}>
                 {chartData.map((entry, index) => (
                   <Cell key={String(entry.name)} fill={chartColors[index % chartColors.length]} />
@@ -96,5 +90,48 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
         </ResponsiveContainer>
       </CardContent>
     </Card>
+  );
+}
+
+function ChartTooltip({
+  active,
+  label,
+  payload,
+  valueLabel,
+}: {
+  active?: boolean;
+  label?: string;
+  payload?: Array<{ value?: number | string; name?: string; payload?: ChartDatum }>;
+  valueLabel: string;
+}) {
+  if (!active || !payload?.length) {
+    return null;
+  }
+
+  const point = payload[0]?.payload;
+  const value = payload[0]?.value ?? point?.value ?? 0;
+  const details = point?.details ?? [];
+
+  return (
+    <div
+      className="max-w-[min(320px,calc(100vw-2rem))] rounded-[14px] border border-[rgba(148,163,184,0.22)] bg-[#0d171e] p-3 text-sm text-[#f8fafc] shadow-[0_18px_45px_rgba(0,0,0,0.32)]"
+    >
+      <div className="font-semibold">{label ?? point?.name}</div>
+      <div className="mt-1 text-xs text-muted-foreground">
+        {valueLabel}: <span className="tabular-num text-foreground">{value}{point?.unit ? ` ${point.unit}` : ""}</span>
+      </div>
+      {details.length > 0 ? (
+        <div className="mt-3 max-h-44 space-y-1 overflow-y-auto border-t border-border pt-2">
+          {details.slice(0, 12).map((detail) => (
+            <div key={detail} className="text-xs leading-snug text-muted-foreground">
+              {detail}
+            </div>
+          ))}
+          {details.length > 12 ? (
+            <div className="text-xs text-muted-foreground">+ dalších {details.length - 12}</div>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
   );
 }
