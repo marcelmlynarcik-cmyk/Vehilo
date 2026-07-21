@@ -112,10 +112,18 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
                 <TableBody>
                   {visibleExpenses.map((expense) => (
                     <TableRow key={expense.id}>
-                      <TableCell>{formatDisplayDate(expense.date)}</TableCell>
+                      <TableCell>
+                        <Link href={`/expenses/${expense.id}`} className="text-[var(--accent)] hover:underline">
+                          {formatDisplayDate(expense.date)}
+                        </Link>
+                      </TableCell>
                       <TableCell>{data.vehicles.find((vehicle) => vehicle.id === expense.vehicle_id)?.name ?? "Vozidlo"}</TableCell>
                       <TableCell>{expense.category}</TableCell>
-                      <TableCell>{expense.description}</TableCell>
+                      <TableCell>
+                        <Link href={`/expenses/${expense.id}`} className="font-medium hover:text-[var(--accent)]">
+                          {expense.description}
+                        </Link>
+                      </TableCell>
                       <TableCell className="text-right">{expense.mileage ? `${formatNumber(expense.mileage)} km` : "-"}</TableCell>
                       <TableCell className="text-right">{formatCurrency(expense.amount, expense.currency)}</TableCell>
                       <TableCell className="flex justify-end gap-2">
@@ -153,10 +161,18 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
                     <TableBody>
                       {hiddenExpenses.map((expense) => (
                         <TableRow key={expense.id}>
-                          <TableCell>{formatDisplayDate(expense.date)}</TableCell>
+                          <TableCell>
+                            <Link href={`/expenses/${expense.id}`} className="text-[var(--accent)] hover:underline">
+                              {formatDisplayDate(expense.date)}
+                            </Link>
+                          </TableCell>
                           <TableCell>{data.vehicles.find((vehicle) => vehicle.id === expense.vehicle_id)?.name ?? "Vozidlo"}</TableCell>
                           <TableCell>{expense.category}</TableCell>
-                          <TableCell>{expense.description}</TableCell>
+                          <TableCell>
+                            <Link href={`/expenses/${expense.id}`} className="font-medium hover:text-[var(--accent)]">
+                              {expense.description}
+                            </Link>
+                          </TableCell>
                           <TableCell className="text-right">{expense.mileage ? `${formatNumber(expense.mileage)} km` : "-"}</TableCell>
                           <TableCell className="text-right">{formatCurrency(expense.amount, expense.currency)}</TableCell>
                           <TableCell className="flex justify-end gap-2">
@@ -315,7 +331,7 @@ function DeleteExpenseDialog({ expense }: { expense: Expense }) {
 function ExpenseMobileCard({ expense, vehicles, currency }: { expense: Expense; vehicles: Vehicle[]; currency: string }) {
   return (
     <div className="min-w-0 rounded-[18px] border border-border bg-[rgba(8,17,23,0.42)] p-4">
-      <div className="flex min-w-0 items-start justify-between gap-3">
+      <Link href={`/expenses/${expense.id}`} className="flex min-w-0 items-start justify-between gap-3 hover:text-[var(--accent)]">
         <div className="min-w-0">
           <div className="truncate text-sm font-semibold">{expense.description}</div>
           <div className="mt-1 text-xs text-muted-foreground">
@@ -323,7 +339,7 @@ function ExpenseMobileCard({ expense, vehicles, currency }: { expense: Expense; 
           </div>
         </div>
         <div className="shrink-0 text-right text-sm font-semibold">{formatCurrency(expense.amount, currency)}</div>
-      </div>
+      </Link>
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
         <span className="rounded-full border border-border px-2 py-1">{expense.category}</span>
         <span>{expense.mileage ? `${formatNumber(expense.mileage)} km` : "Bez nájezdu"}</span>

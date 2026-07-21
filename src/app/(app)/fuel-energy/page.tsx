@@ -1,4 +1,5 @@
 import { BatteryCharging, Fuel, Pencil, Plus, Trash2, Zap } from "lucide-react";
+import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -187,10 +188,16 @@ function EnergyEntriesTable({
           <TableBody>
             {visibleEntries.map((entry) => (
               <TableRow key={entry.id}>
-                <TableCell>{formatDisplayDate(entry.date)}</TableCell>
+                <TableCell>
+                  <Link href={`/fuel-energy/${entry.id}`} className="text-[var(--accent)] hover:underline">
+                    {formatDisplayDate(entry.date)}
+                  </Link>
+                </TableCell>
                 <TableCell>{vehicleNames.get(entry.vehicle_id) ?? "Vozidlo"}</TableCell>
                 <TableCell>
-                  <Badge variant="outline">{formatEntryType(entry)}</Badge>
+                  <Link href={`/fuel-energy/${entry.id}`} className="hover:text-[var(--accent)]">
+                    <Badge variant="outline">{formatEntryType(entry)}</Badge>
+                  </Link>
                 </TableCell>
                 <TableCell className="text-right">
                   {formatNumber(entry.quantity)} {formatUnit(entry.quantity_unit)}
@@ -225,10 +232,16 @@ function EnergyEntriesTable({
               <TableBody>
                 {hiddenEntries.map((entry) => (
                   <TableRow key={entry.id}>
-                    <TableCell>{formatDisplayDate(entry.date)}</TableCell>
+                    <TableCell>
+                      <Link href={`/fuel-energy/${entry.id}`} className="text-[var(--accent)] hover:underline">
+                        {formatDisplayDate(entry.date)}
+                      </Link>
+                    </TableCell>
                     <TableCell>{vehicleNames.get(entry.vehicle_id) ?? "Vozidlo"}</TableCell>
                     <TableCell>
-                      <Badge variant="outline">{formatEntryType(entry)}</Badge>
+                        <Link href={`/fuel-energy/${entry.id}`} className="hover:text-[var(--accent)]">
+                          <Badge variant="outline">{formatEntryType(entry)}</Badge>
+                        </Link>
                     </TableCell>
                     <TableCell className="text-right">
                       {formatNumber(entry.quantity)} {formatUnit(entry.quantity_unit)}

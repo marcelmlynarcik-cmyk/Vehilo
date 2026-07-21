@@ -153,7 +153,7 @@ function ServiceRow({ entry, vehicles, currency }: { entry: ServiceEntry; vehicl
   return (
     <div className="min-w-0 rounded-[18px] border border-border bg-[rgba(8,17,23,0.42)] p-4">
       <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0">
+        <Link href={`/service/${entry.id}`} className="min-w-0 hover:text-[var(--accent)]">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <div className="truncate text-sm font-semibold">{entry.description}</div>
             <Badge variant="outline">{entry.service_type}</Badge>
@@ -162,7 +162,7 @@ function ServiceRow({ entry, vehicles, currency }: { entry: ServiceEntry; vehicl
             {formatDisplayDate(entry.date)} · {vehicles.find((vehicle) => vehicle.id === entry.vehicle_id)?.name ?? "Vozidlo"} · {formatNumber(entry.mileage)} km
           </div>
           {entry.notes ? <div className="mt-2 text-sm text-muted-foreground">{entry.notes}</div> : null}
-        </div>
+        </Link>
         <div className="flex shrink-0 items-center justify-between gap-3 md:flex-col md:items-end">
           <div className="text-sm font-semibold">{formatCurrency(entry.total_cost, currency)}</div>
           <div className="flex gap-2">

@@ -75,8 +75,8 @@ Tomorrow mobile/UX fixes:
 - [ ] Vehicle detail cost cards should include Expenses, not only fuel/service related cards.
 - [ ] Vehicle detail cost cards should be clickable and navigate to the relevant filtered records.
 - [ ] Vehicle detail tab bar (`Přehled`, `Výdaje`, `Palivo`, etc.) must stop floating/moving vertically while swiping on mobile.
-- [ ] Record cards on Expenses, Fuel & Energy and Service pages should be clickable to open a record detail view.
-- [ ] Define and implement record detail views for Expense, Fuel/Energy and Service entries.
+- [x] Record cards on Expenses, Fuel & Energy and Service pages should be clickable to open a record detail view.
+- [x] Define and implement record detail views for Expense, Fuel/Energy and Service entries.
 
 Latest progress:
 
@@ -93,6 +93,7 @@ Latest progress:
 - [x] Long record lists now show the latest 10 records first, with older records available through native expansion.
 - [x] Mobile bottom navigation was tightened so the bar is anchored to the bottom instead of visually floating with safe-area padding.
 - [x] Mobile navigation now includes a hamburger Menu sheet with access to all sections, including Expenses, Fuel & Energy and Service.
+- [x] Expense, Fuel/Energy and Service entries now have detail views and record links from list/detail surfaces.
 - [ ] Service filters and Service charts still need to be completed and verified.
 
 GitHub status:

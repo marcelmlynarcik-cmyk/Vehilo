@@ -281,6 +281,7 @@ function RecordCard({
 function ExpenseRow({ expense }: { expense: Expense }) {
   return (
     <ListRow
+      href={`/expenses/${expense.id}`}
       title={expense.description}
       detail={`${formatDate(expense.date)} · ${expense.category}${expense.mileage ? ` · ${formatNumber(expense.mileage)} km` : ""}`}
       amount={formatCurrency(expense.amount, expense.currency)}
@@ -293,6 +294,7 @@ function EnergyRow({ entry, currency }: { entry: EnergyEntry; currency: string }
 
   return (
     <ListRow
+      href={`/fuel-energy/${entry.id}`}
       title={entry.fuel_station ?? entry.charging_location ?? formatEnergyType(entry.entry_type)}
       detail={`${formatDate(entry.date)} · ${formatNumber(entry.mileage)} km · ${quantity}`}
       amount={formatCurrency(entry.total_price, currency)}
@@ -303,6 +305,7 @@ function EnergyRow({ entry, currency }: { entry: EnergyEntry; currency: string }
 function ServiceRow({ entry }: { entry: ServiceEntry }) {
   return (
     <ListRow
+      href={`/service/${entry.id}`}
       title={entry.description}
       detail={`${formatDate(entry.date)} · ${entry.service_type} · ${formatNumber(entry.mileage)} km`}
       amount={formatCurrency(entry.total_cost, entry.currency)}
@@ -320,14 +323,28 @@ function DocumentRow({ document }: { document: VehicleDocument }) {
   );
 }
 
-function ListRow({ title, detail, amount }: { title: string; detail: string; amount: string }) {
-  return (
-    <div className="flex flex-col gap-2 rounded-[16px] border border-border bg-[rgba(8,17,23,0.42)] p-3 sm:flex-row sm:items-center sm:justify-between">
+function ListRow({ title, detail, amount, href }: { title: string; detail: string; amount: string; href?: string }) {
+  const content = (
+    <>
       <div className="min-w-0">
         <div className="truncate font-medium">{title}</div>
         <div className="text-sm text-muted-foreground">{detail}</div>
       </div>
       <div className="tabular-num shrink-0 font-semibold text-white">{amount}</div>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className="flex flex-col gap-2 rounded-[16px] border border-border bg-[rgba(8,17,23,0.42)] p-3 transition-colors hover:border-[rgba(45,212,163,0.34)] hover:bg-[rgba(13,23,30,0.78)] sm:flex-row sm:items-center sm:justify-between">
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2 rounded-[16px] border border-border bg-[rgba(8,17,23,0.42)] p-3 sm:flex-row sm:items-center sm:justify-between">
+      {content}
     </div>
   );
 }
