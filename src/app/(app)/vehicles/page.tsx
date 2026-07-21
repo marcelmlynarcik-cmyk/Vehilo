@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/empty-state";
 import { loadVehicleListData } from "@/lib/data/vehicles";
-import { formatCurrency, formatNumber } from "@/lib/calculations/costs";
+import { formatCurrency, formatNumber, sumEnergyCost, sumServiceCost } from "@/lib/calculations/costs";
 import type { GarageData, Vehicle } from "@/types/domain";
 
 export default async function VehiclesPage() {
@@ -109,8 +109,8 @@ function VehiclesHero({
 
 function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) {
   const expenses = data.expenses.filter((expense) => expense.vehicle_id === vehicle.id);
-  const energyCount = data.energyEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
-  const serviceCount = data.serviceEntries.filter((entry) => entry.vehicle_id === vehicle.id).length;
+  const energyEntries = data.energyEntries.filter((entry) => entry.vehicle_id === vehicle.id);
+  const serviceEntries = data.serviceEntries.filter((entry) => entry.vehicle_id === vehicle.id);
   const documentCount = data.documents.filter((document) => document.vehicle_id === vehicle.id).length;
   const subtitle = [vehicle.brand, vehicle.model, vehicle.generation, vehicle.engine].filter(Boolean).join(" ");
 
@@ -154,8 +154,8 @@ function VehicleCard({ vehicle, data }: { vehicle: Vehicle; data: GarageData }) 
 
           <div className="grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
             <MiniStat href={`/expenses?vehicle=${vehicle.id}`} icon={ReceiptText} label="Výdaje" value={formatCurrency(sumExpenses(expenses), vehicle.currency)} tone="green" />
-            <MiniStat href={`/fuel-energy?vehicle=${vehicle.id}`} icon={Fuel} label="Tankování" value={String(energyCount)} tone="blue" />
-            <MiniStat href={`/service?vehicle=${vehicle.id}`} icon={Wrench} label="Servis" value={String(serviceCount)} tone="amber" />
+            <MiniStat href={`/fuel-energy?vehicle=${vehicle.id}`} icon={Fuel} label="Tankování" value={formatCurrency(sumEnergyCost(energyEntries), vehicle.currency)} tone="blue" />
+            <MiniStat href={`/service?vehicle=${vehicle.id}`} icon={Wrench} label="Servis" value={formatCurrency(sumServiceCost(serviceEntries), vehicle.currency)} tone="amber" />
             <MiniStat href={`/documents?vehicle=${vehicle.id}`} icon={FileText} label="Dokumenty" value={String(documentCount)} tone="purple" />
           </div>
 

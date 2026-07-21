@@ -59,7 +59,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
             <FilterInput name="q" label="Hledání" placeholder="Popis, kategorie, poznámka" defaultValue={filters.q} />
             <FilterSelect name="vehicle" label="Vozidlo" value={filters.vehicle} allLabel="Všechna vozidla" options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])} />
             <FilterSelect name="category" label="Kategorie" value={filters.category} options={expenseCategories.map((category): [string, string] => [category, category])} />
-            <FilterInput name="month" label="Měsíc" type="month" defaultValue={filters.month} />
+            <FilterInput name="month" label="Měsíc" placeholder="RRRR-MM" defaultValue={filters.month} maxLength={7} />
             <FilterSelect name="year" label="Rok" value={filters.year} options={expenseYears.map((year): [string, string] => [year, year])} />
             <div className="flex gap-2">
               <Button type="submit" className="flex-1">Filtrovat</Button>
@@ -217,12 +217,14 @@ function FilterInput({
   type = "text",
   placeholder,
   defaultValue,
+  maxLength,
 }: {
   name: string;
   label: string;
   type?: string;
   placeholder?: string;
   defaultValue: string;
+  maxLength?: number;
 }) {
   return (
     <div className="max-w-full min-w-0 overflow-hidden space-y-1.5">
@@ -231,6 +233,9 @@ function FilterInput({
         id={`expense-filter-${name}`}
         name={name}
         type={type}
+        inputMode={name === "month" ? "numeric" : undefined}
+        pattern={name === "month" ? "[0-9]{4}-[0-9]{2}" : undefined}
+        maxLength={maxLength}
         placeholder={placeholder}
         defaultValue={defaultValue}
         className="block w-full max-w-full min-w-0"
