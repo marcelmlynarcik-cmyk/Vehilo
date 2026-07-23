@@ -24,7 +24,7 @@ const actions = [
   { label: "Přidat tankování / nabíjení", icon: Fuel, href: "/fuel-energy?add=energy" },
   { label: "Přidat výdaj", icon: ReceiptText, href: "/expenses?add=expense" },
   { label: "Přidat servis", icon: Wrench, href: "/service?add=service" },
-  { label: "Přidat připomínku", icon: Bell },
+  { label: "Přidat připomínku", icon: Bell, href: "/reminders?add=reminder" },
   { label: "Přidat vozidlo", icon: Car },
   { label: "Přidat dokument", icon: FileText },
 ];

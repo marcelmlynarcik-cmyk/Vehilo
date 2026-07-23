@@ -2047,6 +2047,9 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Verified current Fuel & Energy source aggregates against Supabase: 167 fuel records, 242119.02 Kč total, yearly totals from 2022 through 2026.
 - Removed duplicate Quick Add action for charging; the single Fuel & Energy quick action now covers both fuel and charging.
 - Fixed React lint issues in Energy and Service forms by moving derived state updates out of synchronous effects.
+- Started the real Reminders product flow with create/edit/delete actions against Supabase.
+- Added highlighted due/overdue reminder list, postpone by custom days/km and mark-done flow with optional repeat reminder creation.
+- Connected Quick Add to open the real reminder form.
 
 Reminder product requirements captured for future implementation:
 
@@ -2055,3 +2058,18 @@ Reminder product requirements captured for future implementation:
 - When a reminder is marked done, the app must ask whether to create the same reminder again for the next interval.
 - Reminders must support functional push notifications on Android and iPhone.
 - Push notifications must be implemented as part of the reminders product flow, with device registration, opt-in/permission handling and reminder delivery behavior tested on both Android and iOS.
+
+Advanced statistics requirements captured for future implementation:
+
+- Add odometer statistics showing average kilometers driven per day, grouped yearly while displaying the daily average for each year.
+- Expand fuel price analytics with a small summary table for minimum, maximum and average fuel price.
+- Add full vs partial refuel statistics: how many refuels were full tank vs partial.
+- Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.
+- Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
+- Add refueled quantity statistics with minimum, maximum and average quantity.
+- Add full-tank cost statistics with minimum, maximum and average cost.
+- Add cumulative total cost chart, likely grouped monthly.
+- Add daily operating cost: how much the vehicle costs to run per day.
+- Add cost per kilometer for operating costs.
+- Add pure ownership cost including vehicle purchase price, not only recorded operating costs.
+- Review existing statistics first, reuse anything already implemented and then expand the Statistics/Fuel & Energy/Dashboard views as broadly as useful.
