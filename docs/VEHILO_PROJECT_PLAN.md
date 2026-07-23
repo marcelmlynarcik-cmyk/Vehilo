@@ -2053,3 +2053,5 @@ Reminder product requirements captured for future implementation:
 - When a reminder becomes due, the app must show a reminders list where due/active reminders remain visually highlighted until the user marks them done or otherwise resolves them.
 - Users must be able to postpone a reminder by a user-entered number of kilometers or days.
 - When a reminder is marked done, the app must ask whether to create the same reminder again for the next interval.
+- Reminders must support functional push notifications on Android and iPhone.
+- Push notifications must be implemented as part of the reminders product flow, with device registration, opt-in/permission handling and reminder delivery behavior tested on both Android and iOS.
