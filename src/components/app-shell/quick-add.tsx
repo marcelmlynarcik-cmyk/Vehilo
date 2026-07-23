@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import {
-  BatteryCharging,
   Bell,
   Car,
   FileText,
@@ -28,7 +27,6 @@ const actions = [
   { label: "Přidat připomínku", icon: Bell },
   { label: "Přidat vozidlo", icon: Car },
   { label: "Přidat dokument", icon: FileText },
-  { label: "Přidat nabíjení", icon: BatteryCharging, href: "/fuel-energy?add=energy" },
 ];
 
 export function QuickAdd() {

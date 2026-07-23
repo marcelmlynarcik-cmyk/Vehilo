@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Save, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -77,16 +77,15 @@ export function ServiceEntryForm({ action, vehicles, defaultDate, entry }: Servi
   const availableServiceTypes = selectedVehicle ? serviceTypesForPowertrain(selectedVehicle.powertrain_type) : sharedServiceTypes;
   const selectedServiceType = entry?.service_type ?? availableServiceTypes[0] ?? "Ostatní servis";
 
-  useEffect(() => {
-    const labor = parseDecimal(laborCost);
-    const parts = parseDecimal(partsCost);
+  function handleLaborCostChange(nextLaborCost: string) {
+    setLaborCost(nextLaborCost);
+    updateTotalCost(nextLaborCost, partsCost, setTotalCost);
+  }
 
-    if (labor == null && parts == null) {
-      return;
-    }
-
-    setTotalCost(String(Math.round(((labor ?? 0) + (parts ?? 0)) * 100) / 100));
-  }, [laborCost, partsCost]);
+  function handlePartsCostChange(nextPartsCost: string) {
+    setPartsCost(nextPartsCost);
+    updateTotalCost(laborCost, nextPartsCost, setTotalCost);
+  }
 
   if (vehicles.length === 0) {
     return (
@@ -143,8 +142,8 @@ export function ServiceEntryForm({ action, vehicles, defaultDate, entry }: Servi
       </div>
 
       <div className="grid min-w-0 gap-4 md:grid-cols-3">
-        <InputWithLabel label="Práce" name="labor_cost" type="number" step="0.01" value={laborCost} onChange={setLaborCost} />
-        <InputWithLabel label="Díly" name="parts_cost" type="number" step="0.01" value={partsCost} onChange={setPartsCost} />
+        <InputWithLabel label="Práce" name="labor_cost" type="number" step="0.01" value={laborCost} onChange={handleLaborCostChange} />
+        <InputWithLabel label="Díly" name="parts_cost" type="number" step="0.01" value={partsCost} onChange={handlePartsCostChange} />
         <InputWithLabel label="Celkem" name="total_cost" type="number" step="0.01" value={totalCost} onChange={setTotalCost} required />
       </div>
 
@@ -311,6 +310,17 @@ function parseDecimal(value: string) {
 
 function formatDecimalInput(value: number | null | undefined) {
   return value == null || !Number.isFinite(Number(value)) ? "" : String(Number(value));
+}
+
+function updateTotalCost(laborCost: string, partsCost: string, setTotalCost: (value: string) => void) {
+  const labor = parseDecimal(laborCost);
+  const parts = parseDecimal(partsCost);
+
+  if (labor == null && parts == null) {
+    return;
+  }
+
+  setTotalCost(String(Math.round(((labor ?? 0) + (parts ?? 0)) * 100) / 100));
 }
 
 function serviceTypesForPowertrain(powertrain: PowertrainType) {

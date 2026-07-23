@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { BatteryCharging, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,18 +48,22 @@ export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: Energy
     entry?.entry_type ?? (selectedVehicle ? defaultEntryType(selectedVehicle.powertrain_type) : "fuel"),
   );
 
-  useEffect(() => {
-    if (selectedVehicle && !entryTypesForPowertrain(selectedVehicle.powertrain_type).includes(entryType)) {
-      setEntryType(defaultEntryType(selectedVehicle.powertrain_type));
-    }
-  }, [entryType, selectedVehicle]);
-
   const availableEntryTypes = selectedVehicle
     ? entryTypesForPowertrain(selectedVehicle.powertrain_type)
     : (["fuel"] satisfies EnergyEntryType[]);
   const quantityUnit = defaultQuantityUnit(entryType);
   const isCharging = entryType === "charging";
   const totalPrice = calculateTotalPrice(quantityValue, unitPriceValue);
+
+  function handleVehicleChange(nextVehicleId: string) {
+    const nextVehicle = vehicles.find((vehicle) => vehicle.id === nextVehicleId) ?? vehicles[0] ?? null;
+
+    setVehicleId(nextVehicleId);
+
+    if (nextVehicle && !entryTypesForPowertrain(nextVehicle.powertrain_type).includes(entryType)) {
+      setEntryType(defaultEntryType(nextVehicle.powertrain_type));
+    }
+  }
 
   if (vehicles.length === 0) {
     return (
@@ -80,7 +84,7 @@ export function EnergyEntryForm({ action, vehicles, defaultDate, entry }: Energy
         <SelectWithLabel
           label="Vozidlo"
           value={vehicleId}
-          onValueChange={setVehicleId}
+          onValueChange={handleVehicleChange}
           items={vehicles.map((vehicle): [string, string] => [
             vehicle.id,
             `${vehicle.name} - ${vehicle.brand} ${vehicle.model}`,

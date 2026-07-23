@@ -36,16 +36,19 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const currency = data.profile?.currency ?? "CZK";
   const defaultDate = formatDateInput(new Date());
   const openEnergyDialog = query.add === "energy";
-  const selectedVehicle = getQueryValue(query.vehicle, "all");
-  const filteredEnergyEntries = selectedVehicle === "all"
-    ? data.energyEntries
-    : data.energyEntries.filter((entry) => entry.vehicle_id === selectedVehicle);
+  const filters = parseEnergyFilters(query);
+  const filteredEnergyEntries = filterEnergyEntries(data.energyEntries, filters);
   const consumptionSummaries = calculateConsumptionSummaries(filteredEnergyEntries);
   const consumptionTrend = buildConsumptionTrendSeries(filteredEnergyEntries);
   const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries);
   const monthlyUnitPrices = buildMonthlyUnitPriceSeries(filteredEnergyEntries);
   const monthlyCosts = buildMonthlyEnergyCostSeries(filteredEnergyEntries);
+  const yearlyCosts = buildYearlyEnergyCostSeries(filteredEnergyEntries, currency);
+  const typeCosts = buildEnergyTypeCostSeries(filteredEnergyEntries);
+  const vehicleCosts = buildVehicleEnergyCostSeries(filteredEnergyEntries, data.vehicles);
   const unitPriceTitle = formatUnitPriceTitle(filteredEnergyEntries);
+  const energyYears = uniqueSorted(data.energyEntries.map((entry) => entry.date.slice(0, 4))).reverse();
+  const energyTypes = uniqueSorted(data.energyEntries.map((entry) => entry.entry_type));
 
   return (
     <div className="space-y-6">
@@ -59,19 +62,40 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <AlertTitle>Vehilo přizpůsobuje sledování podle typu pohonu.</AlertTitle>
         <AlertDescription>Spotřeba se pro vyšší přesnost počítá pouze mezi plnými tankováními nebo plnými nabitími.</AlertDescription>
       </Alert>
-      <form action="/fuel-energy" className="flex max-w-sm flex-col gap-1.5">
-        <Label htmlFor="fuel-energy-vehicle-filter" className="text-xs text-muted-foreground">Vozidlo</Label>
-        <select
-          id="fuel-energy-vehicle-filter"
-          name="vehicle"
-          defaultValue={selectedVehicle}
-          className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
-        >
-          <option value="all">Všechna vozidla</option>
-          {data.vehicles.map((vehicle) => <option key={vehicle.id} value={vehicle.id}>{vehicle.name}</option>)}
-        </select>
-        <Button type="submit" className="mt-1">Filtrovat</Button>
-      </form>
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtry</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form action="/fuel-energy" className="grid min-w-0 gap-3 md:grid-cols-4">
+            <FilterSelect
+              name="vehicle"
+              label="Vozidlo"
+              value={filters.vehicle}
+              allLabel="Všechna vozidla"
+              options={data.vehicles.map((vehicle): [string, string] => [vehicle.id, vehicle.name])}
+            />
+            <FilterSelect
+              name="type"
+              label="Typ záznamu"
+              value={filters.type}
+              options={energyTypes.map((type): [string, string] => [type, formatEntryTypeLabel(type)])}
+            />
+            <FilterSelect
+              name="year"
+              label="Rok"
+              value={filters.year}
+              options={energyYears.map((year): [string, string] => [year, year])}
+            />
+            <div className="flex items-end gap-2">
+              <Button type="submit" className="flex-1">Filtrovat</Button>
+              <Button asChild variant="outline" className="flex-1">
+                <Link href="/fuel-energy">Reset</Link>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="Celkové náklady" value={formatCurrency(sumEnergyCost(filteredEnergyEntries), currency)} description="Palivo, LPG, CNG a nabíjení" icon={Fuel} />
         <MetricCard title="Průměrná spotřeba" value={formatConsumptionSummaries(consumptionSummaries)} description="Mezi plnými záznamy" icon={Zap} />
@@ -102,6 +126,11 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
           valueLabel="Cena za jednotku"
         />
       </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        <ChartCard title="Náklady podle roku" type="bar" data={yearlyCosts} valueLabel="Náklady" />
+        <ChartCard title="Náklady podle typu" type="pie" data={typeCosts} valueLabel="Náklady" />
+        <ChartCard title="Náklady podle vozidla" type="bar" data={vehicleCosts} valueLabel="Náklady" />
+      </div>
       {data.energyEntries.length === 0 ? (
         <div id="records">
           <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
@@ -122,6 +151,40 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
           <p>CNG: kg, cena za kg, kg/100 km a cena na 100 km.</p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function FilterSelect({
+  name,
+  label,
+  value,
+  options,
+  allLabel = "Všechny",
+}: {
+  name: string;
+  label: string;
+  value: string;
+  options: Array<[string, string]>;
+  allLabel?: string;
+}) {
+  return (
+    <div className="min-w-0 space-y-1.5">
+      <Label htmlFor={`fuel-energy-filter-${name}`} className="text-xs text-muted-foreground">{label}</Label>
+      <select
+        id={`fuel-energy-filter-${name}`}
+        name={name}
+        defaultValue={value}
+        aria-label={label}
+        className="h-12 w-full min-w-0 rounded-[14px] border border-[rgba(148,163,184,0.34)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_0_0_1px_rgba(255,255,255,0.02)] outline-none transition-colors hover:border-[rgba(148,163,184,0.5)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+      >
+        <option value="all">{allLabel}</option>
+        {options.map(([optionValue, optionLabel]) => (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
@@ -358,14 +421,19 @@ function formatEntryType(entry: EnergyEntry) {
     return entry.full_charge ? "Nabíjení - plné" : "Nabíjení";
   }
 
+  const label = formatEntryTypeLabel(entry.entry_type);
+  return entry.full_tank ? `${label} - plná` : label;
+}
+
+function formatEntryTypeLabel(entryType: string) {
   const labels: Record<string, string> = {
-    fuel: "Tankování",
+    charging: "Nabíjení",
+    fuel: "Palivo",
     lpg: "LPG",
     cng: "CNG",
   };
 
-  const label = labels[entry.entry_type] ?? "Záznam";
-  return entry.full_tank ? `${label} - plná` : label;
+  return labels[entryType] ?? "Záznam";
 }
 
 function formatUnitPriceTitle(entries: EnergyEntry[]) {
@@ -400,4 +468,77 @@ function getQueryValue(value: string | string[] | undefined, fallback = "") {
   }
 
   return value ?? fallback;
+}
+
+function parseEnergyFilters(query: Awaited<FuelEnergyPageProps["searchParams"]>) {
+  return {
+    vehicle: getQueryValue(query.vehicle, "all"),
+    type: getQueryValue(query.type, "all"),
+    year: getQueryValue(query.year, "all"),
+  };
+}
+
+function filterEnergyEntries(entries: EnergyEntry[], filters: ReturnType<typeof parseEnergyFilters>) {
+  return entries.filter((entry) => {
+    if (filters.vehicle !== "all" && entry.vehicle_id !== filters.vehicle) {
+      return false;
+    }
+
+    if (filters.type !== "all" && entry.entry_type !== filters.type) {
+      return false;
+    }
+
+    if (filters.year !== "all" && !entry.date.startsWith(filters.year)) {
+      return false;
+    }
+
+    return true;
+  });
+}
+
+function buildYearlyEnergyCostSeries(entries: EnergyEntry[], currency: string) {
+  const grouped = new Map<string, { value: number; details: string[] }>();
+
+  for (const entry of entries) {
+    const year = entry.date.slice(0, 4);
+    const group = grouped.get(year) ?? { value: 0, details: [] };
+    group.value += Number(entry.total_price);
+    group.details.push(`${formatDisplayDate(entry.date)} · ${formatEntryTypeLabel(entry.entry_type)} · ${formatCurrency(entry.total_price, currency)}`);
+    grouped.set(year, group);
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, group]) => ({
+      name,
+      value: Math.round(group.value * 100) / 100,
+      details: group.details,
+    }));
+}
+
+function buildEnergyTypeCostSeries(entries: EnergyEntry[]) {
+  return buildGroupedEnergySeries(entries, (entry) => formatEntryTypeLabel(entry.entry_type));
+}
+
+function buildVehicleEnergyCostSeries(entries: EnergyEntry[], vehicles: Vehicle[]) {
+  const vehicleNames = new Map(vehicles.map((vehicle) => [vehicle.id, vehicle.name]));
+
+  return buildGroupedEnergySeries(entries, (entry) => vehicleNames.get(entry.vehicle_id) ?? "Vozidlo");
+}
+
+function buildGroupedEnergySeries(entries: EnergyEntry[], getName: (entry: EnergyEntry) => string) {
+  const grouped = new Map<string, number>();
+
+  for (const entry of entries) {
+    const name = getName(entry);
+    grouped.set(name, (grouped.get(name) ?? 0) + Number(entry.total_price));
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b, "cs-CZ"))
+    .map(([name, value]) => ({ name, value: Math.round(value * 100) / 100 }));
+}
+
+function uniqueSorted(values: string[]) {
+  return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, "cs-CZ"));
 }

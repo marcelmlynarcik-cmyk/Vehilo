@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-21
+Last updated: 2026-07-23
 
 ## Project Summary
 
@@ -27,6 +27,12 @@ The app must feel like a real SaaS product that can be launched publicly, not a 
 We will not build Vehilo around mock data.
 
 Instead, we will build the product with real data persistence from the beginning using Supabase. Temporary seed data may be used only for development/testing, but the application architecture, forms, queries, validation, auth, policies and UI states must be designed for real user-owned data from day one.
+
+Launch audit / paid-launch readiness decision:
+
+- Launch audit, legal/accounting/security paid-launch readiness and real payment activation are intentionally deferred until the user explicitly asks to start that final phase.
+- Do not prioritize Phase A-G launch readiness work before then; continue product feature work, analytics, records, dashboard/statistics and remaining core app flows first.
+- The launch readiness section remains in this plan as the final pre-launch checklist, not as the next implementation priority.
 
 Analytics verification rule:
 
@@ -56,25 +62,25 @@ Current phase:
 
 Next session priority:
 
-- Fix the mobile UX issues captured at the end of 2026-07-20 before continuing new feature work.
-- Finish Service filters and real service charts, mirroring the completed Expenses page behavior.
-- Verify Service chart aggregates against real Supabase data before considering them done.
-- Then continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
-- Continue product work without reworking the established app visual design.
+- Continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
+- Keep verifying every Fuel & Energy aggregate against real Supabase data before marking analytics complete.
+- Then continue remaining ownership/service/dashboard statistics work without reworking the established app visual design.
+- Do not start launch audit / paid-launch readiness until the user explicitly asks for that final phase.
 
-Tomorrow mobile/UX fixes:
+Mobile/UX verification:
 
-- [ ] Expense filters on mobile need visible labels/placeholders; users should not have to open a dropdown to know what it filters.
-- [ ] Fix the mobile Expense filter text field that stretches outside the viewport.
-- [ ] Reduce unnecessary left padding in charts on mobile.
-- [ ] Investigate and fix Expense cost per km showing `0 Kč/km`; verify the calculation against real Supabase mileage and expense data.
-- [ ] Hamburger menu should close after selecting a navigation item.
-- [ ] Fuel & Energy chart tooltips must use Czech labels instead of generic `value`.
-- [ ] Fuel & Energy unit labels must match the selected vehicle/powertrain; diesel should not show `kWh` in the price-per-unit chart.
-- [ ] Vehicle filters must display the vehicle name after selection, not the raw vehicle UUID.
-- [ ] Vehicle detail cost cards should include Expenses, not only fuel/service related cards.
-- [ ] Vehicle detail cost cards should be clickable and navigate to the relevant filtered records.
-- [ ] Vehicle detail tab bar (`Přehled`, `Výdaje`, `Palivo`, etc.) must stop floating/moving vertically while swiping on mobile.
+- [x] Expense filters on mobile have visible labels/placeholders; users do not need to open a dropdown to know what it filters.
+- [x] Mobile Expense filter text field no longer stretches outside the viewport.
+- [x] Chart left padding on mobile was reduced.
+- [x] Expense cost per km no longer reproduces as `0 Kč/km`; verified against current real Supabase mileage and expense data for Golfík.
+- [x] Hamburger menu closes after selecting a navigation item.
+- [x] Fuel & Energy chart tooltips use Czech labels instead of generic `value`.
+- [x] Fuel & Energy unit labels match the selected record units; diesel no longer shows `kWh` in the price-per-unit chart.
+- [x] Vehicle filters display the vehicle name after selection, not the raw vehicle UUID.
+- [x] Vehicle detail cost cards include Expenses, not only fuel/service related cards.
+- [x] Vehicle detail cost cards are clickable and navigate to the relevant filtered records.
+- [x] Vehicle detail tab bar (`Přehled`, `Výdaje`, `Palivo`, etc.) no longer floats/moves vertically while swiping on mobile.
+- [x] Visual mobile verification completed on 2026-07-23; current mobile UX is acceptable.
 - [x] Record cards on Expenses, Fuel & Energy and Service pages should be clickable to open a record detail view.
 - [x] Define and implement record detail views for Expense, Fuel/Energy and Service entries.
 - [x] Expense entries must support uploading a receipt/document/photo attachment.
@@ -96,7 +102,7 @@ Latest progress:
 - [x] Mobile bottom navigation was tightened so the bar is anchored to the bottom instead of visually floating with safe-area padding.
 - [x] Mobile navigation now includes a hamburger Menu sheet with access to all sections, including Expenses, Fuel & Energy and Service.
 - [x] Expense, Fuel/Energy and Service entries now have detail views and record links from list/detail surfaces.
-- [ ] Service filters and Service charts still need to be completed and verified.
+- [x] Service filters and Service charts are implemented and verified against real Supabase aggregate data.
 
 GitHub status:
 
@@ -2027,3 +2033,23 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Added edit/delete actions for energy records and improved consumption summaries so they are grouped by vehicle, entry type and unit between full records.
 - Added permanent analytics verification rule: every calculation, chart, metric card and statistics view must be checked against real Supabase data before completion.
 - Remaining Phase 6 work: refined electric/PHEV/LPG/CNG statistics and real charts.
+
+### 2026-07-23
+
+- Confirmed the previously listed mobile UX fixes are now implemented.
+- Completed visual mobile verification; current mobile UX is acceptable.
+- Confirmed Expense cost per km no longer reproduces as `0 Kč/km`; current Golfík Supabase data gives a non-zero expense cost per km.
+- Confirmed Service filters and real Service charts are implemented.
+- Verified Service chart source aggregates against real Supabase data: 31 service records, 105873 Kč total, 10 service types, yearly totals from 2021 through 2026.
+- Updated next priority to continue Phase 6 Fuel & Energy statistics and real chart refinement.
+- Added Fuel & Energy filters for vehicle, record type and year.
+- Added Fuel & Energy cost charts by year, record type and vehicle, using real energy entry data.
+- Verified current Fuel & Energy source aggregates against Supabase: 167 fuel records, 242119.02 Kč total, yearly totals from 2022 through 2026.
+- Removed duplicate Quick Add action for charging; the single Fuel & Energy quick action now covers both fuel and charging.
+- Fixed React lint issues in Energy and Service forms by moving derived state updates out of synchronous effects.
+
+Reminder product requirements captured for future implementation:
+
+- When a reminder becomes due, the app must show a reminders list where due/active reminders remain visually highlighted until the user marks them done or otherwise resolves them.
+- Users must be able to postpone a reminder by a user-entered number of kilometers or days.
+- When a reminder is marked done, the app must ask whether to create the same reminder again for the next interval.
