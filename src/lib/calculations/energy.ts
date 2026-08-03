@@ -43,6 +43,13 @@ export interface FuelEnergyAdvancedStats {
   fullTankCosts: UnitValueStats[];
 }
 
+interface CostPer100KmSegment {
+  entry: EnergyEntry;
+  previous: EnergyEntry;
+  distance: number;
+  cost: number;
+}
+
 export function calculateConsumptionPer100Km(entries: EnergyEntry[]) {
   return calculateConsumptionSummaries(entries)[0]?.value ?? 0;
 }
@@ -112,24 +119,12 @@ export function calculateConsumptionSummaries(entries: EnergyEntry[]): Consumpti
 }
 
 export function calculateCostPer100Km(entries: EnergyEntry[]) {
-  const vehicleGroups = groupEntriesByVehicle(entries);
   let totalCost = 0;
   let totalDistance = 0;
 
-  for (const group of vehicleGroups.values()) {
-    const ordered = [...group].sort((a, b) => a.mileage - b.mileage || a.date.localeCompare(b.date));
-    const first = ordered[0];
-    const last = ordered.at(-1);
-
-    const firstMileage = Number(first?.mileage);
-    const lastMileage = Number(last?.mileage);
-
-    if (!first || !last || lastMileage <= firstMileage) {
-      continue;
-    }
-
-    totalCost += ordered.reduce((total, entry) => total + Number(entry.total_price), 0);
-    totalDistance += lastMileage - firstMileage;
+  for (const segment of buildCostPer100KmSegments(entries)) {
+    totalCost += segment.cost;
+    totalDistance += segment.distance;
   }
 
   if (totalDistance === 0) {
@@ -154,22 +149,35 @@ export function buildMonthlyEnergyCostSeries(entries: EnergyEntry[]): ChartPoint
   return mapMonthlyGroups(entries, (group) => sumNumbers(group.map((entry) => entry.total_price)));
 }
 
-export function buildMonthlyCostPer100KmSeries(entries: EnergyEntry[]): ChartPoint[] {
-  return mapMonthlyGroups(entries, (group) => {
-    const ordered = [...group].sort((a, b) => a.mileage - b.mileage || a.date.localeCompare(b.date));
-    const first = ordered[0];
-    const last = ordered.at(-1);
+export function buildMonthlyCostPer100KmSeries(entries: EnergyEntry[], currency = "CZK"): ChartPoint[] {
+  const monthlySegments = new Map<string, CostPer100KmSegment[]>();
 
-    const firstMileage = Number(first?.mileage);
-    const lastMileage = Number(last?.mileage);
+  for (const segment of buildCostPer100KmSegments(entries)) {
+    const month = segment.entry.date.slice(0, 7);
+    monthlySegments.set(month, [...(monthlySegments.get(month) ?? []), segment]);
+  }
 
-    if (!first || !last || lastMileage <= firstMileage) {
-      return null;
-    }
+  return [...monthlySegments.entries()]
+    .sort(([monthA], [monthB]) => monthA.localeCompare(monthB))
+    .map<ChartPoint | null>(([month, segments]) => {
+      const cost = sumNumbers(segments.map((segment) => segment.cost));
+      const distance = sumNumbers(segments.map((segment) => segment.distance));
 
-    const cost = sumNumbers(ordered.map((entry) => entry.total_price));
-    return (cost / (lastMileage - firstMileage)) * 100;
-  });
+      if (distance <= 0) {
+        return null;
+      }
+
+      return {
+        name: formatMonthLabel(month),
+        value: roundChartValue((cost / distance) * 100),
+        details: segments.map((segment) => {
+          const previousDate = formatDateLabel(segment.previous.date);
+          const currentDate = formatDateLabel(segment.entry.date);
+          return `${currentDate}: ${formatCurrencyValue(segment.cost, currency)} / ${formatQuantity(segment.distance)} km od ${previousDate}`;
+        }),
+      };
+    })
+    .filter((point): point is ChartPoint => point !== null);
 }
 
 export function buildMonthlyUnitPriceSeries(entries: EnergyEntry[]): ChartPoint[] {
@@ -277,6 +285,38 @@ function groupEntriesByVehicle(entries: EnergyEntry[]) {
   });
 
   return groups;
+}
+
+function buildCostPer100KmSegments(entries: EnergyEntry[]): CostPer100KmSegment[] {
+  const segments: CostPer100KmSegment[] = [];
+
+  for (const group of groupEntriesByVehicle(entries).values()) {
+    const ordered = [...group].sort((a, b) => a.mileage - b.mileage || a.date.localeCompare(b.date));
+
+    ordered.forEach((entry, index) => {
+      const previous = ordered[index - 1];
+
+      if (!previous) {
+        return;
+      }
+
+      const distance = Number(entry.mileage) - Number(previous.mileage);
+      const cost = Number(entry.total_price);
+
+      if (distance <= 0 || !Number.isFinite(cost) || cost <= 0) {
+        return;
+      }
+
+      segments.push({
+        entry,
+        previous,
+        distance,
+        cost,
+      });
+    });
+  }
+
+  return segments.sort((a, b) => a.entry.date.localeCompare(b.entry.date) || a.entry.mileage - b.entry.mileage);
 }
 
 function calculateUnitPriceStats(entries: EnergyEntry[]): UnitValueStats[] {

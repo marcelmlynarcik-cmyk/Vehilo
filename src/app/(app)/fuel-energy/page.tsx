@@ -45,7 +45,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const consumptionSummaries = calculateConsumptionSummaries(filteredEnergyEntries);
   const advancedStats = calculateFuelEnergyAdvancedStats(filteredEnergyEntries);
   const consumptionTrend = buildConsumptionTrendSeries(filteredEnergyEntries);
-  const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries);
+  const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries, currency);
   const unitPriceEntries = buildUnitPriceEntrySeries(filteredEnergyEntries, currency);
   const monthlyCosts = buildMonthlyEnergyCostSeries(filteredEnergyEntries);
   const yearlyCosts = buildYearlyEnergyCostSeries(filteredEnergyEntries, currency);

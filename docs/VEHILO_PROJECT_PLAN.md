@@ -271,6 +271,7 @@ Security rules:
 - [ ] Documents
 - [ ] Statistics
 - [ ] Settings
+- [ ] Admin Analytics
 
 ### Navigation
 
@@ -957,18 +958,18 @@ Features:
 - [ ] Fuel / energy cost percentage
 - [ ] Service cost percentage
 - [ ] Insurance cost percentage
-- [ ] Depreciation estimate
-- [ ] Purchase price vs current value
-- [ ] Most expensive month
+- [x] Depreciation estimate
+- [x] Purchase price vs current value
+- [x] Most expensive month
 - [x] Most expensive category
 - [x] Most expensive vehicle
-- [ ] Fuel / energy consumption trend
+- [x] Fuel / energy consumption trend
 - [x] Cost trend over time
 - [x] Expense breakdowns
 - [x] Mileage driven per month
 - [ ] Fuel/electricity price trends
-- [ ] Service cost trend
-- [ ] Cumulative ownership cost
+- [x] Service cost trend
+- [x] Cumulative ownership cost
 - [x] Vehicle comparison
 
 Charts:
@@ -976,10 +977,10 @@ Charts:
 - [x] Line: monthly total cost
 - [x] Bar: expense categories
 - [x] Pie: cost distribution
-- [ ] Line: fuel / energy consumption
+- [x] Line: fuel / energy consumption
 - [x] Bar: mileage per month
 - [x] Area: cumulative cost of ownership
-- [ ] Bar: cost per 100 km by vehicle
+- [x] Bar: cost per 100 km by vehicle
 - [ ] Line: depreciation over time
 - [ ] Stacked: fuel vs service vs insurance vs other
 
@@ -1014,12 +1015,12 @@ Cost calculations:
 - [ ] Average monthly cost
 - [ ] Expense category percentage
 - [ ] Vehicle cost comparison
-- [ ] Depreciation estimate
+- [x] Depreciation estimate
 
 Fuel calculations:
 
 - [ ] Fuel consumption in L/100 km
-- [ ] Fuel cost per 100 km
+- [x] Fuel cost per 100 km
 - [ ] Fuel cost per km
 - [ ] Average fuel price
 - [ ] Consumption between full tank records only
@@ -1171,11 +1172,29 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Accessibility pass.
 - [ ] Empty/loading/error states.
 - [ ] Validation messages.
+- [ ] Clearly mark unfinished or in-progress features in the UI so users know what is still being worked on.
 - [ ] Database indexes.
 - [ ] Supabase advisor checks.
 - [ ] Vercel preview verification.
 - [ ] Production deployment verification.
 - [ ] README and setup docs.
+
+### Phase 10 - Public Launch
+
+- [ ] Choose and configure production hosting for the Next.js app.
+- [ ] Connect the `vehilo.eu` domain to production.
+- [ ] Configure HTTPS, canonical URL and production environment variables.
+- [ ] Verify Supabase Auth redirect URLs for `vehilo.eu`.
+- [ ] Verify Supabase RLS and storage policies before public access.
+- [ ] Add a production-safe admin role model.
+- [ ] Build an admin-only analytics page visible only to the app owner/admin.
+- [ ] Track active users, new users by day, total registered users and basic usage counts.
+- [ ] Add SEO metadata for public pages.
+- [ ] Add `robots.txt` and `sitemap.xml`.
+- [ ] Configure Google Search Console for `vehilo.eu`.
+- [ ] Verify that private app pages are not indexed.
+- [ ] Add public landing/sign-in entry page if needed for Google indexing.
+- [ ] Add launch checklist and rollback notes.
 
 ## File Structure Proposal
 
@@ -2059,6 +2078,11 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Increased visual contrast for app cards, table rows, Settings dropdowns and shared input fields so records and form controls do not blend into the dark background.
 - Added real Statistics/Dashboard chart sources for cost categories, cost type distribution, vehicle cost comparison, monthly mileage and average kilometers per day by year.
 - Verified the new chart sources against live Supabase data: 58 monthly cost buckets, first month 2021-02 at 7340 Kč, last month 2026-07 at 14242.53 Kč; cost type distribution Palivo a energie 244400.16 Kč, Servis 113573 Kč, Výdaje 22890 Kč; top categories Palivo a energie 244400.16 Kč, Servis 113573 Kč, STK 9250 Kč, Pojištění 5840 Kč, Dálniční známka 4500 Kč; vehicle cost comparison currently Golfík 380863.16 Kč; 56 monthly mileage buckets from 2021-06 at 272000 km through 2026-07 at 422155 km; average km/day by year is 88.31 in 2022, 86.27 in 2023, 78.79 in 2024, 79.73 in 2025 and 72.14 in 2026.
+- Added the remaining real Statistics chart sources for fuel/energy consumption trend, cost per 100 km by vehicle, service cost trend, vehicle depreciation snapshot, purchase value vs current value and most-expensive-month insights.
+- Verified the new Statistics aggregates against live Supabase data: most expensive month 2024-02 at 27511.50 Kč; top category Palivo a energie 244400.16 Kč; most expensive vehicle Golfík 380863.16 Kč; cost per 100 km for Golfík 163.35 Kč across 233155 km; service trend has 23 monthly buckets from 2021-06 through 2026-07 totaling 113573 Kč; current fuel consumption has one verified full-tank interval in 2026-07, 852 km and 6.15 l/100 km; Golfík has purchase price 150000 Kč and no current value yet, so depreciation charts intentionally stay empty until current value is entered.
+- Changed the Fuel & Energy `Cena na 100 km` metric and chart from a first-vs-last-mileage monthly range to weighted segments between consecutive records for the same vehicle. August 2024 now verifies as 2183.84 Kč across 726 km, or 300.80 Kč/100 km, instead of the misleading 859 Kč/100 km from the old 254 km monthly range.
+- Added always-visible legends to pie charts so users can read category colors without clicking individual slices.
+- Reworked Dashboard insight cards from generic `Vehilo Insight` labels into explicit cards with a title, status and explanation, and marked the non-functional install/PWA action as `Připravujeme` instead of showing an active button.
 
 Reminder product requirements captured for future implementation:
 

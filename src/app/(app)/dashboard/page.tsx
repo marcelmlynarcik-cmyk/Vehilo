@@ -86,14 +86,31 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         {[
-          "Měsíční náklady ukazují skutečné výdaje v aktuálním kalendářním měsíci.",
-          "Podíl paliva a energie se bude počítat ze záznamů v Supabase.",
-          "Nejbližší urgentní připomínka se zobrazí po vytvoření připomínek.",
+          {
+            title: "Aktuální měsíc",
+            status: "Hotovo",
+            description: "Ukazuje součet reálně zadaných výdajů, paliva a servisu v tomto kalendářním měsíci.",
+          },
+          {
+            title: "Podíl paliva a energie",
+            status: "Připravujeme",
+            description: "Bude porovnávat palivo, nabíjení a ostatní náklady, aby bylo jasné, co tvoří největší část provozu.",
+          },
+          {
+            title: "Nejbližší urgentní připomínka",
+            status: "Připravujeme",
+            description: "Po dokončení připomínek zde bude nejdůležitější servis, dokument nebo termín, který vyžaduje pozornost.",
+          },
         ].map((insight) => (
-          <Card key={insight}>
+          <Card key={insight.title}>
             <CardContent className="p-5">
-              <Badge variant="secondary" className="mb-3">Vehilo Insight</Badge>
-              <p className="text-sm text-muted-foreground">{insight}</p>
+              <div className="mb-3 flex min-w-0 items-center justify-between gap-3">
+                <h2 className="min-w-0 text-sm font-semibold text-foreground">{insight.title}</h2>
+                <Badge variant={insight.status === "Hotovo" ? "secondary" : "outline"} className="shrink-0">
+                  {insight.status}
+                </Badge>
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">{insight.description}</p>
             </CardContent>
           </Card>
         ))}
@@ -105,9 +122,9 @@ export default async function DashboardPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
-            Přidejte Vehilo na domovskou obrazovku pro rychlejší přístup ke garáži.
+            Přidání Vehilo na domovskou obrazovku připravujeme jako součást PWA podpory.
           </p>
-          <Button variant="outline">Instalovat aplikaci</Button>
+          <Button variant="outline" disabled>Připravujeme</Button>
         </CardContent>
       </Card>
     </div>

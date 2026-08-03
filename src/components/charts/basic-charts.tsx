@@ -81,8 +81,23 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
             {emptyLabel}
           </div>
         ) : null}
-        <ResponsiveContainer width="100%" height="100%">
-          {type === "line" ? (
+        {type === "pie" ? (
+          <div className="grid h-full min-h-0 grid-rows-[minmax(0,1fr)_auto] gap-3">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Tooltip active={tooltipActive} trigger="click" wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} onDismiss={() => setTooltipDismissed(true)} />} position={{ x: 8, y: 8 }} />
+                <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={54} outerRadius={82} paddingAngle={2}>
+                  {chartData.map((entry, index) => (
+                    <Cell key={String(entry.name)} fill={chartColors[index % chartColors.length]} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            {hasData ? <PieLegend data={chartData} /> : null}
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            {type === "line" ? (
             <LineChart data={chartData} margin={{ left: 0, right: 12, top: 8, bottom: 0 }}>
               <CartesianGrid stroke="rgba(148, 163, 184, 0.12)" strokeDasharray="3 3" />
               <XAxis dataKey="name" tickLine={false} axisLine={false} tick={axisStyle} />
@@ -106,19 +121,30 @@ export function ChartCard({ title, type, data, emptyLabel = "Zatím bez dat", va
               <Tooltip active={tooltipActive} trigger="click" wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} onDismiss={() => setTooltipDismissed(true)} />} cursor={{ stroke: "rgba(45, 212, 163, 0.2)" }} position={{ x: 8, y: 8 }} />
               <Area type="monotone" dataKey="value" name={valueLabel} stroke="#2dd4a3" strokeWidth={3} fill="#2dd4a3" fillOpacity={0.18} />
             </AreaChart>
-          ) : (
-            <PieChart>
-              <Tooltip active={tooltipActive} trigger="click" wrapperStyle={{ pointerEvents: "auto" }} content={<ChartTooltip valueLabel={valueLabel} onDismiss={() => setTooltipDismissed(true)} />} position={{ x: 8, y: 8 }} />
-              <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={58} outerRadius={88} paddingAngle={2}>
-                {chartData.map((entry, index) => (
-                  <Cell key={String(entry.name)} fill={chartColors[index % chartColors.length]} />
-                ))}
-              </Pie>
-            </PieChart>
-          )}
-        </ResponsiveContainer>
+            ) : null}
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
+  );
+}
+
+function PieLegend({ data }: { data: ChartDatum[] }) {
+  return (
+    <div className="grid max-h-20 min-h-0 grid-cols-2 gap-x-3 gap-y-1 overflow-y-auto pr-1 text-xs text-muted-foreground [scrollbar-width:thin]">
+      {data.map((entry, index) => (
+        <div key={String(entry.name)} className="flex min-w-0 items-center gap-2">
+          <span
+            className="size-2.5 shrink-0 rounded-sm"
+            style={{ backgroundColor: chartColors[index % chartColors.length] }}
+            aria-hidden="true"
+          />
+          <span className="min-w-0 truncate" title={entry.name}>
+            {entry.name}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 

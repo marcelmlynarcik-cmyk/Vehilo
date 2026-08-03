@@ -85,6 +85,10 @@ export function calculateDepreciation(vehicle: Vehicle) {
   return Math.max(0, Number(vehicle.purchase_price) - Number(vehicle.current_value));
 }
 
+export function calculateTotalDepreciation(vehicles: Vehicle[]) {
+  return vehicles.reduce((total, vehicle) => total + calculateDepreciation(vehicle), 0);
+}
+
 export function calculateVehicleCost(data: GarageData, vehicleId: string) {
   const expenses = data.expenses.filter((expense) => expense.vehicle_id === vehicleId);
   const energy = data.energyEntries.filter((entry) => entry.vehicle_id === vehicleId);
@@ -195,6 +199,71 @@ export function buildVehicleCostSeries(data: GarageData) {
   }
 
   return mapNamedCosts(grouped);
+}
+
+export function buildVehicleCostPer100KmSeries(data: GarageData) {
+  return data.vehicles
+    .map((vehicle) => {
+      const mileage = drivenMileage(vehicle);
+
+      if (mileage <= 0) {
+        return null;
+      }
+
+      return {
+        name: vehicle.name,
+        value: roundMoney((calculateVehicleCost(data, vehicle.id) / mileage) * 100),
+      };
+    })
+    .filter((point): point is { name: string; value: number } => point !== null)
+    .sort((a, b) => b.value - a.value);
+}
+
+export function buildVehicleDepreciationSeries(vehicles: Vehicle[]) {
+  return vehicles
+    .map((vehicle) => ({
+      name: vehicle.name,
+      value: roundMoney(calculateDepreciation(vehicle)),
+    }))
+    .filter((point) => point.value > 0)
+    .sort((a, b) => b.value - a.value);
+}
+
+export function buildPurchaseVsCurrentValueSeries(vehicles: Vehicle[]) {
+  const purchaseValue = vehicles.reduce((total, vehicle) => total + Number(vehicle.purchase_price ?? 0), 0);
+  const currentValue = vehicles.reduce((total, vehicle) => total + Number(vehicle.current_value ?? 0), 0);
+
+  return [
+    { name: "Pořizovací cena", value: roundMoney(purchaseValue) },
+    { name: "Aktuální hodnota", value: roundMoney(currentValue) },
+  ].filter((point) => point.value > 0);
+}
+
+export function buildServiceCostTrendSeries(data: GarageData) {
+  const grouped = new Map<string, number>();
+
+  for (const entry of data.serviceEntries) {
+    addMonthlyCost(grouped, entry.date, entry.total_cost);
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, value]) => ({
+      name: formatMonthLabel(month),
+      value: roundMoney(value),
+    }));
+}
+
+export function findMostExpensiveMonth(data: GarageData) {
+  return buildMonthlyTotalCostSeries(data).sort((a, b) => b.value - a.value)[0] ?? null;
+}
+
+export function findMostExpensiveCategory(data: GarageData) {
+  return buildCostCategorySeries(data)[0] ?? null;
+}
+
+export function findMostExpensiveVehicle(data: GarageData) {
+  return buildVehicleCostSeries(data)[0] ?? null;
 }
 
 export function buildMileageMonthSeries(data: GarageData) {
