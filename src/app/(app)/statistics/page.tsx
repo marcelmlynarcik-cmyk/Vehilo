@@ -4,29 +4,44 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChartCard } from "@/components/charts/basic-charts";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
-import { calculateAverageMonthlyCost, calculateCostPerKm, calculateTotalOwnershipCost, formatCurrency } from "@/lib/calculations/costs";
+import {
+  buildCumulativeTotalCostSeries,
+  buildMonthlyTotalCostSeries,
+  calculateAverageMonthlyCost,
+  calculateCostPerKm,
+  calculateDailyOperatingCost,
+  calculateOperatingCostPerKm,
+  calculateRecordedCost,
+  calculateTotalOwnershipCost,
+  formatCurrency,
+} from "@/lib/calculations/costs";
 import { loadGarageData } from "@/lib/data/garage";
 
 export default async function StatisticsPage() {
   const { data } = await loadGarageData();
   const currency = data.profile?.currency ?? "CZK";
+  const monthlyTotalCosts = buildMonthlyTotalCostSeries(data);
+  const cumulativeTotalCosts = buildCumulativeTotalCostSeries(data);
 
   return (
     <div className="space-y-6">
       <PageHeader title="Statistiky" description="Pokročilá analytika skutečných nákladů, spotřeby, servisu, odpisů a porovnání vozidel." />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard title="Celkové vlastnické náklady" value={formatCurrency(calculateTotalOwnershipCost(data), currency)} description="TCO" icon={BarChart3} />
-        <MetricCard title="Cena za kilometr" value={`${formatCurrency(calculateCostPerKm(data), currency, 2)}/km`} description="Napříč garáží od koupě" icon={BarChart3} />
-        <MetricCard title="Měsíční průměr" value={formatCurrency(calculateAverageMonthlyCost(data), currency)} description="Z reálných záznamů" icon={BarChart3} />
+        <MetricCard title="Provozní náklady" value={formatCurrency(calculateRecordedCost(data), currency)} description="Výdaje, palivo a servis" icon={BarChart3} />
+        <MetricCard title="Denní provoz" value={formatCurrency(calculateDailyOperatingCost(data), currency)} description="Od prvního záznamu" icon={BarChart3} />
+        <MetricCard title="Provoz na km" value={`${formatCurrency(calculateOperatingCostPerKm(data), currency, 2)}/km`} description="Bez pořizovací ceny" icon={BarChart3} />
+        <MetricCard title="Vlastnické náklady" value={formatCurrency(calculateTotalOwnershipCost(data), currency)} description="Provoz + čistá pořizovací cena" icon={BarChart3} />
+        <MetricCard title="TCO na km" value={`${formatCurrency(calculateCostPerKm(data), currency, 2)}/km`} description="Včetně vlastnictví" icon={BarChart3} />
+        <MetricCard title="Měsíční průměr" value={formatCurrency(calculateAverageMonthlyCost(data), currency)} description="Z reálných provozních záznamů" icon={BarChart3} />
         <MetricCard title="Počet vozidel" value={String(data.vehicles.length)} description="Pro porovnání" icon={BarChart3} />
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Měsíční celkové náklady" type="line" />
+        <ChartCard title="Měsíční celkové náklady" type="line" data={monthlyTotalCosts} valueLabel="Náklady" />
         <ChartCard title="Kategorie nákladů" type="bar" />
         <ChartCard title="Rozložení nákladů" type="pie" />
         <ChartCard title="Spotřeba paliva / energie" type="line" />
         <ChartCard title="Nájezd po měsících" type="bar" />
-        <ChartCard title="Kumulativní TCO" type="area" />
+        <ChartCard title="Kumulativní provozní náklady" type="area" data={cumulativeTotalCosts} valueLabel="Náklady" />
       </div>
       <Card>
         <CardContent className="p-5">

@@ -33,6 +33,7 @@ Launch audit / paid-launch readiness decision:
 - Launch audit, legal/accounting/security paid-launch readiness and real payment activation are intentionally deferred until the user explicitly asks to start that final phase.
 - Do not prioritize Phase A-G launch readiness work before then; continue product feature work, analytics, records, dashboard/statistics and remaining core app flows first.
 - The launch readiness section remains in this plan as the final pre-launch checklist, not as the next implementation priority.
+- Vehilo will not use a separate `Pro` tier in the core app. The final monetization direction is one low-cost paid subscription for all users, with the full product available to every paying user.
 
 Analytics verification rule:
 
@@ -993,19 +994,11 @@ Sections:
 - [ ] Privacy
 - [ ] Future Monetization
 
-Vehilo Pro card:
+Monetization note:
 
-- Unlimited vehicles
-- Advanced charts
-- Document storage
-- Smart reminders
-- Export to PDF
-- Export to Excel
-- Shared family garage
-- Multi-user access
-- Fleet mode
-- Maintenance templates
-- AI insights
+- Do not present feature gating as `Vehilo Pro`.
+- Future billing should use one paid full-version subscription for all users.
+- Family/shared garage, multi-user access and fleet mode can be planned later as separate product expansion, not as the initial Pro card in Settings.
 
 ## Calculation Helpers
 
@@ -2058,6 +2051,12 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Added a Fuel & Energy statistics panel with unit price min/max/average, full vs partial counts, days between records, kilometers between full records, refueled quantity min/max/average and full-tank cost min/max/average.
 - Verified the new Fuel & Energy statistics against live Supabase `energy_entries`: 168 records total; 2 full entries, 0 partial entries and 166 imported entries without full/partial state; liters unit price min 38.80, max 43.50, average 41.15; days between records min 1, max 41, average 10.09 across 164 intervals; liters quantity min 51.84, max 52.44, average 52.14; full-tank cost min 2011.39 Kč, max 2281.14 Kč, average 2146.27 Kč; kilometers between full entries 852 km.
 - Current imported My Car history still has 166 fuel entries with quantity `0`, so price/quantity/full-tank statistics intentionally reflect only the 2 manually entered real quantity records until the import can be enriched.
+- Added real monthly total cost and cumulative operating cost chart data to Dashboard and Statistics.
+- Split cost metrics into recorded operating cost, daily operating cost, operating cost per km, pure ownership cost and TCO per km.
+- Updated total ownership cost to include recorded operating costs plus net vehicle acquisition cost, using `purchase_price - current_value` when current value exists and full purchase price otherwise.
+- Verified ownership/operating cost aggregates against live Supabase data: 209 cost records, first cost date 2021-02-03, 380863.16 Kč recorded operating cost, 150000 Kč net acquisition cost, 530863.16 Kč pure ownership cost, 233155 km driven mileage, 1.63 Kč/km operating cost, 2.28 Kč/km TCO, 189.67 Kč/day operating cost as of 2026-08-03, 58 monthly cost buckets from 2021-02 through 2026-07.
+- Removed the `Vehilo Pro` card from Settings because the product direction is a single low-cost full-version subscription for all users rather than a Pro tier.
+- Increased visual contrast for app cards, table rows, Settings dropdowns and shared input fields so records and form controls do not blend into the dark background.
 
 Reminder product requirements captured for future implementation:
 
@@ -2076,8 +2075,8 @@ Advanced statistics requirements captured for future implementation:
 - [x] Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
 - [x] Add refueled quantity statistics with minimum, maximum and average quantity.
 - [x] Add full-tank cost statistics with minimum, maximum and average cost.
-- Add cumulative total cost chart, likely grouped monthly.
-- Add daily operating cost: how much the vehicle costs to run per day.
-- Add cost per kilometer for operating costs.
-- Add pure ownership cost including vehicle purchase price, not only recorded operating costs.
+- [x] Add cumulative total cost chart, likely grouped monthly.
+- [x] Add daily operating cost: how much the vehicle costs to run per day.
+- [x] Add cost per kilometer for operating costs.
+- [x] Add pure ownership cost including vehicle purchase price, not only recorded operating costs.
 - Review existing statistics first, reuse anything already implemented and then expand the Statistics/Fuel & Energy/Dashboard views as broadly as useful.

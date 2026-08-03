@@ -1,6 +1,5 @@
 import { Download, ShieldCheck, Upload } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -72,17 +71,6 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-      <Card>
-        <CardHeader><CardTitle>Vehilo Pro</CardTitle></CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">Budoucí rozšíření pro náročnější uživatele, rodiny a menší flotily.</p>
-          <div className="flex flex-wrap gap-2">
-            {["Neomezená vozidla", "Pokročilé grafy", "Úložiště dokumentů", "Chytré připomínky", "PDF export", "Excel export", "Rodinná garáž", "Fleet mode", "AI insights"].map((item) => (
-              <Badge key={item} variant="secondary">{item}</Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }
@@ -168,7 +156,7 @@ function SelectField({
         name={name}
         form={form}
         defaultValue={value}
-        className="flex h-12 w-full rounded-[14px] border border-input bg-input px-3.5 text-sm text-foreground outline-none transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-12 w-full rounded-[14px] border border-[rgba(148,163,184,0.46)] bg-[rgba(13,23,30,0.98)] px-3.5 text-sm text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_0_0_1px_rgba(255,255,255,0.03)] outline-none transition-colors hover:border-[rgba(203,213,225,0.62)] focus-visible:border-ring focus-visible:bg-[rgba(16,30,39,1)] focus-visible:ring-3 focus-visible:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {items.map(([itemValue, itemLabel]) => (
           <option key={itemValue} value={itemValue}>{itemLabel}</option>

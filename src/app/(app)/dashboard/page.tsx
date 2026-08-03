@@ -17,9 +17,14 @@ import { ChartCard } from "@/components/charts/basic-charts";
 import { MetricCard } from "@/components/shared/metric-card";
 import { loadGarageData } from "@/lib/data/garage";
 import {
+  buildCumulativeTotalCostSeries,
+  buildMonthlyTotalCostSeries,
   calculateAverageMonthlyCost,
   calculateCostPerKm,
   calculateCurrentMonthCost,
+  calculateDailyOperatingCost,
+  calculateOperatingCostPerKm,
+  calculateRecordedCost,
   calculateTotalOwnershipCost,
   countReminderStatus,
   formatCurrency,
@@ -31,16 +36,21 @@ export default async function DashboardPage() {
   const { data } = await loadGarageData();
   const currency = data.profile?.currency ?? "CZK";
   const totalCost = calculateTotalOwnershipCost(data);
+  const recordedCost = calculateRecordedCost(data);
   const averageMonthlyCost = calculateAverageMonthlyCost(data);
   const currentMonthCost = calculateCurrentMonthCost(data);
   const costPerKm = calculateCostPerKm(data);
+  const operatingCostPerKm = calculateOperatingCostPerKm(data);
+  const dailyOperatingCost = calculateDailyOperatingCost(data);
   const garageMileage = totalMileage(data.vehicles);
+  const monthlyTotalCosts = buildMonthlyTotalCostSeries(data);
+  const cumulativeTotalCosts = buildCumulativeTotalCostSeries(data);
 
   return (
     <div className="space-y-6">
       <DashboardHero
         vehicleCount={data.vehicles.length}
-        totalCost={formatCurrency(totalCost, currency)}
+        totalCost={formatCurrency(recordedCost, currency)}
         monthlyCost={formatCurrency(currentMonthCost, currency)}
         mileage={`${formatNumber(garageMileage)} km`}
         vehicles={data.vehicles.map((vehicle) => ({ id: vehicle.id, name: vehicle.name }))}
@@ -50,8 +60,11 @@ export default async function DashboardPage() {
         <MetricCard title="Vozidla celkem" value={String(data.vehicles.length)} description="Aktivní záznamy v garáži" icon={Car} />
         <MetricCard title="Měsíční náklady" value={formatCurrency(currentMonthCost, currency)} description="Aktuální kalendářní měsíc" icon={ReceiptText} />
         <MetricCard title="Měsíční průměr" value={formatCurrency(averageMonthlyCost, currency)} description="Od prvního záznamu" icon={ReceiptText} />
-        <MetricCard title="Celkové náklady" value={formatCurrency(totalCost, currency)} description="Výdaje, palivo a servis" icon={Gauge} />
-        <MetricCard title="Cena za kilometr" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Napříč všemi vozidly od koupě" icon={Fuel} />
+        <MetricCard title="Provozní náklady" value={formatCurrency(recordedCost, currency)} description="Výdaje, palivo a servis" icon={Gauge} />
+        <MetricCard title="Denní provoz" value={formatCurrency(dailyOperatingCost, currency)} description="Od prvního záznamu" icon={ReceiptText} />
+        <MetricCard title="Provoz na km" value={`${formatCurrency(operatingCostPerKm, currency, 2)}/km`} description="Bez pořizovací ceny" icon={Fuel} />
+        <MetricCard title="Vlastnické náklady" value={formatCurrency(totalCost, currency)} description="Provoz + čistá pořizovací cena" icon={Gauge} />
+        <MetricCard title="TCO na km" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Včetně vlastnictví" icon={Fuel} />
         <MetricCard title="Nadcházející připomínky" value={String(countReminderStatus(data.reminders, "upcoming"))} description="Plánovaný servis a dokumenty" icon={Bell} />
         <MetricCard title="Po termínu" value={String(countReminderStatus(data.reminders, "overdue"))} description="Vyžaduje pozornost" icon={CalendarClock} />
         <MetricCard title="Dokumenty brzy expirují" value={String(data.documents.filter((document) => document.status === "expiring_soon").length)} description="Pojištění, STK/MOT a povolení" icon={FileText} />
@@ -59,9 +72,9 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <ChartCard title="Měsíční výdaje" type="bar" valueLabel="Náklady" />
+        <ChartCard title="Měsíční výdaje" type="bar" data={monthlyTotalCosts} valueLabel="Náklady" />
         <ChartCard title="Výdaje podle kategorií" type="pie" valueLabel="Náklady" />
-        <ChartCard title="Kumulativní náklady" type="area" valueLabel="Náklady" />
+        <ChartCard title="Kumulativní náklady" type="area" data={cumulativeTotalCosts} valueLabel="Náklady" />
         <ChartCard title="Trend nákladů na palivo a energii" type="line" valueLabel="Náklady" />
         <ChartCard title="Trend spotřeby" type="line" valueLabel="Spotřeba" />
         <ChartCard title="Výdaje podle vozidel" type="bar" valueLabel="Náklady" />
