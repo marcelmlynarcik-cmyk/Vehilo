@@ -9,6 +9,8 @@ export interface ConsumptionSummary {
 export interface ChartPoint {
   name: string;
   value: number;
+  unit?: string;
+  details?: string[];
 }
 
 export interface ConsumptionChartPoint extends ChartPoint {
@@ -140,6 +142,35 @@ export function buildMonthlyUnitPriceSeries(entries: EnergyEntry[]): ChartPoint[
   );
 }
 
+export function buildUnitPriceEntrySeries(entries: EnergyEntry[], currency: string): ChartPoint[] {
+  const entriesByDate = new Map<string, number>();
+
+  return entries
+    .filter((entry) => Number(entry.quantity) > 0)
+    .sort((a, b) => a.date.localeCompare(b.date) || a.mileage - b.mileage)
+    .map((entry) => {
+      const sameDateIndex = entriesByDate.get(entry.date) ?? 0;
+      entriesByDate.set(entry.date, sameDateIndex + 1);
+
+      const unitPrice = entry.unit_price ?? Number(entry.total_price) / Number(entry.quantity);
+      const unit = `${currency}/${formatQuantityUnit(entry.quantity_unit)}`;
+      const station = entry.fuel_station ?? entry.charging_location;
+      const details = [
+        `${formatDateLabel(entry.date)} · ${formatEnergyType(entry.entry_type)}`,
+        `${formatQuantity(entry.quantity)} ${formatQuantityUnit(entry.quantity_unit)} · ${formatCurrencyValue(entry.total_price, currency)}`,
+        station ? `Místo: ${station}` : null,
+        `Nájezd: ${formatQuantity(entry.mileage)} km`,
+      ].filter((detail): detail is string => detail != null);
+
+      return {
+        name: sameDateIndex === 0 ? formatDateLabel(entry.date) : `${formatDateLabel(entry.date)} #${sameDateIndex + 1}`,
+        value: roundChartValue(unitPrice),
+        unit,
+        details,
+      };
+    });
+}
+
 export function buildConsumptionTrendSeries(entries: EnergyEntry[]): ConsumptionChartPoint[] {
   const points: ConsumptionChartPoint[] = [];
 
@@ -257,6 +288,45 @@ function sumNumbers(values: Array<number | string>): number {
 function formatMonthLabel(month: string) {
   const [year, monthNumber] = month.split("-");
   return `${monthNumber}.${year.slice(2)}`;
+}
+
+function formatDateLabel(date: string) {
+  const [year, month, day] = date.split("-");
+  return `${day}.${month}.${year.slice(2)}`;
+}
+
+function formatEnergyType(entryType: EnergyEntry["entry_type"]) {
+  const labels: Record<EnergyEntry["entry_type"], string> = {
+    charging: "Nabíjení",
+    fuel: "Palivo",
+    lpg: "LPG",
+    cng: "CNG",
+  };
+
+  return labels[entryType];
+}
+
+function formatQuantityUnit(unit: EnergyEntry["quantity_unit"]) {
+  const labels: Record<EnergyEntry["quantity_unit"], string> = {
+    liters: "l",
+    gallons: "gal",
+    kWh: "kWh",
+    kg: "kg",
+  };
+
+  return labels[unit];
+}
+
+function formatQuantity(value: number | string) {
+  return new Intl.NumberFormat("cs-CZ", { maximumFractionDigits: 2 }).format(Number(value));
+}
+
+function formatCurrencyValue(value: number | string, currency: string) {
+  return new Intl.NumberFormat("cs-CZ", {
+    style: "currency",
+    currency,
+    maximumFractionDigits: 2,
+  }).format(Number(value));
 }
 
 function roundChartValue(value: number) {

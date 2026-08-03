@@ -17,7 +17,7 @@ import {
   buildConsumptionTrendSeries,
   buildMonthlyCostPer100KmSeries,
   buildMonthlyEnergyCostSeries,
-  buildMonthlyUnitPriceSeries,
+  buildUnitPriceEntrySeries,
   calculateCostPer100Km,
   calculateConsumptionSummaries,
   type ConsumptionSummary,
@@ -41,7 +41,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const consumptionSummaries = calculateConsumptionSummaries(filteredEnergyEntries);
   const consumptionTrend = buildConsumptionTrendSeries(filteredEnergyEntries);
   const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries);
-  const monthlyUnitPrices = buildMonthlyUnitPriceSeries(filteredEnergyEntries);
+  const unitPriceEntries = buildUnitPriceEntrySeries(filteredEnergyEntries, currency);
   const monthlyCosts = buildMonthlyEnergyCostSeries(filteredEnergyEntries);
   const yearlyCosts = buildYearlyEnergyCostSeries(filteredEnergyEntries, currency);
   const typeCosts = buildEnergyTypeCostSeries(filteredEnergyEntries);
@@ -121,7 +121,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <ChartCard
           title={unitPriceTitle}
           type="line"
-          data={monthlyUnitPrices}
+          data={unitPriceEntries}
           emptyLabel="Čeká na záznamy s množstvím"
           valueLabel="Cena za jednotku"
         />
