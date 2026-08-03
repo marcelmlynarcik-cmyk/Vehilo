@@ -17,6 +17,32 @@ export interface ConsumptionChartPoint extends ChartPoint {
   unit: EnergyEntry["quantity_unit"];
 }
 
+export interface ValueStats {
+  min: number;
+  max: number;
+  average: number;
+  count: number;
+}
+
+export interface UnitValueStats extends ValueStats {
+  unit: EnergyEntry["quantity_unit"];
+}
+
+export interface RefuelCompletionStats {
+  full: number;
+  partial: number;
+  unknown: number;
+}
+
+export interface FuelEnergyAdvancedStats {
+  unitPrices: UnitValueStats[];
+  refuelCompletion: RefuelCompletionStats;
+  daysBetweenEntries: ValueStats | null;
+  fullTankDistances: UnitValueStats[];
+  quantities: UnitValueStats[];
+  fullTankCosts: UnitValueStats[];
+}
+
 export function calculateConsumptionPer100Km(entries: EnergyEntry[]) {
   return calculateConsumptionSummaries(entries)[0]?.value ?? 0;
 }
@@ -111,6 +137,17 @@ export function calculateCostPer100Km(entries: EnergyEntry[]) {
   }
 
   return (totalCost / totalDistance) * 100;
+}
+
+export function calculateFuelEnergyAdvancedStats(entries: EnergyEntry[]): FuelEnergyAdvancedStats {
+  return {
+    unitPrices: calculateUnitPriceStats(entries),
+    refuelCompletion: calculateRefuelCompletionStats(entries),
+    daysBetweenEntries: calculateDaysBetweenEntriesStats(entries),
+    fullTankDistances: calculateFullTankDistanceStats(entries),
+    quantities: calculateQuantityStats(entries),
+    fullTankCosts: calculateFullTankCostStats(entries),
+  };
 }
 
 export function buildMonthlyEnergyCostSeries(entries: EnergyEntry[]): ChartPoint[] {
@@ -240,6 +277,165 @@ function groupEntriesByVehicle(entries: EnergyEntry[]) {
   });
 
   return groups;
+}
+
+function calculateUnitPriceStats(entries: EnergyEntry[]): UnitValueStats[] {
+  const values = new Map<EnergyEntry["quantity_unit"], number[]>();
+
+  entries.forEach((entry) => {
+    const quantity = Number(entry.quantity);
+
+    if (quantity <= 0) {
+      return;
+    }
+
+    const unitPrice = entry.unit_price ?? Number(entry.total_price) / quantity;
+
+    if (Number.isFinite(unitPrice) && unitPrice > 0) {
+      values.set(entry.quantity_unit, [...(values.get(entry.quantity_unit) ?? []), unitPrice]);
+    }
+  });
+
+  return mapUnitStats(values);
+}
+
+function calculateRefuelCompletionStats(entries: EnergyEntry[]): RefuelCompletionStats {
+  return entries.reduce<RefuelCompletionStats>(
+    (stats, entry) => {
+      const fullEntry = entry.full_tank ?? entry.full_charge;
+
+      if (fullEntry === true) {
+        stats.full += 1;
+      } else if (fullEntry === false) {
+        stats.partial += 1;
+      } else {
+        stats.unknown += 1;
+      }
+
+      return stats;
+    },
+    { full: 0, partial: 0, unknown: 0 },
+  );
+}
+
+function calculateDaysBetweenEntriesStats(entries: EnergyEntry[]): ValueStats | null {
+  const values: number[] = [];
+
+  for (const group of groupEntriesForConsumption(entries).values()) {
+    const ordered = [...group].sort((a, b) => a.date.localeCompare(b.date) || a.mileage - b.mileage);
+
+    ordered.forEach((entry, index) => {
+      const previous = ordered[index - 1];
+
+      if (!previous) {
+        return;
+      }
+
+      const days = daysBetween(previous.date, entry.date);
+
+      if (days > 0) {
+        values.push(days);
+      }
+    });
+  }
+
+  return calculateStats(values);
+}
+
+function calculateFullTankDistanceStats(entries: EnergyEntry[]): UnitValueStats[] {
+  const values = new Map<EnergyEntry["quantity_unit"], number[]>();
+
+  for (const group of groupEntriesForConsumption(entries).values()) {
+    const ordered = [...group].sort((a, b) => a.mileage - b.mileage || a.date.localeCompare(b.date));
+    let previousFullEntry: EnergyEntry | null = null;
+
+    ordered.forEach((entry) => {
+      const fullEntry = entry.full_tank || entry.full_charge;
+
+      if (!fullEntry) {
+        return;
+      }
+
+      if (previousFullEntry) {
+        const distance = Number(entry.mileage) - Number(previousFullEntry.mileage);
+
+        if (distance > 0) {
+          values.set(entry.quantity_unit, [...(values.get(entry.quantity_unit) ?? []), distance]);
+        }
+      }
+
+      previousFullEntry = entry;
+    });
+  }
+
+  return mapUnitStats(values);
+}
+
+function calculateQuantityStats(entries: EnergyEntry[]): UnitValueStats[] {
+  const values = new Map<EnergyEntry["quantity_unit"], number[]>();
+
+  entries.forEach((entry) => {
+    const quantity = Number(entry.quantity);
+
+    if (quantity > 0) {
+      values.set(entry.quantity_unit, [...(values.get(entry.quantity_unit) ?? []), quantity]);
+    }
+  });
+
+  return mapUnitStats(values);
+}
+
+function calculateFullTankCostStats(entries: EnergyEntry[]): UnitValueStats[] {
+  const values = new Map<EnergyEntry["quantity_unit"], number[]>();
+
+  entries.forEach((entry) => {
+    const fullEntry = entry.full_tank || entry.full_charge;
+    const cost = Number(entry.total_price);
+
+    if (fullEntry && cost > 0) {
+      values.set(entry.quantity_unit, [...(values.get(entry.quantity_unit) ?? []), cost]);
+    }
+  });
+
+  return mapUnitStats(values);
+}
+
+function mapUnitStats(values: Map<EnergyEntry["quantity_unit"], number[]>): UnitValueStats[] {
+  return [...values.entries()]
+    .map(([unit, unitValues]) => {
+      const stats = calculateStats(unitValues);
+
+      if (!stats) {
+        return null;
+      }
+
+      return { unit, ...stats };
+    })
+    .filter((stats): stats is UnitValueStats => stats !== null)
+    .sort((a, b) => unitSortOrder(a.unit) - unitSortOrder(b.unit));
+}
+
+function calculateStats(values: number[]): ValueStats | null {
+  const finiteValues = values.filter((value) => Number.isFinite(value));
+
+  if (finiteValues.length === 0) {
+    return null;
+  }
+
+  return {
+    min: roundChartValue(Math.min(...finiteValues)),
+    max: roundChartValue(Math.max(...finiteValues)),
+    average: roundChartValue(sumNumbers(finiteValues) / finiteValues.length),
+    count: finiteValues.length,
+  };
+}
+
+function daysBetween(startDate: string, endDate: string) {
+  const start = new Date(`${startDate}T00:00:00Z`).getTime();
+  const end = new Date(`${endDate}T00:00:00Z`).getTime();
+  const millisecondsPerDay = 24 * 60 * 60 * 1000;
+
+  return Math.round((end - start) / millisecondsPerDay);
 }
 
 function mapMonthlyGroups(

@@ -2051,6 +2051,14 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Added highlighted due/overdue reminder list, postpone by custom days/km and mark-done flow with optional repeat reminder creation.
 - Connected Quick Add to open the real reminder form.
 
+### 2026-08-03
+
+- Fixed chart tooltip interaction so selected tooltips can be scrolled without changing the selected data point, and can be dismissed by clicking outside, pressing Escape, or using the close button.
+- Changed the Fuel & Energy price-per-unit chart to plot every real tanking/charging record with quantity instead of monthly aggregation.
+- Added a Fuel & Energy statistics panel with unit price min/max/average, full vs partial counts, days between records, kilometers between full records, refueled quantity min/max/average and full-tank cost min/max/average.
+- Verified the new Fuel & Energy statistics against live Supabase `energy_entries`: 168 records total; 2 full entries, 0 partial entries and 166 imported entries without full/partial state; liters unit price min 38.80, max 43.50, average 41.15; days between records min 1, max 41, average 10.09 across 164 intervals; liters quantity min 51.84, max 52.44, average 52.14; full-tank cost min 2011.39 Kč, max 2281.14 Kč, average 2146.27 Kč; kilometers between full entries 852 km.
+- Current imported My Car history still has 166 fuel entries with quantity `0`, so price/quantity/full-tank statistics intentionally reflect only the 2 manually entered real quantity records until the import can be enriched.
+
 Reminder product requirements captured for future implementation:
 
 - When a reminder becomes due, the app must show a reminders list where due/active reminders remain visually highlighted until the user marks them done or otherwise resolves them.
@@ -2062,12 +2070,12 @@ Reminder product requirements captured for future implementation:
 Advanced statistics requirements captured for future implementation:
 
 - Add odometer statistics showing average kilometers driven per day, grouped yearly while displaying the daily average for each year.
-- Expand fuel price analytics with a small summary table for minimum, maximum and average fuel price.
-- Add full vs partial refuel statistics: how many refuels were full tank vs partial.
-- Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.
-- Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
-- Add refueled quantity statistics with minimum, maximum and average quantity.
-- Add full-tank cost statistics with minimum, maximum and average cost.
+- [x] Expand fuel price analytics with a small summary table for minimum, maximum and average fuel price.
+- [x] Add full vs partial refuel statistics: how many refuels were full tank vs partial.
+- [x] Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.
+- [x] Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
+- [x] Add refueled quantity statistics with minimum, maximum and average quantity.
+- [x] Add full-tank cost statistics with minimum, maximum and average cost.
 - Add cumulative total cost chart, likely grouped monthly.
 - Add daily operating cost: how much the vehicle costs to run per day.
 - Add cost per kilometer for operating costs.

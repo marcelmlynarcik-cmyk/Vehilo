@@ -14,6 +14,7 @@ import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { formatCurrency, sumEnergyCost } from "@/lib/calculations/costs";
 import {
+  calculateFuelEnergyAdvancedStats,
   buildConsumptionTrendSeries,
   buildMonthlyCostPer100KmSeries,
   buildMonthlyEnergyCostSeries,
@@ -21,6 +22,9 @@ import {
   calculateCostPer100Km,
   calculateConsumptionSummaries,
   type ConsumptionSummary,
+  type FuelEnergyAdvancedStats,
+  type UnitValueStats,
+  type ValueStats,
 } from "@/lib/calculations/energy";
 import { loadGarageData } from "@/lib/data/garage";
 import type { EnergyEntry, Vehicle } from "@/types/domain";
@@ -39,6 +43,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
   const filters = parseEnergyFilters(query);
   const filteredEnergyEntries = filterEnergyEntries(data.energyEntries, filters);
   const consumptionSummaries = calculateConsumptionSummaries(filteredEnergyEntries);
+  const advancedStats = calculateFuelEnergyAdvancedStats(filteredEnergyEntries);
   const consumptionTrend = buildConsumptionTrendSeries(filteredEnergyEntries);
   const monthlyCostPer100Km = buildMonthlyCostPer100KmSeries(filteredEnergyEntries);
   const unitPriceEntries = buildUnitPriceEntrySeries(filteredEnergyEntries, currency);
@@ -102,6 +107,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
         <MetricCard title="Cena na 100 km" value={formatCurrency(calculateCostPer100Km(filteredEnergyEntries), currency)} description="Z reálných záznamů" icon={BatteryCharging} />
         <MetricCard title="Záznamy" value={String(filteredEnergyEntries.length)} description="Tankování a nabíjení" icon={Fuel} />
       </div>
+      <FuelEnergyStatsPanel stats={advancedStats} currency={currency} />
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard
           title="Spotřeba mezi plnými záznamy"
@@ -151,6 +157,60 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
           <p>CNG: kg, cena za kg, kg/100 km a cena na 100 km.</p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function FuelEnergyStatsPanel({ stats, currency }: { stats: FuelEnergyAdvancedStats; currency: string }) {
+  const completionTotal = stats.refuelCompletion.full + stats.refuelCompletion.partial + stats.refuelCompletion.unknown;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Palivové statistiky</CardTitle>
+      </CardHeader>
+      <CardContent className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <StatisticBlock
+          label="Cena za jednotku"
+          value={formatUnitStats(stats.unitPrices, (stat) => formatCurrency(stat.average, currency, 2), "průměr")}
+          detail={formatUnitRange(stats.unitPrices, (value, unit) => `${formatCurrency(value, currency, 2)}/${formatUnit(unit)}`)}
+        />
+        <StatisticBlock
+          label="Plné vs částečné"
+          value={`${stats.refuelCompletion.full} / ${stats.refuelCompletion.partial}`}
+          detail={completionTotal > 0 ? `${completionTotal} záznamů celkem${stats.refuelCompletion.unknown > 0 ? `, ${stats.refuelCompletion.unknown} bez stavu` : ""}` : "Zatím bez záznamů"}
+        />
+        <StatisticBlock
+          label="Dny mezi záznamy"
+          value={formatValueStats(stats.daysBetweenEntries, (value) => `${formatNumber(value)} dní`, "průměr")}
+          detail={formatValueRange(stats.daysBetweenEntries, (value) => `${formatNumber(value)} dní`)}
+        />
+        <StatisticBlock
+          label="Km mezi plnými"
+          value={formatUnitStats(stats.fullTankDistances, (stat) => `${formatNumber(stat.average)} km`, "průměr")}
+          detail={formatUnitRange(stats.fullTankDistances, (value) => `${formatNumber(value)} km`)}
+        />
+        <StatisticBlock
+          label="Natankované množství"
+          value={formatUnitStats(stats.quantities, (stat) => `${formatNumber(stat.average)} ${formatUnit(stat.unit)}`, "průměr")}
+          detail={formatUnitRange(stats.quantities, (value, unit) => `${formatNumber(value)} ${formatUnit(unit)}`)}
+        />
+        <StatisticBlock
+          label="Cena plné nádrže"
+          value={formatUnitStats(stats.fullTankCosts, (stat) => formatCurrency(stat.average, currency), "průměr")}
+          detail={formatUnitRange(stats.fullTankCosts, (value) => formatCurrency(value, currency))}
+        />
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatisticBlock({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <div className="min-w-0 rounded-[14px] border border-border bg-muted/20 px-4 py-3">
+      <div className="text-xs font-semibold uppercase text-muted-foreground">{label}</div>
+      <div className="mt-1 break-words text-lg font-bold tabular-num text-foreground">{value}</div>
+      <div className="mt-1 break-words text-xs leading-relaxed text-muted-foreground">{detail}</div>
     </div>
   );
 }
@@ -414,6 +474,40 @@ function formatConsumptionSummaries(summaries: ConsumptionSummary[]) {
   return summaries
     .map((summary) => `${summary.value.toFixed(1)} ${formatUnit(summary.unit)}/100 km`)
     .join(" + ");
+}
+
+function formatValueStats(stats: ValueStats | null, formatValue: (value: number) => string, suffix: string) {
+  if (!stats) {
+    return "-";
+  }
+
+  return `${formatValue(stats.average)} ${suffix}`;
+}
+
+function formatValueRange(stats: ValueStats | null, formatValue: (value: number) => string) {
+  if (!stats) {
+    return "Čeká na více záznamů";
+  }
+
+  return `Min ${formatValue(stats.min)} · max ${formatValue(stats.max)} · ${stats.count} intervalů`;
+}
+
+function formatUnitStats(stats: UnitValueStats[], formatStat: (stat: UnitValueStats) => string, suffix: string) {
+  if (stats.length === 0) {
+    return "-";
+  }
+
+  return stats.map((stat) => `${formatStat(stat)} ${suffix}`).join(" + ");
+}
+
+function formatUnitRange(stats: UnitValueStats[], formatValue: (value: number, unit: UnitValueStats["unit"]) => string) {
+  if (stats.length === 0) {
+    return "Čeká na více záznamů";
+  }
+
+  return stats
+    .map((stat) => `${formatUnit(stat.unit)}: min ${formatValue(stat.min, stat.unit)} · max ${formatValue(stat.max, stat.unit)} · ${stat.count} záznamů`)
+    .join(" | ");
 }
 
 function formatEntryType(entry: EnergyEntry) {
