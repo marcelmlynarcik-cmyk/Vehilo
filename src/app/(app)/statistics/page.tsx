@@ -5,8 +5,13 @@ import { ChartCard } from "@/components/charts/basic-charts";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import {
+  buildAverageDailyMileageByYearSeries,
   buildCumulativeTotalCostSeries,
+  buildCostCategorySeries,
+  buildCostTypeDistributionSeries,
+  buildMileageMonthSeries,
   buildMonthlyTotalCostSeries,
+  buildVehicleCostSeries,
   calculateAverageMonthlyCost,
   calculateCostPerKm,
   calculateDailyOperatingCost,
@@ -22,6 +27,11 @@ export default async function StatisticsPage() {
   const currency = data.profile?.currency ?? "CZK";
   const monthlyTotalCosts = buildMonthlyTotalCostSeries(data);
   const cumulativeTotalCosts = buildCumulativeTotalCostSeries(data);
+  const costCategories = buildCostCategorySeries(data);
+  const costDistribution = buildCostTypeDistributionSeries(data);
+  const mileageMonths = buildMileageMonthSeries(data);
+  const dailyMileageByYear = buildAverageDailyMileageByYearSeries(data);
+  const vehicleCosts = buildVehicleCostSeries(data);
 
   return (
     <div className="space-y-6">
@@ -37,11 +47,13 @@ export default async function StatisticsPage() {
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard title="Měsíční celkové náklady" type="line" data={monthlyTotalCosts} valueLabel="Náklady" />
-        <ChartCard title="Kategorie nákladů" type="bar" />
-        <ChartCard title="Rozložení nákladů" type="pie" />
+        <ChartCard title="Kategorie nákladů" type="bar" data={costCategories} valueLabel="Náklady" />
+        <ChartCard title="Rozložení nákladů" type="pie" data={costDistribution} valueLabel="Náklady" />
         <ChartCard title="Spotřeba paliva / energie" type="line" />
-        <ChartCard title="Nájezd po měsících" type="bar" />
+        <ChartCard title="Nájezd po měsících" type="bar" data={mileageMonths} valueLabel="Nájezd" />
         <ChartCard title="Kumulativní provozní náklady" type="area" data={cumulativeTotalCosts} valueLabel="Náklady" />
+        <ChartCard title="Průměr km/den podle roku" type="bar" data={dailyMileageByYear} valueLabel="Km/den" />
+        <ChartCard title="Náklady podle vozidla" type="bar" data={vehicleCosts} valueLabel="Náklady" />
       </div>
       <Card>
         <CardContent className="p-5">

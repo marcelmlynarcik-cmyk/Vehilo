@@ -960,25 +960,25 @@ Features:
 - [ ] Depreciation estimate
 - [ ] Purchase price vs current value
 - [ ] Most expensive month
-- [ ] Most expensive category
-- [ ] Most expensive vehicle
+- [x] Most expensive category
+- [x] Most expensive vehicle
 - [ ] Fuel / energy consumption trend
-- [ ] Cost trend over time
-- [ ] Expense breakdowns
-- [ ] Mileage driven per month
+- [x] Cost trend over time
+- [x] Expense breakdowns
+- [x] Mileage driven per month
 - [ ] Fuel/electricity price trends
 - [ ] Service cost trend
 - [ ] Cumulative ownership cost
-- [ ] Vehicle comparison
+- [x] Vehicle comparison
 
 Charts:
 
-- [ ] Line: monthly total cost
-- [ ] Bar: expense categories
-- [ ] Pie: cost distribution
+- [x] Line: monthly total cost
+- [x] Bar: expense categories
+- [x] Pie: cost distribution
 - [ ] Line: fuel / energy consumption
-- [ ] Bar: mileage per month
-- [ ] Area: cumulative cost of ownership
+- [x] Bar: mileage per month
+- [x] Area: cumulative cost of ownership
 - [ ] Bar: cost per 100 km by vehicle
 - [ ] Line: depreciation over time
 - [ ] Stacked: fuel vs service vs insurance vs other
@@ -2057,6 +2057,8 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Verified ownership/operating cost aggregates against live Supabase data: 209 cost records, first cost date 2021-02-03, 380863.16 Kč recorded operating cost, 150000 Kč net acquisition cost, 530863.16 Kč pure ownership cost, 233155 km driven mileage, 1.63 Kč/km operating cost, 2.28 Kč/km TCO, 189.67 Kč/day operating cost as of 2026-08-03, 58 monthly cost buckets from 2021-02 through 2026-07.
 - Removed the `Vehilo Pro` card from Settings because the product direction is a single low-cost full-version subscription for all users rather than a Pro tier.
 - Increased visual contrast for app cards, table rows, Settings dropdowns and shared input fields so records and form controls do not blend into the dark background.
+- Added real Statistics/Dashboard chart sources for cost categories, cost type distribution, vehicle cost comparison, monthly mileage and average kilometers per day by year.
+- Verified the new chart sources against live Supabase data: 58 monthly cost buckets, first month 2021-02 at 7340 Kč, last month 2026-07 at 14242.53 Kč; cost type distribution Palivo a energie 244400.16 Kč, Servis 113573 Kč, Výdaje 22890 Kč; top categories Palivo a energie 244400.16 Kč, Servis 113573 Kč, STK 9250 Kč, Pojištění 5840 Kč, Dálniční známka 4500 Kč; vehicle cost comparison currently Golfík 380863.16 Kč; 56 monthly mileage buckets from 2021-06 at 272000 km through 2026-07 at 422155 km; average km/day by year is 88.31 in 2022, 86.27 in 2023, 78.79 in 2024, 79.73 in 2025 and 72.14 in 2026.
 
 Reminder product requirements captured for future implementation:
 
@@ -2068,7 +2070,7 @@ Reminder product requirements captured for future implementation:
 
 Advanced statistics requirements captured for future implementation:
 
-- Add odometer statistics showing average kilometers driven per day, grouped yearly while displaying the daily average for each year.
+- [x] Add odometer statistics showing average kilometers driven per day, grouped yearly while displaying the daily average for each year.
 - [x] Expand fuel price analytics with a small summary table for minimum, maximum and average fuel price.
 - [x] Add full vs partial refuel statistics: how many refuels were full tank vs partial.
 - [x] Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.

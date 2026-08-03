@@ -159,6 +159,93 @@ export function buildCumulativeTotalCostSeries(data: GarageData) {
   });
 }
 
+export function buildCostCategorySeries(data: GarageData) {
+  const grouped = new Map<string, number>();
+
+  for (const expense of data.expenses) {
+    addNamedCost(grouped, formatExpenseCategory(expense.category), expense.amount);
+  }
+
+  for (const entry of data.energyEntries) {
+    addNamedCost(grouped, "Palivo a energie", entry.total_price);
+  }
+
+  for (const entry of data.serviceEntries) {
+    addNamedCost(grouped, "Servis", entry.total_cost);
+  }
+
+  return mapNamedCosts(grouped);
+}
+
+export function buildCostTypeDistributionSeries(data: GarageData) {
+  const grouped = new Map<string, number>();
+
+  addNamedCost(grouped, "Výdaje", sumExpenses(data.expenses));
+  addNamedCost(grouped, "Palivo a energie", sumEnergyCost(data.energyEntries));
+  addNamedCost(grouped, "Servis", sumServiceCost(data.serviceEntries));
+
+  return mapNamedCosts(grouped);
+}
+
+export function buildVehicleCostSeries(data: GarageData) {
+  const grouped = new Map<string, number>();
+
+  for (const vehicle of data.vehicles) {
+    addNamedCost(grouped, vehicle.name, calculateVehicleCost(data, vehicle.id));
+  }
+
+  return mapNamedCosts(grouped);
+}
+
+export function buildMileageMonthSeries(data: GarageData) {
+  const grouped = new Map<string, number>();
+
+  for (const entry of mileageEntries(data)) {
+    const month = entry.date.slice(0, 7);
+    grouped.set(month, Math.max(grouped.get(month) ?? 0, entry.mileage));
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, mileage]) => ({
+      name: formatMonthLabel(month),
+      value: roundMoney(mileage),
+    }));
+}
+
+export function buildAverageDailyMileageByYearSeries(data: GarageData) {
+  const grouped = new Map<string, number[]>();
+
+  for (const group of groupMileageEntriesByVehicle(data).values()) {
+    const ordered = [...group].sort((a, b) => a.date.localeCompare(b.date) || a.mileage - b.mileage);
+
+    ordered.forEach((entry, index) => {
+      const previous = ordered[index - 1];
+
+      if (!previous) {
+        return;
+      }
+
+      const days = daysBetween(previous.date, entry.date);
+      const distance = entry.mileage - previous.mileage;
+
+      if (days <= 0 || distance <= 0) {
+        return;
+      }
+
+      const year = entry.date.slice(0, 4);
+      grouped.set(year, [...(grouped.get(year) ?? []), distance / days]);
+    });
+  }
+
+  return [...grouped.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([year, values]) => ({
+      name: year,
+      value: roundMoney(values.reduce((total, value) => total + value, 0) / values.length),
+    }));
+}
+
 export function calculateCurrentMonthCost(data: GarageData, date = new Date()) {
   const month = formatMonthKey(date);
   const expenses = data.expenses
@@ -197,6 +284,72 @@ function firstCostDate(data: GarageData) {
 function addMonthlyCost(grouped: Map<string, number>, date: string, value: number) {
   const month = date.slice(0, 7);
   grouped.set(month, (grouped.get(month) ?? 0) + Number(value));
+}
+
+function addNamedCost(grouped: Map<string, number>, name: string, value: number) {
+  const numericValue = Number(value);
+
+  if (numericValue <= 0) {
+    return;
+  }
+
+  grouped.set(name, (grouped.get(name) ?? 0) + numericValue);
+}
+
+function mapNamedCosts(grouped: Map<string, number>) {
+  return [...grouped.entries()]
+    .filter(([, value]) => value > 0)
+    .sort(([, a], [, b]) => b - a)
+    .map(([name, value]) => ({
+      name,
+      value: roundMoney(value),
+    }));
+}
+
+function mileageEntries(data: GarageData) {
+  return [
+    ...data.energyEntries.map((entry) => ({
+      vehicleId: entry.vehicle_id,
+      date: entry.date,
+      mileage: Number(entry.mileage),
+    })),
+    ...data.serviceEntries.map((entry) => ({
+      vehicleId: entry.vehicle_id,
+      date: entry.date,
+      mileage: Number(entry.mileage),
+    })),
+    ...data.expenses
+      .filter((expense) => expense.mileage != null)
+      .map((expense) => ({
+        vehicleId: expense.vehicle_id,
+        date: expense.date,
+        mileage: Number(expense.mileage),
+      })),
+  ].filter((entry) => entry.mileage > 0);
+}
+
+function groupMileageEntriesByVehicle(data: GarageData) {
+  const groups = new Map<string, ReturnType<typeof mileageEntries>>();
+
+  for (const entry of mileageEntries(data)) {
+    groups.set(entry.vehicleId, [...(groups.get(entry.vehicleId) ?? []), entry]);
+  }
+
+  return groups;
+}
+
+function formatExpenseCategory(category: string) {
+  const labels: Record<string, string> = {
+    insurance: "Pojištění",
+    parking: "Parkování",
+    toll: "Dálniční známky a mýto",
+    washing: "Mytí",
+    accessories: "Doplňky",
+    tax: "Daně a poplatky",
+    other: "Ostatní",
+  };
+
+  return labels[category] ?? category;
 }
 
 function formatMonthKey(date: Date) {

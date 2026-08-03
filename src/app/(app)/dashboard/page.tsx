@@ -18,7 +18,9 @@ import { MetricCard } from "@/components/shared/metric-card";
 import { loadGarageData } from "@/lib/data/garage";
 import {
   buildCumulativeTotalCostSeries,
+  buildCostCategorySeries,
   buildMonthlyTotalCostSeries,
+  buildVehicleCostSeries,
   calculateAverageMonthlyCost,
   calculateCostPerKm,
   calculateCurrentMonthCost,
@@ -45,6 +47,8 @@ export default async function DashboardPage() {
   const garageMileage = totalMileage(data.vehicles);
   const monthlyTotalCosts = buildMonthlyTotalCostSeries(data);
   const cumulativeTotalCosts = buildCumulativeTotalCostSeries(data);
+  const costCategories = buildCostCategorySeries(data);
+  const vehicleCosts = buildVehicleCostSeries(data);
 
   return (
     <div className="space-y-6">
@@ -73,11 +77,11 @@ export default async function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <ChartCard title="Měsíční výdaje" type="bar" data={monthlyTotalCosts} valueLabel="Náklady" />
-        <ChartCard title="Výdaje podle kategorií" type="pie" valueLabel="Náklady" />
+        <ChartCard title="Výdaje podle kategorií" type="pie" data={costCategories} valueLabel="Náklady" />
         <ChartCard title="Kumulativní náklady" type="area" data={cumulativeTotalCosts} valueLabel="Náklady" />
         <ChartCard title="Trend nákladů na palivo a energii" type="line" valueLabel="Náklady" />
         <ChartCard title="Trend spotřeby" type="line" valueLabel="Spotřeba" />
-        <ChartCard title="Výdaje podle vozidel" type="bar" valueLabel="Náklady" />
+        <ChartCard title="Výdaje podle vozidel" type="bar" data={vehicleCosts} valueLabel="Náklady" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
