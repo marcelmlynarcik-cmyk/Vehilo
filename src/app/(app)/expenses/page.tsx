@@ -82,7 +82,7 @@ export default async function ExpensesPage({ searchParams }: ExpensesPageProps) 
         <MetricCard title="Náklad na km" value={`${formatCurrency(costPerKm, currency, 2)}/km`} description="Jen vozidla ve filtrovaných výdajích" icon={ReceiptText} />
       </div>
       {data.expenses.length === 0 ? (
-        <EmptyState icon={ReceiptText} title="Zatím žádné výdaje" description="Po připojení Supabase a vytvoření prvního vozidla zde budete ukládat skutečné náklady." actionLabel="Přidat výdaj" />
+        <EmptyState icon={ReceiptText} title="Zatím žádné výdaje" description="Pro první záznam použijte tlačítko Přidat výdaj nahoře na stránce." />
       ) : filteredExpenses.length === 0 ? (
         <EmptyState icon={ReceiptText} title="Žádné výdaje pro tento filtr" description="Změňte filtr nebo resetujte výběr." />
       ) : (

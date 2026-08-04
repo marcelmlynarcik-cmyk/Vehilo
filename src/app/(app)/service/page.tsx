@@ -83,7 +83,7 @@ export default async function ServicePage({ searchParams }: ServicePageProps) {
       </div>
       <div className="grid gap-4 lg:grid-cols-[1fr_360px]">
         {data.serviceEntries.length === 0 ? (
-          <EmptyState icon={Wrench} title="Servisní historie je prázdná" description="Po připojení Supabase zde vznikne časová osa oprav, údržby a EV kontrol." actionLabel="Přidat servis" />
+          <EmptyState icon={Wrench} title="Servisní historie je prázdná" description="Pro první servisní záznam použijte tlačítko Přidat servis nahoře na stránce." />
         ) : filteredServiceEntries.length === 0 ? (
           <EmptyState icon={Wrench} title="Žádný servis pro tento filtr" description="Změňte filtr nebo resetujte výběr." />
         ) : (

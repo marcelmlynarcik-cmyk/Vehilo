@@ -79,8 +79,8 @@ export default async function DashboardPage() {
         <ChartCard title="Měsíční výdaje" type="bar" data={monthlyTotalCosts} valueLabel="Náklady" />
         <ChartCard title="Výdaje podle kategorií" type="pie" data={costCategories} valueLabel="Náklady" />
         <ChartCard title="Kumulativní náklady" type="area" data={cumulativeTotalCosts} valueLabel="Náklady" />
-        <ChartCard title="Trend nákladů na palivo a energii" type="line" valueLabel="Náklady" />
-        <ChartCard title="Trend spotřeby" type="line" valueLabel="Spotřeba" />
+        <PlannedChartCard title="Trend nákladů na palivo a energii" description="Samostatný trend paliva a nabíjení bude doplněný po dalším rozšíření Fuel & Energy analytiky." />
+        <PlannedChartCard title="Trend spotřeby" description="Spotřeba bude na dashboardu vycházet z ověřených plných tankování nebo nabití." />
         <ChartCard title="Výdaje podle vozidel" type="bar" data={vehicleCosts} valueLabel="Náklady" />
       </div>
 
@@ -128,6 +128,22 @@ export default async function DashboardPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function PlannedChartCard({ title, description }: { title: string; description: string }) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-base">{title}</CardTitle>
+          <Badge variant="outline" className="shrink-0">Připravujeme</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="flex h-[260px] flex-col items-center justify-center rounded-b-[20px] border-t border-border text-center md:h-72">
+        <div className="max-w-xs text-sm leading-6 text-muted-foreground">{description}</div>
+      </CardContent>
+    </Card>
   );
 }
 

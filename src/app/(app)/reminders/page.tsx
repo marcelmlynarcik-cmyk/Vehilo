@@ -53,7 +53,7 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
         <MetricCard title="Hotovo" value={String(countReminderStatus(data.reminders, "done"))} description="Dokončené připomínky" icon={CheckCircle2} />
       </div>
       {data.reminders.length === 0 ? (
-        <EmptyState icon={Bell} title="Zatím žádné připomínky" description="Vehilo bude hlídat olej, filtry, brzdy, STK/MOT, pojištění, dálniční známky, pneumatiky i EV kontroly." actionLabel="Přidat připomínku" />
+        <EmptyState icon={Bell} title="Zatím žádné připomínky" description="Pro první datumovou, kilometrovou nebo kombinovanou připomínku použijte tlačítko Přidat připomínku nahoře na stránce." />
       ) : (
         <Card id="records">
           <CardHeader>

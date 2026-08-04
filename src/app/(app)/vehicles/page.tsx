@@ -41,7 +41,6 @@ export default async function VehiclesPage() {
           icon={Car}
           title="Zatím žádné vozidlo"
           description="Přidejte první skutečné vozidlo. Vehilo přizpůsobí pole pro palivo, energii a servis podle typu pohonu."
-          actionLabel="Přidat vozidlo"
         />
       ) : (
         <div className="grid gap-4 xl:grid-cols-2">

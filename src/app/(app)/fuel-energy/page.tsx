@@ -139,7 +139,7 @@ export default async function FuelEnergyPage({ searchParams }: FuelEnergyPagePro
       </div>
       {data.energyEntries.length === 0 ? (
         <div id="records">
-          <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Po přidání vozidla nabídne Vehilo správný formulář: litry, kWh nebo kg podle typu pohonu." actionLabel="Přidat tankování / nabíjení" />
+          <EmptyState icon={Fuel} title="Zatím žádné záznamy paliva ani energie" description="Pro první tankování nebo nabíjení použijte tlačítko Přidat tankování / nabíjení nahoře na stránce." />
         </div>
       ) : filteredEnergyEntries.length === 0 ? (
         <div id="records">

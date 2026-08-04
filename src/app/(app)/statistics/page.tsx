@@ -85,7 +85,10 @@ export default async function StatisticsPage() {
             <p>Nejdražší kategorie: {mostExpensiveCategory ? `${mostExpensiveCategory.name} (${formatCurrency(mostExpensiveCategory.value, currency)})` : "čeká na náklady"}.</p>
             <p>Nejdražší vozidlo: {mostExpensiveVehicle ? `${mostExpensiveVehicle.name} (${formatCurrency(mostExpensiveVehicle.value, currency)})` : "čeká na vozidla"}.</p>
             <p>Nejdražší měsíc: {mostExpensiveMonth ? `${mostExpensiveMonth.name} (${formatCurrency(mostExpensiveMonth.value, currency)})` : "čeká na náklady"}.</p>
-            <p>Plug-in hybrid analýza oddělí palivo a domácí/veřejné nabíjení.</p>
+            <p>
+              <Badge variant="outline" className="mr-2">Připravujeme</Badge>
+              Plug-in hybrid analýza oddělí palivo a domácí/veřejné nabíjení.
+            </p>
           </div>
         </CardContent>
       </Card>
