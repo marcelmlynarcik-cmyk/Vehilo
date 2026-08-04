@@ -72,8 +72,10 @@ Current phase:
 
 Next session priority:
 
-- Start Phase 6 Production Hardening now.
-- Then complete Phase 7 Public Launch, including the `vehilo.eu` production domain move and the first owner/admin page.
+- Continue Phase 7 Public Launch follow-up.
+- Finish Google Cloud Console OAuth production configuration for `https://www.vehilo.eu`.
+- Verify Supabase Auth URL Configuration and redirect allowlist for `https://www.vehilo.eu/auth/callback`.
+- Submit `https://www.vehilo.eu/sitemap.xml` in Google Search Console after domain verification.
 - Keep all unfinished visible app features clearly labelled as `Připravujeme`, `Ve vývoji` or equivalent Czech status copy.
 - After Phase 6-7, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
 - Do not activate real payments until the user explicitly asks for that final payment phase.
@@ -192,10 +194,11 @@ Current Vercel state:
 - Project: `vehilo`
 - Project ID: `prj_O4cSERGTJwVVtnUISRBJYnY7q91Q`
 - Production alias: `https://www.vehilo.eu`
-- Latest verified production deployment: `dpl_E6HaQUZgPoxYod1coWQwsLBNLMYN`
+- Latest verified production deployment: GitHub commit `70fbad2`.
 - Deployment status: `READY`
-- HTTP verification: production alias returns `200`.
-- Production `NEXT_PUBLIC_SITE_URL` should be set to `https://www.vehilo.eu`.
+- HTTP verification: `https://www.vehilo.eu` returns `200`; `https://vehilo.eu` redirects to `https://www.vehilo.eu/`.
+- Production `NEXT_PUBLIC_SITE_URL` is set to `https://www.vehilo.eu`.
+- Production `robots.txt` and `sitemap.xml` use `https://www.vehilo.eu`.
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_SITE_URL` are configured for Vercel Production, Preview and Development.
 - GitHub repository connection is completed.
 - Google OAuth Authorized JavaScript origins must include `https://www.vehilo.eu`.
@@ -227,13 +230,14 @@ Auth decision:
 Google OAuth setup status:
 
 - Google provider setup was completed by the user for local development.
+- Google Cloud Console production configuration for the final custom domain still needs a hands-on verification pass.
 - Current local app URL: `http://localhost:3000`.
 - Current local app callback: `http://localhost:3000/auth/callback`.
 - Current production URL: `https://www.vehilo.eu`.
 - Current production callback: `https://www.vehilo.eu/auth/callback`.
 - Supabase project callback used in Google Cloud: `https://elqjzqufqjwiqsqqwhen.supabase.co/auth/v1/callback`.
-- Important before production/Vercel: add the final Vercel production URL to Google Authorized JavaScript origins and add the final Vercel `/auth/callback` URL to Supabase redirect URLs.
 - Important after custom domain: verify Google Cloud, Supabase URL Configuration and Vercel `NEXT_PUBLIC_SITE_URL` all use `https://www.vehilo.eu`.
+- Next check: Google Cloud Console OAuth consent screen, authorized domains, Authorized JavaScript origins and Supabase callback/provider settings.
 
 Planned tasks:
 
@@ -1185,27 +1189,27 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Database indexes.
 - [ ] Supabase advisor checks.
 - [ ] Vercel preview verification.
-- [ ] Production deployment verification.
+- [x] Production deployment verification.
 - [ ] README and setup docs.
 
 ### Phase 7 - Public Launch
 
-- [ ] Choose and configure production hosting for the Next.js app.
+- [x] Choose and configure production hosting for the Next.js app.
 - [x] Connect the `vehilo.eu` domain to production.
-- [ ] Configure HTTPS, canonical URL and production environment variables.
+- [x] Configure HTTPS, canonical URL and production environment variables.
 - [ ] Verify Supabase Auth redirect URLs for `vehilo.eu`.
 - [ ] Verify Supabase RLS and storage policies before public access.
-- [ ] Add a production-safe admin role model.
-- [ ] Build the first admin-only page visible only to the app owner/admin.
-- [ ] Track active users, new users by day, total registered users and basic usage counts.
-- [ ] Show total vehicles, expenses, energy entries, service entries, reminders and documents.
-- [ ] Show app health and deployment/environment status notes.
-- [ ] Clearly mark planned admin tools as `Ve vývoji` until implemented.
+- [x] Add a production-safe admin role model.
+- [x] Build the first admin-only page visible only to the app owner/admin.
+- [x] Track active users, new users by day, total registered users and basic usage counts.
+- [x] Show total vehicles, expenses, energy entries, service entries, reminders and documents.
+- [x] Show app health and deployment/environment status notes.
+- [x] Clearly mark planned admin tools as `Ve vývoji` until implemented.
 - [x] Add SEO metadata for public pages.
 - [x] Add `robots.txt` and `sitemap.xml`.
 - [ ] Configure Google Search Console for `vehilo.eu`.
-- [ ] Verify that private app pages are not indexed.
-- [ ] Add public landing/sign-in entry page if needed for Google indexing.
+- [x] Verify that private app pages are not indexed.
+- [x] Add public landing/sign-in entry page if needed for Google indexing.
 - [ ] Add launch checklist and rollback notes.
 
 ### Phase 8 - Fuel & Energy Core
