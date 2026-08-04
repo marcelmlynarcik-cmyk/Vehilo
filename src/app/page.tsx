@@ -239,7 +239,7 @@ async function Landing({
 
       <section className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-12 sm:px-6 md:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:py-16">
         <div className="space-y-4">
-          <Badge variant="outline" className="border-[#101418]/15 bg-white/60">
+          <Badge variant="outline" className="border-[#101418]/15 bg-white/60 text-[#101418]">
             Co budete mít po ruce
           </Badge>
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
