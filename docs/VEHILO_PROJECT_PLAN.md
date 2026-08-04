@@ -73,8 +73,7 @@ Current phase:
 Next session priority:
 
 - Continue Phase 7 Public Launch follow-up.
-- Finish Google Cloud Console OAuth production configuration for `https://www.vehilo.eu`.
-- Verify Supabase Auth URL Configuration and redirect allowlist for `https://www.vehilo.eu/auth/callback`.
+- Google login on `https://www.vehilo.eu` is working; keep Google Cloud Console and Supabase Auth settings documented as production-ready.
 - Submit `https://www.vehilo.eu/sitemap.xml` in Google Search Console after domain verification.
 - Keep all unfinished visible app features clearly labelled as `Připravujeme`, `Ve vývoji` or equivalent Czech status copy.
 - After Phase 6-7, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
@@ -230,14 +229,14 @@ Auth decision:
 Google OAuth setup status:
 
 - Google provider setup was completed by the user for local development.
-- Google Cloud Console production configuration for the final custom domain still needs a hands-on verification pass.
+- Google login was verified by the user on the final production domain.
 - Current local app URL: `http://localhost:3000`.
 - Current local app callback: `http://localhost:3000/auth/callback`.
 - Current production URL: `https://www.vehilo.eu`.
 - Current production callback: `https://www.vehilo.eu/auth/callback`.
 - Supabase project callback used in Google Cloud: `https://elqjzqufqjwiqsqqwhen.supabase.co/auth/v1/callback`.
-- Important after custom domain: verify Google Cloud, Supabase URL Configuration and Vercel `NEXT_PUBLIC_SITE_URL` all use `https://www.vehilo.eu`.
-- Next check: Google Cloud Console OAuth consent screen, authorized domains, Authorized JavaScript origins and Supabase callback/provider settings.
+- Google Cloud, Supabase URL Configuration and Vercel `NEXT_PUBLIC_SITE_URL` are expected to use `https://www.vehilo.eu`.
+- Next check: keep OAuth consent screen and authorized domains documented before broader public launch.
 
 Planned tasks:
 
@@ -1139,8 +1138,8 @@ Reminder calculations:
 ### Phase 3 - Auth And App Shell
 
 - [ ] Public landing/sign-in page with Vehilo logo and product information.
-- [ ] Google OAuth sign-in.
-- [ ] Auth callback route.
+- [x] Google OAuth sign-in.
+- [x] Auth callback route.
 - [ ] Sign in page.
 - [ ] Sign up page.
 - [ ] Sign out action.
@@ -1197,7 +1196,7 @@ Vehicles are the root entity for almost every other feature.
 - [x] Choose and configure production hosting for the Next.js app.
 - [x] Connect the `vehilo.eu` domain to production.
 - [x] Configure HTTPS, canonical URL and production environment variables.
-- [ ] Verify Supabase Auth redirect URLs for `vehilo.eu`.
+- [x] Verify Supabase Auth redirect URLs for `vehilo.eu`.
 - [ ] Verify Supabase RLS and storage policies before public access.
 - [x] Add a production-safe admin role model.
 - [x] Build the first admin-only page visible only to the app owner/admin.
