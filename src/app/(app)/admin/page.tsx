@@ -199,7 +199,7 @@ export default async function AdminPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <StatusRow label="Prostředí" value={process.env.NODE_ENV === "production" ? "Production" : "Development"} ready />
-            <StatusRow label="Doména vehilo.eu" value="Ve vývoji" ready={false} />
+            <StatusRow label="Doména vehilo.eu" value="Aktivní" ready />
             <StatusRow label="Platby" value="Odloženo" ready={false} />
           </CardContent>
         </Card>
