@@ -38,9 +38,12 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
       />
       <Alert>
         <Bell className="size-4" />
-        <AlertTitle>Push notifikace budou součástí připomínek.</AlertTitle>
+        <AlertTitle className="flex flex-wrap items-center gap-2">
+          Push notifikace budou součástí připomínek.
+          <Badge variant="outline">Připravujeme</Badge>
+        </AlertTitle>
         <AlertDescription>
-          Android a iPhone push doručení naváže na tento seznam, stav připomínek a uživatelské povolení upozornění.
+          Android a iPhone push doručení zatím není aktivní. Aktuálně funguje evidence připomínek v aplikaci.
         </AlertDescription>
       </Alert>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

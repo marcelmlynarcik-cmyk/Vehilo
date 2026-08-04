@@ -12,14 +12,24 @@ export default async function DocumentsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Dokumenty" description="Uložte technické průkazy, pojištění, STK/MOT, faktury, smlouvy, dálniční známky a povolení." actions={<Button><Plus className="mr-2 size-4" />Přidat dokument</Button>} />
+      <PageHeader
+        title="Dokumenty"
+        description="Uložte technické průkazy, pojištění, STK/MOT, faktury, smlouvy, dálniční známky a povolení."
+        actions={
+          <Button disabled>
+            <Plus className="mr-2 size-4" />
+            Přidat dokument
+            <Badge variant="outline" className="ml-2">Připravujeme</Badge>
+          </Button>
+        }
+      />
       <div className="grid gap-4 sm:grid-cols-3">
         <MetricCard title="Platné" value={String(data.documents.filter((item) => item.status === "valid").length)} description="Bez blížícího se konce" icon={FileText} />
-        <MetricCard title="Brzy vyprší" value={String(data.documents.filter((item) => item.status === "expiring_soon").length)} description="Vytvoří připomínku" icon={FileText} />
+        <MetricCard title="Brzy vyprší" value={String(data.documents.filter((item) => item.status === "expiring_soon").length)} description="Napojení na připomínky se připravuje" icon={FileText} />
         <MetricCard title="Prošlé" value={String(data.documents.filter((item) => item.status === "expired").length)} description="Vyžaduje pozornost" icon={FileText} />
       </div>
       {data.documents.length === 0 ? (
-        <EmptyState icon={FileText} title="Zatím žádné dokumenty" description="Po nastavení Supabase Storage zde budete ukládat skutečné soubory a data expirace." actionLabel="Přidat dokument" />
+        <EmptyState icon={FileText} title="Dokumenty se připravují" description="Metadata a soubory dokumentů budou dostupné po dokončení dokumentového modulu a Supabase Storage toku." />
       ) : null}
       <Card>
         <CardHeader><CardTitle>Kategorie dokumentů</CardTitle></CardHeader>

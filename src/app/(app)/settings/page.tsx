@@ -1,5 +1,6 @@
-import { Download, Mail, ShieldCheck, Upload } from "lucide-react";
+import { Download, Mail, ShieldCheck, Upload, type LucideIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -55,20 +56,26 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader><CardTitle>Notifikace</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <ToggleRow title="PWA notifikace" description="Připomínky před servisem, STK/MOT a expirací dokumentů." />
-            <ToggleRow title="E-mailové notifikace" description="Placeholder pro pozdější cloudové e-maily." />
+            <PlannedFeatureRow title="PWA notifikace" description="Připomínky před servisem, STK/MOT a expirací dokumentů." />
+            <PlannedFeatureRow title="E-mailové notifikace" description="Cloudové e-maily přijdou až po výběru e-mailového poskytovatele." />
             <div className="space-y-2">
-              <Label htmlFor="notify_before_days">Upozornit dní předem</Label>
-              <Input id="notify_before_days" placeholder="14" disabled />
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="notify_before_days">Upozornit dní předem</Label>
+                <Badge variant="outline">Připravujeme</Badge>
+              </div>
+              <Input id="notify_before_days" placeholder="14" disabled aria-describedby="notify_before_days_status" />
+              <p id="notify_before_days_status" className="text-xs text-muted-foreground">
+                Tato volba zatím není aktivní.
+              </p>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader><CardTitle>Aplikace a soukromí</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            <Button variant="outline" className="w-full justify-start"><Download className="mr-2 size-4" />Export dat</Button>
-            <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 size-4" />Import dat</Button>
-            <Button variant="outline" className="w-full justify-start"><ShieldCheck className="mr-2 size-4" />Cloud sync placeholder</Button>
+            <PlannedAction icon={Download} label="Export dat" />
+            <PlannedAction icon={Upload} label="Import dat" />
+            <PlannedAction icon={ShieldCheck} label="Cloud sync" />
           </CardContent>
         </Card>
         <Card>
@@ -187,8 +194,31 @@ function SelectField({
   );
 }
 
-function ToggleRow({ title, description }: { title: string; description: string }) {
-  return <div className="flex items-center justify-between gap-4 rounded-[18px] border border-border bg-muted/35 p-3"><div><div className="font-semibold text-white">{title}</div><div className="text-sm text-muted-foreground">{description}</div></div><Switch /></div>;
+function PlannedFeatureRow({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-[18px] border border-border bg-muted/35 p-3">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="font-semibold text-white">{title}</div>
+          <Badge variant="outline">Připravujeme</Badge>
+        </div>
+        <div className="mt-1 text-sm text-muted-foreground">{description}</div>
+      </div>
+      <Switch disabled aria-label={`${title} se připravuje`} />
+    </div>
+  );
+}
+
+function PlannedAction({ icon: Icon, label }: { icon: LucideIcon; label: string }) {
+  return (
+    <Button variant="outline" className="w-full justify-between gap-3" disabled>
+      <span className="flex min-w-0 items-center">
+        <Icon className="mr-2 size-4 shrink-0" aria-hidden="true" />
+        <span className="truncate">{label}</span>
+      </span>
+      <Badge variant="outline" className="shrink-0">Připravujeme</Badge>
+    </Button>
+  );
 }
 
 function getInitials(name: string, email: string) {
