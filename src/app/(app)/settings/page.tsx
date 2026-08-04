@@ -1,4 +1,4 @@
-import { Download, ShieldCheck, Upload } from "lucide-react";
+import { Download, Mail, ShieldCheck, Upload } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PageHeader } from "@/components/shared/page-header";
 import { loadGarageData } from "@/lib/data/garage";
+import { supportEmail, supportMailto } from "@/lib/contact";
 import { updatePreferences } from "@/app/(app)/settings/actions";
 
 export default async function SettingsPage() {
@@ -68,6 +69,26 @@ export default async function SettingsPage() {
             <Button variant="outline" className="w-full justify-start"><Download className="mr-2 size-4" />Export dat</Button>
             <Button variant="outline" className="w-full justify-start"><Upload className="mr-2 size-4" />Import dat</Button>
             <Button variant="outline" className="w-full justify-start"><ShieldCheck className="mr-2 size-4" />Cloud sync placeholder</Button>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle>Podpora</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-[18px] border border-border bg-muted/35 p-4">
+              <div className="flex items-center gap-2 font-semibold text-white">
+                <Mail className="size-4 text-[var(--accent)]" aria-hidden="true" />
+                Kontakt pro dotazy
+              </div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Pokud máte dotaz, narazili jste na problém nebo chcete něco doplnit, napište přímo na e-mail níže.
+              </p>
+            </div>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <a href={supportMailto}>
+                <Mail className="mr-2 size-4" />
+                {supportEmail}
+              </a>
+            </Button>
           </CardContent>
         </Card>
       </div>

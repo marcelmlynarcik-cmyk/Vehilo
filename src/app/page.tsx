@@ -15,6 +15,7 @@ import {
 import { signInWithGoogle } from "@/app/auth/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { supportEmail, supportMailto } from "@/lib/contact";
 
 const heroMetrics = [
   { label: "Měsíční náklady", value: "8 420 Kč", tone: "text-emerald-300" },
@@ -257,11 +258,16 @@ async function Landing({
 
       <section className="border-t border-[#101418]/10 bg-white">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 sm:px-6 md:px-8 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="size-5 text-emerald-700" aria-hidden="true" />
-            <p className="text-sm leading-6 text-[#4b535b]">
-              Vehilo je připravené pro reálná uživatelská data a soukromé záznamy každého účtu.
-            </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="size-5 text-emerald-700" aria-hidden="true" />
+              <p className="text-sm leading-6 text-[#4b535b]">
+                Vehilo je připravené pro reálná uživatelská data a soukromé záznamy každého účtu.
+              </p>
+            </div>
+            <a className="text-sm font-medium text-[#101418] underline-offset-4 hover:underline" href={supportMailto}>
+              Kontakt: {supportEmail}
+            </a>
           </div>
           <form action={signInWithGoogle}>
             <Button type="submit" className="h-10 w-full px-4 sm:w-auto">
