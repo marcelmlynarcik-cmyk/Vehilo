@@ -14,6 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ChartCard } from "@/components/charts/basic-charts";
 import { PageHeader } from "@/components/shared/page-header";
 import { requireAdmin } from "@/lib/admin";
 import { loadAdminOverview } from "@/lib/data/admin";
@@ -102,6 +103,76 @@ export default async function AdminPage() {
             </Card>
           );
         })}
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)]">
+        <ChartCard
+          title="Noví uživatelé podle dne"
+          type="bar"
+          data={overview.newUsersByDay}
+          emptyLabel="Zatím nejsou dostupná data o registracích."
+          valueLabel="Noví uživatelé"
+        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="size-4 text-[var(--accent)]" aria-hidden="true" />
+              Registrace
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <StatusRow
+              label="Období grafu"
+              value={overview.newUsersByDay.length > 0 ? "30 dní" : "Ve vývoji"}
+              ready={overview.newUsersByDay.length > 0}
+            />
+            <StatusRow
+              label="Zdroj"
+              value="profiles.created_at"
+              ready={overview.hasAdminDataSource}
+            />
+            <StatusRow
+              label="Denní trend"
+              value={overview.hasAdminDataSource ? "Aktivní" : "Ve vývoji"}
+              ready={overview.hasAdminDataSource}
+            />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        <ChartCard
+          title="Noví uživatelé podle měsíce"
+          type="bar"
+          data={overview.newUsersByMonth}
+          emptyLabel="Zatím nejsou dostupná měsíční data o registracích."
+          valueLabel="Noví uživatelé"
+        />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="size-4 text-[var(--accent)]" aria-hidden="true" />
+              Měsíční registrace
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm text-muted-foreground">
+            <StatusRow
+              label="Období grafu"
+              value={overview.newUsersByMonth.length > 0 ? "12 měsíců" : "Ve vývoji"}
+              ready={overview.newUsersByMonth.length > 0}
+            />
+            <StatusRow
+              label="Zdroj"
+              value="profiles.created_at"
+              ready={overview.hasAdminDataSource}
+            />
+            <StatusRow
+              label="Měsíční trend"
+              value={overview.hasAdminDataSource ? "Aktivní" : "Ve vývoji"}
+              ready={overview.hasAdminDataSource}
+            />
+          </CardContent>
+        </Card>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
