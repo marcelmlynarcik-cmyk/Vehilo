@@ -1238,6 +1238,7 @@ Vehicles are the root entity for almost every other feature.
 
 - [ ] Full dashboard aggregation.
 - [ ] Advanced statistics page.
+- [ ] Verify the `Výdaje podle kategorií` chart categories and totals, including whether `Palivo a energie`, `Servis`, `STK`, `Pojištění`, `Dálniční známka` and `Příslušenství` are grouped correctly.
 - [ ] Vehicle comparisons.
 - [ ] Insight cards.
 - [ ] PWA install card.
