@@ -6,17 +6,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { VehiloLogo } from "@/components/app-shell/logo";
-import { navigationItems } from "@/components/app-shell/navigation";
+import { adminNavigationItem, navigationItems } from "@/components/app-shell/navigation";
 import { QuickAdd } from "@/components/app-shell/quick-add";
 import { SignOutButton } from "@/components/app-shell/sign-out-button";
 import type { Profile } from "@/types/domain";
 import { cn } from "@/lib/utils";
 
-export function Sidebar({ profile }: { profile: Profile | null }) {
+export function Sidebar({ profile, isAdmin = false }: { profile: Profile | null; isAdmin?: boolean }) {
   const pathname = usePathname();
   const displayName = profile?.name || profile?.email || "Uživatel Vehilo";
   const accountLabel = profile?.email || "Přihlášený účet";
   const initials = getInitials(displayName);
+  const visibleNavigationItems = isAdmin ? [...navigationItems, adminNavigationItem] : navigationItems;
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-[272px] shrink-0 border-r border-sidebar-border bg-sidebar px-4 py-5 backdrop-blur-[22px] lg:flex lg:flex-col">
@@ -27,7 +28,7 @@ export function Sidebar({ profile }: { profile: Profile | null }) {
         <QuickAdd />
       </div>
       <nav className="mt-6 grid gap-1">
-        {navigationItems.map((item) => {
+        {visibleNavigationItems.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 

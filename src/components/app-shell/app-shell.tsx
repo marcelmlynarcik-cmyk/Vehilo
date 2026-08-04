@@ -11,13 +11,14 @@ interface AppShellProps {
   configured: boolean;
   authenticated: boolean;
   profile: Profile | null;
+  isAdmin?: boolean;
   error?: string;
 }
 
-export function AppShell({ children, configured, authenticated, profile, error }: AppShellProps) {
+export function AppShell({ children, configured, authenticated, profile, isAdmin = false, error }: AppShellProps) {
   return (
     <div className="flex min-h-dvh text-foreground">
-      <Sidebar profile={profile} />
+      <Sidebar profile={profile} isAdmin={isAdmin} />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 border-b border-border bg-[rgba(5,11,16,0.82)] px-4 py-3 backdrop-blur-[18px] lg:px-8">
           <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-3">
@@ -44,7 +45,7 @@ export function AppShell({ children, configured, authenticated, profile, error }
           </div>
         </main>
       </div>
-      <MobileNav />
+      <MobileNav isAdmin={isAdmin} />
     </div>
   );
 }

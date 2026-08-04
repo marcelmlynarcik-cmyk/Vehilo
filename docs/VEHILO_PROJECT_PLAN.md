@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-07-23
+Last updated: 2026-08-04
 
 ## Project Summary
 
@@ -28,11 +28,13 @@ We will not build Vehilo around mock data.
 
 Instead, we will build the product with real data persistence from the beginning using Supabase. Temporary seed data may be used only for development/testing, but the application architecture, forms, queries, validation, auth, policies and UI states must be designed for real user-owned data from day one.
 
-Launch audit / paid-launch readiness decision:
+Current launch priority decision:
 
-- Launch audit, legal/accounting/security paid-launch readiness and real payment activation are intentionally deferred until the user explicitly asks to start that final phase.
-- Do not prioritize Phase A-G launch readiness work before then; continue product feature work, analytics, records, dashboard/statistics and remaining core app flows first.
-- The launch readiness section remains in this plan as the final pre-launch checklist, not as the next implementation priority.
+- Phase 6 Production Hardening and Phase 7 Public Launch are now the immediate priority.
+- The owner/admin page is part of this immediate Phase 7 priority, not a later optional analytics enhancement.
+- Remaining product feature work from Phase 8-10 will continue after Phase 6-7 are handled.
+- Paid subscription activation and real payment processing are still deferred until the user explicitly asks to start that final payment phase.
+- Legal/accounting/security paid-launch readiness tasks remain in this plan as the final pre-payment checklist unless explicitly selected for implementation.
 - Vehilo will not use a separate `Pro` tier in the core app. The final monetization direction is one low-cost paid subscription for all users, with the full product available to every paying user.
 
 Analytics verification rule:
@@ -40,6 +42,13 @@ Analytics verification rule:
 - Every calculation, chart, metric card and statistics view must be verified against the user's real Supabase data before being considered complete.
 - Verification should include concrete source rows or aggregate SQL results from the live project, especially for imported Golf data and newly entered records.
 - Mock or empty-state testing is not enough for analytics work; it can supplement but not replace real-data validation.
+
+Unfinished feature visibility rule:
+
+- Every unfinished, placeholder, disabled or partially implemented feature visible in the app must be clearly marked in Czech as still being worked on.
+- Users must not see controls that look fully active when the underlying feature is not functional yet.
+- Preferred labels: `Připravujeme`, `Ve vývoji`, or a short Czech status message near the affected control/card.
+- This applies especially to install prompts, push notifications, reminders/documents gaps, monetization placeholders, admin-only tools and any future launch-readiness feature.
 
 ## Collaboration Status
 
@@ -63,10 +72,11 @@ Current phase:
 
 Next session priority:
 
-- Continue Phase 6 with refined fuel/electric/PHEV/LPG/CNG statistics and real charts.
-- Keep verifying every Fuel & Energy aggregate against real Supabase data before marking analytics complete.
-- Then continue remaining ownership/service/dashboard statistics work without reworking the established app visual design.
-- Do not start launch audit / paid-launch readiness until the user explicitly asks for that final phase.
+- Start Phase 6 Production Hardening now.
+- Then complete Phase 7 Public Launch, including the `vehilo.eu` production domain move and the first owner/admin page.
+- Keep all unfinished visible app features clearly labelled as `Připravujeme`, `Ve vývoji` or equivalent Czech status copy.
+- After Phase 6-7, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
+- Do not activate real payments until the user explicitly asks for that final payment phase.
 
 Mobile/UX verification:
 
@@ -272,6 +282,33 @@ Security rules:
 - [ ] Statistics
 - [ ] Settings
 - [ ] Admin Analytics
+- [ ] Admin page for owner/operator
+
+### Admin Page
+
+Purpose:
+
+- A private owner/operator page for the app admin, not a normal user feature.
+- Must be protected by a production-safe admin role model before public launch.
+- Must not expose broad access to user private files/documents unless there is a legitimate support reason and an audit trail.
+
+Initial admin page should show:
+
+- [ ] Registered user count
+- [ ] New users by day
+- [ ] Active users / recent sign-ins if available
+- [ ] Total vehicles, expenses, energy entries, service entries, reminders and documents
+- [ ] Basic usage counts by day/month
+- [ ] App health and deployment/environment status notes
+- [ ] Clear `Ve vývoji` labels for admin tools that are planned but not implemented
+
+Future paid-launch admin/support tools:
+
+- [ ] User lookup for support
+- [ ] Subscription/payment status after billing is implemented
+- [ ] Transactional email resend tools after email provider is implemented
+- [ ] Legal document version management after legal documents are implemented
+- [ ] Audited support notes/actions
 
 ### Navigation
 
@@ -1137,7 +1174,41 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Dashboard cost cards using real data.
 - [ ] Basic statistics charts.
 
-### Phase 6 - Fuel & Energy Core
+### Phase 6 - Production Hardening
+
+- [ ] Responsive QA.
+- [ ] Accessibility pass.
+- [ ] Empty/loading/error states.
+- [ ] Validation messages.
+- [ ] Clearly mark unfinished or in-progress features in the UI so users know what is still being worked on.
+- [ ] Verify no visible unfinished feature looks like a completed production feature.
+- [ ] Database indexes.
+- [ ] Supabase advisor checks.
+- [ ] Vercel preview verification.
+- [ ] Production deployment verification.
+- [ ] README and setup docs.
+
+### Phase 7 - Public Launch
+
+- [ ] Choose and configure production hosting for the Next.js app.
+- [ ] Connect the `vehilo.eu` domain to production.
+- [ ] Configure HTTPS, canonical URL and production environment variables.
+- [ ] Verify Supabase Auth redirect URLs for `vehilo.eu`.
+- [ ] Verify Supabase RLS and storage policies before public access.
+- [ ] Add a production-safe admin role model.
+- [ ] Build the first admin-only page visible only to the app owner/admin.
+- [ ] Track active users, new users by day, total registered users and basic usage counts.
+- [ ] Show total vehicles, expenses, energy entries, service entries, reminders and documents.
+- [ ] Show app health and deployment/environment status notes.
+- [ ] Clearly mark planned admin tools as `Ve vývoji` until implemented.
+- [ ] Add SEO metadata for public pages.
+- [ ] Add `robots.txt` and `sitemap.xml`.
+- [ ] Configure Google Search Console for `vehilo.eu`.
+- [ ] Verify that private app pages are not indexed.
+- [ ] Add public landing/sign-in entry page if needed for Google indexing.
+- [ ] Add launch checklist and rollback notes.
+
+### Phase 8 - Fuel & Energy Core
 
 - [x] Energy entries CRUD.
 - [x] Powertrain-adaptive forms.
@@ -1147,7 +1218,7 @@ Vehicles are the root entity for almost every other feature.
 - [ ] LPG/CNG calculations.
 - [ ] Fuel & Energy charts.
 
-### Phase 7 - Service, Reminders, Documents
+### Phase 9 - Service, Reminders, Documents
 
 - [ ] Service entries CRUD.
 - [ ] Maintenance timeline.
@@ -1157,7 +1228,7 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Supabase Storage uploads.
 - [ ] Document expiration reminders.
 
-### Phase 8 - Advanced Dashboard And Statistics
+### Phase 10 - Advanced Dashboard And Statistics
 
 - [ ] Full dashboard aggregation.
 - [ ] Advanced statistics page.
@@ -1165,36 +1236,7 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Insight cards.
 - [ ] PWA install card.
 - [ ] Offline placeholder.
-
-### Phase 9 - Production Hardening
-
-- [ ] Responsive QA.
-- [ ] Accessibility pass.
-- [ ] Empty/loading/error states.
-- [ ] Validation messages.
-- [ ] Clearly mark unfinished or in-progress features in the UI so users know what is still being worked on.
-- [ ] Database indexes.
-- [ ] Supabase advisor checks.
-- [ ] Vercel preview verification.
-- [ ] Production deployment verification.
-- [ ] README and setup docs.
-
-### Phase 10 - Public Launch
-
-- [ ] Choose and configure production hosting for the Next.js app.
-- [ ] Connect the `vehilo.eu` domain to production.
-- [ ] Configure HTTPS, canonical URL and production environment variables.
-- [ ] Verify Supabase Auth redirect URLs for `vehilo.eu`.
-- [ ] Verify Supabase RLS and storage policies before public access.
-- [ ] Add a production-safe admin role model.
-- [ ] Build an admin-only analytics page visible only to the app owner/admin.
-- [ ] Track active users, new users by day, total registered users and basic usage counts.
-- [ ] Add SEO metadata for public pages.
-- [ ] Add `robots.txt` and `sitemap.xml`.
-- [ ] Configure Google Search Console for `vehilo.eu`.
-- [ ] Verify that private app pages are not indexed.
-- [ ] Add public landing/sign-in entry page if needed for Google indexing.
-- [ ] Add launch checklist and rollback notes.
+- [ ] App-wide unfinished/placeholder feature labelling pass.
 
 ## File Structure Proposal
 
@@ -2083,6 +2125,17 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Changed the Fuel & Energy `Cena na 100 km` metric and chart from a first-vs-last-mileage monthly range to weighted segments between consecutive records for the same vehicle. August 2024 now verifies as 2183.84 Kč across 726 km, or 300.80 Kč/100 km, instead of the misleading 859 Kč/100 km from the old 254 km monthly range.
 - Added always-visible legends to pie charts so users can read category colors without clicking individual slices.
 - Reworked Dashboard insight cards from generic `Vehilo Insight` labels into explicit cards with a title, status and explanation, and marked the non-functional install/PWA action as `Připravujeme` instead of showing an active button.
+
+### 2026-08-04
+
+- Reprioritized the plan so Production Hardening and Public Launch run next, with remaining Fuel & Energy, Reminders/Documents and advanced statistics work continuing afterward.
+- Added a permanent unfinished-feature visibility rule: every visible unfinished or placeholder function must be clearly labelled in Czech as `Připravujeme`, `Ve vývoji` or equivalent.
+- Added the first owner/admin page scope to the immediate Public Launch phase.
+- Implemented the first `/admin` route protected by a server-side `VEHILO_ADMIN_EMAILS` allowlist.
+- Added optional server-only Supabase admin client support through `SUPABASE_SECRET_KEY` or legacy `SUPABASE_SERVICE_ROLE_KEY`; the key is not exposed to browser code.
+- Added admin overview metrics for profiles, vehicles, expenses, fuel/energy entries, service entries, reminders and documents when the server-only secret is configured.
+- Added admin navigation that appears only for allowed admin users.
+- Added clear `Ve vývoji` labelling for planned admin/support tools that are not implemented yet.
 
 Reminder product requirements captured for future implementation:
 

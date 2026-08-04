@@ -25,6 +25,17 @@ pnpm dev
 
 Lokální proměnné jsou v `.env.local`. Šablona je v `.env.example`.
 
+Povinné proměnné:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+
+Admin proměnné pro owner-only stránku:
+
+- `VEHILO_ADMIN_EMAILS` - čárkou oddělený seznam admin emailů.
+- `SUPABASE_SECRET_KEY` - server-only Supabase secret key pro celkové admin metriky. Nikdy nepoužívat s prefixem `NEXT_PUBLIC_`.
+
 ## Supabase
 
 Aktivní projekt:

@@ -13,11 +13,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { mobileNavigationItems, navigationItems } from "@/components/app-shell/navigation";
+import { adminNavigationItem, mobileNavigationItems, navigationItems } from "@/components/app-shell/navigation";
 import { QuickAdd } from "@/components/app-shell/quick-add";
 import { cn } from "@/lib/utils";
 
-export function MobileNav() {
+export function MobileNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -66,14 +66,15 @@ export function MobileNav() {
             </Button>
           );
         })}
-        <MobileMenu pathname={pathname} />
+        <MobileMenu pathname={pathname} isAdmin={isAdmin} />
       </div>
     </nav>
   );
 }
 
-function MobileMenu({ pathname }: { pathname: string }) {
+function MobileMenu({ pathname, isAdmin }: { pathname: string; isAdmin: boolean }) {
   const [open, setOpen] = useState(false);
+  const visibleNavigationItems = isAdmin ? [...navigationItems, adminNavigationItem] : navigationItems;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -94,7 +95,7 @@ function MobileMenu({ pathname }: { pathname: string }) {
           <SheetDescription>Všechny sekce Vehilo.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-2 px-5 pb-5 sm:grid-cols-2">
-          {navigationItems.map((item) => {
+          {visibleNavigationItems.map((item) => {
             const Icon = item.icon;
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
 

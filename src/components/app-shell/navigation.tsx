@@ -7,6 +7,7 @@ import {
   Gauge,
   ReceiptText,
   Settings,
+  ShieldCheck,
   Wrench,
 } from "lucide-react";
 
@@ -21,6 +22,8 @@ export const navigationItems = [
   { href: "/statistics", label: "Statistiky", icon: BarChart3 },
   { href: "/settings", label: "Nastavení", icon: Settings },
 ];
+
+export const adminNavigationItem = { href: "/admin", label: "Admin", icon: ShieldCheck };
 
 export const mobileNavigationItems = [
   navigationItems[0],
