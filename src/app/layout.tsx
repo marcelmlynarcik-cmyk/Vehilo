@@ -2,17 +2,44 @@ import type { Metadata, Viewport } from "next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { ServiceWorkerProvider } from "@/components/providers/service-worker-provider";
+import { publicSiteUrl } from "@/lib/site";
 import "./globals.css";
 
+const siteDescription =
+  "Všechny náklady, palivo, energie, servis, dokumenty a připomínky pro vaše vozidla na jednom místě.";
+const socialImage = "/pozadie/vehilo-hero-background.png";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(publicSiteUrl),
   applicationName: "Vehilo",
   title: {
-    default: "Vehilo",
+    default: "Vehilo | Chytrá garáž pro náklady, servis a připomínky",
     template: "%s | Vehilo",
   },
-  description:
-    "Všechny náklady, palivo, energie, servis, dokumenty a připomínky pro vaše vozidla na jednom místě.",
+  description: siteDescription,
   manifest: "/manifest.json",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Vehilo",
+    description: siteDescription,
+    url: "/",
+    siteName: "Vehilo",
+    locale: "cs_CZ",
+    type: "website",
+    images: [socialImage],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vehilo",
+    description: siteDescription,
+    images: [socialImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   appleWebApp: {
     capable: true,
     title: "Vehilo",
