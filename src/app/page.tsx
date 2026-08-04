@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import {
   BarChart3,
   Bell,
@@ -16,6 +17,7 @@ import { signInWithGoogle } from "@/app/auth/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supportEmail, supportMailto } from "@/lib/contact";
+import { legalLinks } from "@/lib/legal";
 
 const heroMetrics = [
   { label: "Náklady", value: "Měsíce i celkem", tone: "text-emerald-300" },
@@ -267,7 +269,8 @@ async function Landing({
       </section>
 
       <section className="border-t border-[#101418]/10 bg-white">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 sm:px-6 md:px-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 sm:px-6 md:px-8">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
             <div className="flex items-center gap-3">
               <ShieldCheck className="size-5 text-emerald-700" aria-hidden="true" />
@@ -284,6 +287,17 @@ async function Landing({
               Začít používat Vehilo
             </Button>
           </form>
+          </div>
+          <div className="flex flex-col gap-3 border-t border-[#101418]/10 pt-5 text-sm text-[#5d656d] sm:flex-row sm:items-center sm:justify-between">
+            <div>© 2026 Vehilo. Bezplatná aplikace bez reklam a marketingového sledování.</div>
+            <nav className="flex flex-wrap gap-x-4 gap-y-2">
+              {legalLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="underline-offset-4 hover:underline">
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
         </div>
       </section>
     </main>
