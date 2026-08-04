@@ -18,38 +18,48 @@ import { Button } from "@/components/ui/button";
 import { supportEmail, supportMailto } from "@/lib/contact";
 
 const heroMetrics = [
-  { label: "Měsíční náklady", value: "8 420 Kč", tone: "text-emerald-300" },
-  { label: "Cena za km", value: "4,80 Kč", tone: "text-sky-300" },
-  { label: "Připomínky", value: "3 aktivní", tone: "text-amber-300" },
+  { label: "Náklady", value: "Měsíce i celkem", tone: "text-emerald-300" },
+  { label: "Provoz", value: "Kč/km", tone: "text-sky-300" },
+  { label: "Termíny", value: "Servis a STK", tone: "text-amber-300" },
 ];
 
 const productAreas = [
   {
-    title: "Náklady bez dohadů",
-    description: "Palivo, nabíjení, servis, pojištění, poplatky i mimořádné výdaje v jednom přehledu.",
+    title: "Vozidla a garáž",
+    description: "Uložte jedno auto i více vozidel včetně nájezdu, typu pohonu, nákupních údajů a základních detailů.",
+    icon: Car,
+  },
+  {
+    title: "Náklady a provoz",
+    description: "Evidujte výdaje, servis, palivo a nabíjení. Dashboard počítá měsíční náklady, cenu za kilometr i celkové vlastnictví.",
     icon: BarChart3,
   },
   {
-    title: "Správné jednotky pro každý pohon",
-    description: "Benzín, nafta, hybrid, plug-in hybrid, elektro, LPG i CNG bez univerzálních a matoucích formulářů.",
+    title: "Palivo a nabíjení",
+    description: "Formuláře a přehledy se přizpůsobují benzínu, naftě, hybridům, elektromobilům, LPG i CNG.",
     icon: Fuel,
   },
   {
-    title: "Servis a historie vozidla",
-    description: "Opravy, údržba, díly, faktury a poznámky zůstávají navázané na konkrétní vozidlo.",
+    title: "Servisní historie",
+    description: "Servisní záznamy ukládají typ práce, poskytovatele, díly, cenu, fakturu a poznámky ke konkrétnímu vozidlu.",
     icon: Wrench,
   },
   {
-    title: "Dokumenty a termíny",
-    description: "STK, pojištění, dálniční známka, pneumatiky, olej a další věci, které nechcete řešit pozdě.",
+    title: "Připomínky v aplikaci",
+    description: "Datumové, kilometrové i kombinované připomínky jde vytvořit, upravit, odložit, dokončit nebo zopakovat.",
     icon: Bell,
+  },
+  {
+    title: "Přílohy k záznamům",
+    description: "Výdaje podporují účtenky a servisní záznamy podporují faktury. Samostatný modul dokumentů se dál rozšiřuje.",
+    icon: FileText,
   },
 ];
 
 const trustItems = [
   "Soukromá garáž pro jedno auto i více vozidel",
   "Přihlášení přes Google",
-  "Připravené pro faktury, dokumenty a fotografie",
+  "Reálná data uložená pod vaším účtem",
 ];
 
 export default function LandingPage({
@@ -113,16 +123,16 @@ async function Landing({
             <div className="min-w-0 max-w-3xl space-y-7">
               <Badge className="h-7 rounded-full border-white/15 bg-white/10 px-3 text-white hover:bg-white/10">
                 <Sparkles className="size-3.5" aria-hidden="true" />
-                Skutečné náklady na vlastnictví vozidla
+                Soukromý přehled nákladů a servisu
               </Badge>
 
               <div className="space-y-5">
                 <h1 className="text-4xl font-semibold leading-[0.98] tracking-tight text-balance min-[390px]:text-5xl sm:text-6xl lg:text-7xl">
-                  Mějte svoje auta pod kontrolou.
+                  Skutečné náklady na auto bez dohadů.
                 </h1>
                 <p className="max-w-[calc(100vw-2rem)] text-base leading-7 text-white/72 sm:max-w-xl sm:text-lg lg:max-w-2xl">
-                  Vehilo sjednotí náklady, servis, palivo, nabíjení, dokumenty a termíny do jednoho přehledu.
-                  Bez tabulek, bez zapomenutých faktur, bez odhadů.
+                  Vehilo eviduje vozidla, výdaje, palivo, nabíjení, servis, přílohy a připomínky.
+                  Na jednom místě uvidíte měsíční náklady, cenu za kilometr i servisní historii každého auta.
                 </p>
               </div>
 
@@ -161,8 +171,8 @@ async function Landing({
                 <div className="min-w-0 rounded-[1.25rem] border border-white/10 bg-[#0f1318] p-4 sm:p-5">
                   <div className="mb-5 flex items-center justify-between gap-4">
                     <div>
-                      <div className="text-sm font-medium text-white/56">Přehled garáže</div>
-                      <div className="text-2xl font-semibold tracking-tight">Škoda Enyaq</div>
+                      <div className="text-sm font-medium text-white/56">Ukázka přehledu</div>
+                      <div className="text-2xl font-semibold tracking-tight">Moje garáž</div>
                     </div>
                     <div className="flex size-12 items-center justify-center rounded-2xl bg-emerald-400/12 text-emerald-300">
                       <Car className="size-6" aria-hidden="true" />
@@ -201,19 +211,19 @@ async function Landing({
                       <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4">
                         <div className="flex items-center gap-2 text-sm font-medium text-amber-100">
                           <Bell className="size-4" aria-hidden="true" />
-                          STK za 24 dní
+                          Připomínka v aplikaci
                         </div>
                         <div className="mt-2 text-xs leading-5 text-amber-100/70">
-                          Připomenutí před termínem i podle nájezdu.
+                          Datum, kilometry nebo kombinace obou.
                         </div>
                       </div>
                       <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4">
                         <div className="flex items-center gap-2 text-sm font-medium text-white/76">
                           <FileText className="size-4 text-emerald-300" aria-hidden="true" />
-                          12 dokumentů
+                          Účtenky a faktury
                         </div>
                         <div className="mt-2 text-xs leading-5 text-white/46">
-                          Faktury, pojistky a servisní záznamy.
+                          Přílohy u výdajů a servisu.
                         </div>
                       </div>
                     </div>
@@ -231,11 +241,11 @@ async function Landing({
             Co budete mít po ruce
           </Badge>
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
-            Přehled, který dává smysl běžnému řidiči i celé rodinné garáži.
+            Praktická garáž pro každodenní provoz, servis i dlouhodobé náklady.
           </h2>
           <p className="text-base leading-7 text-[#4b535b]">
-            Úvodní obrazovka má být rychlá, čitelná a použitelná na telefonu, tabletu i počítači.
-            Stejný vizuální směr použijeme dál v aplikaci.
+            Aplikace už pracuje s reálnými daty: vozidla, výdaje, tankování, nabíjení, servis, účtenky,
+            faktury a připomínky jsou navázané na konkrétní vozidlo a přihlášený účet.
           </p>
         </div>
 
