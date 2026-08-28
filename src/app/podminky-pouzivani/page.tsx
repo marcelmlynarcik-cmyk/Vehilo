@@ -5,6 +5,9 @@ import { legalMailto, legalOperator } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Podmínky používání",
   description: "Podmínky používání bezplatné aplikace Vehilo.",
+  alternates: {
+    canonical: "/podminky-pouzivani",
+  },
 };
 
 export default function TermsPage() {

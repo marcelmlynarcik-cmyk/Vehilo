@@ -7,6 +7,9 @@ import { legalMailto, legalOperator } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Kontakt",
   description: "Kontakt na podporu a správce aplikace Vehilo.",
+  alternates: {
+    canonical: "/kontakt",
+  },
 };
 
 export default function ContactPage() {

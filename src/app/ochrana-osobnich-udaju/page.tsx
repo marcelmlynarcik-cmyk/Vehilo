@@ -5,6 +5,9 @@ import { legalMailto, legalOperator } from "@/lib/legal";
 export const metadata: Metadata = {
   title: "Ochrana osobních údajů",
   description: "Informace o zpracování osobních údajů ve službě Vehilo.",
+  alternates: {
+    canonical: "/ochrana-osobnich-udaju",
+  },
 };
 
 export default function PrivacyPage() {

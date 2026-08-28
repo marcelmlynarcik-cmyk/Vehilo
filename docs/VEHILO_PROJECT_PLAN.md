@@ -2155,6 +2155,7 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Added `docs/LAUNCH_CHECKLIST.md` with public-launch checks, Supabase security gate and rollback notes.
 - Supabase security advisor still reports leaked password protection disabled; this remains acceptable while Google login is the primary path and email/password login is not enabled.
 - Supabase performance advisor reports unused indexes; this remains expected until real traffic/data usage accumulates.
+- Expanded public SEO basics: homepage-specific metadata, self canonical URLs for public pages, refreshed sitemap `lastModified`, `/api` robots disallow and WebApplication/WebSite JSON-LD on the landing page.
 
 Reminder product requirements captured for future implementation:
 

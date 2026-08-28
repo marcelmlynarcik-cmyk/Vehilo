@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -18,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supportEmail, supportMailto } from "@/lib/contact";
 import { legalLinks } from "@/lib/legal";
+import { publicSiteUrl } from "@/lib/site";
 
 const heroMetrics = [
   { label: "Náklady", value: "Měsíce i celkem", tone: "text-emerald-300" },
@@ -63,6 +65,21 @@ const trustItems = [
   "Přihlášení přes Google",
   "Reálná data uložená pod vaším účtem",
 ];
+
+export const metadata: Metadata = {
+  title: "Vehilo | Evidence nákladů, servisu a připomínek pro auta",
+  description:
+    "Vehilo je česká PWA aplikace pro evidenci nákladů, tankování, nabíjení, servisu, dokumentů a připomínek pro osobní auta i vícevozidlovou garáž.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Vehilo | Chytrá garáž pro vaše vozidla",
+    description:
+      "Evidujte skutečné náklady, palivo, nabíjení, servis, dokumenty a připomínky na jednom místě.",
+    url: "/",
+  },
+};
 
 export default function LandingPage({
   searchParams,
@@ -130,7 +147,7 @@ async function Landing({
 
               <div className="space-y-5">
                 <h1 className="text-4xl font-semibold leading-[0.98] tracking-tight text-balance min-[390px]:text-5xl sm:text-6xl lg:text-7xl">
-                  Skutečné náklady na auto bez dohadů.
+                  Vehilo pro skutečné náklady na auto.
                 </h1>
                 <p className="max-w-[calc(100vw-2rem)] text-base leading-7 text-white/72 sm:max-w-xl sm:text-lg lg:max-w-2xl">
                   Vehilo eviduje vozidla, výdaje, palivo, nabíjení, servis, přílohy a připomínky.
@@ -300,6 +317,37 @@ async function Landing({
           </div>
         </div>
       </section>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Vehilo",
+              url: publicSiteUrl,
+              inLanguage: "cs-CZ",
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": ["WebApplication", "SoftwareApplication"],
+              name: "Vehilo",
+              url: publicSiteUrl,
+              applicationCategory: ["FinanceApplication", "UtilitiesApplication"],
+              operatingSystem: "Web, Android, iOS",
+              inLanguage: "cs-CZ",
+              description:
+                "Česká PWA aplikace pro evidenci nákladů, tankování, nabíjení, servisu, dokumentů a připomínek pro vozidla.",
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "CZK",
+              },
+            },
+          ]),
+        }}
+      />
     </main>
   );
 }
