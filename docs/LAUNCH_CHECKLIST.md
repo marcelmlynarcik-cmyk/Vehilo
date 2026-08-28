@@ -10,12 +10,18 @@ Last updated: 2026-08-28
 - Google login on the production domain: verified by the user
 - `robots.txt`: available on production
 - `sitemap.xml`: available on production
-- Google Search Console sitemap submission: still pending user-side domain verification/access
+- Google Search Console domain property: verified by the user on 2026-08-28
+- Google Search Console homepage indexing request: submitted by the user on 2026-08-28
+- Google Search Console URL Inspection: Googlebot Smartphone successfully crawled `https://www.vehilo.eu/` on 2026-08-28 at 20:08:14; crawling and indexing are allowed
+- Google Search Console sitemap submission: submitted on 2026-08-28, but Search Console initially reported `Nie je možné načítať`, `Typ: Neznámy` and `Objavené stránky: 0`
+- Google Search Console discovery note: URL Inspection currently reports no detected referring sitemap or referring page; production `robots.txt` links the sitemap and production `sitemap.xml` returns valid XML
 
 ## Before Public Promotion
 
-- Submit `https://www.vehilo.eu/sitemap.xml` in Google Search Console.
+- Monitor the submitted `https://www.vehilo.eu/sitemap.xml` in Google Search Console until it is fetched successfully.
+- If sitemap status still says `Nie je možné načítať` after DNS/Search Console propagation, resubmit the same sitemap URL and retest the live URL.
 - Confirm Google Search Console sees `https://www.vehilo.eu` as the canonical property.
+- Monitor URL Inspection for `https://www.vehilo.eu/` until Google reports the page as indexed.
 - Re-check production login with a normal Google account.
 - Re-check that protected app routes redirect unauthenticated users to the public entry page.
 - Re-check that public legal pages load without authentication.

@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-08-04
+Last updated: 2026-08-28
 
 ## Project Summary
 
@@ -74,9 +74,12 @@ Next session priority:
 
 - Continue Phase 7 Public Launch follow-up.
 - Google login on `https://www.vehilo.eu` is working; keep Google Cloud Console and Supabase Auth settings documented as production-ready.
-- Submit `https://www.vehilo.eu/sitemap.xml` in Google Search Console after domain verification.
-- Keep all unfinished visible app features clearly labelled as `Připravujeme`, `Ve vývoji` or equivalent Czech status copy.
-- After Phase 6-7, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
+- Google Search Console domain property is verified and homepage indexing was requested on 2026-08-28.
+- Google Search Console URL Inspection confirms Googlebot Smartphone successfully crawled `https://www.vehilo.eu/` on 2026-08-28 at 20:08:14; crawling and indexing are allowed.
+- `https://www.vehilo.eu/sitemap.xml` was submitted in Google Search Console on 2026-08-28, but Search Console initially reported `Nie je možné načítať`, `Typ: Neznámy` and `Objavené stránky: 0`; production `robots.txt` and `sitemap.xml` are verified, so the next step is monitoring/resubmission if the state does not clear.
+- Monitor `site:vehilo.eu` and Search Console URL Inspection over the next few days; Google indexing is requested but not immediate.
+- Continue Phase 6 hardening: responsive QA, accessibility pass, empty/loading/error states and validation messages.
+- After Phase 6 hardening, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
 - Do not activate real payments or subscription flows unless the user explicitly changes the monetization direction again.
 
 Mobile/UX verification:
@@ -115,6 +118,10 @@ Latest progress:
 - [x] Mobile navigation now includes a hamburger Menu sheet with access to all sections, including Expenses, Fuel & Energy and Service.
 - [x] Expense, Fuel/Energy and Service entries now have detail views and record links from list/detail surfaces.
 - [x] Service filters and Service charts are implemented and verified against real Supabase aggregate data.
+- [x] Google Search Console domain property was verified and homepage indexing was requested on 2026-08-28.
+- [x] Google Search Console URL Inspection confirms `https://www.vehilo.eu/` was crawled successfully by Googlebot Smartphone on 2026-08-28.
+- [x] Sitemap was submitted to Google Search Console on 2026-08-28; current follow-up is monitoring the initial `Nie je možné načítať` state.
+- [x] Added root error fallback and protected-app loading skeleton for broader route-level hardening.
 
 GitHub status:
 
@@ -1180,12 +1187,12 @@ Vehicles are the root entity for almost every other feature.
 
 - [ ] Responsive QA.
 - [ ] Accessibility pass.
-- [ ] Empty/loading/error states.
+- [x] Empty/loading/error states.
 - [ ] Validation messages.
-- [ ] Clearly mark unfinished or in-progress features in the UI so users know what is still being worked on.
-- [ ] Verify no visible unfinished feature looks like a completed production feature.
+- [x] Clearly mark unfinished or in-progress features in the UI so users know what is still being worked on.
+- [x] Verify no visible unfinished feature looks like a completed production feature.
 - [ ] Database indexes.
-- [ ] Supabase advisor checks.
+- [x] Supabase advisor checks.
 - [ ] Vercel preview verification.
 - [x] Production deployment verification.
 - [ ] README and setup docs.
@@ -1205,7 +1212,7 @@ Vehicles are the root entity for almost every other feature.
 - [x] Clearly mark planned admin tools as `Ve vývoji` until implemented.
 - [x] Add SEO metadata for public pages.
 - [x] Add `robots.txt` and `sitemap.xml`.
-- [ ] Configure Google Search Console for `vehilo.eu`.
+- [ ] Configure Google Search Console for `vehilo.eu` sitemap submission and monitor indexing.
 - [x] Verify that private app pages are not indexed.
 - [x] Add public landing/sign-in entry page if needed for Google indexing.
 - [x] Add launch checklist and rollback notes.
@@ -2156,6 +2163,12 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Supabase security advisor still reports leaked password protection disabled; this remains acceptable while Google login is the primary path and email/password login is not enabled.
 - Supabase performance advisor reports unused indexes; this remains expected until real traffic/data usage accumulates.
 - Expanded public SEO basics: homepage-specific metadata, self canonical URLs for public pages, refreshed sitemap `lastModified`, `/api` robots disallow and WebApplication/WebSite JSON-LD on the landing page.
+- Verified production SEO endpoints after deploy: `https://www.vehilo.eu` returns 200, `https://vehilo.eu` redirects to canonical `https://www.vehilo.eu/`, production `robots.txt` exposes the sitemap and production `sitemap.xml` lists the four public URLs.
+- Google Search Console domain property for `vehilo.eu` was verified by the user.
+- Google Search Console URL Inspection indexing request was submitted for `https://www.vehilo.eu/`.
+- Search Console sitemap was submitted on 2026-08-28; initial status was `Nie je možné načítať` with `Objavené stránky: 0`, while the live production sitemap itself was verified as reachable and valid.
+- URL Inspection now reports Googlebot Smartphone successfully crawled `https://www.vehilo.eu/` on 2026-08-28 at 20:08:14, with crawling and indexing allowed, but no referring sitemap or referring page detected yet.
+- Code audit found visible unfinished/placeholder features labelled with `Připravujeme` or `Ve vývoji`, including Documents, push notifications, export/import/cloud sync, admin support tools and dashboard/statistics placeholders.
 
 Reminder product requirements captured for future implementation:
 
