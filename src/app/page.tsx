@@ -334,7 +334,7 @@ async function Landing({
               "@type": ["WebApplication", "SoftwareApplication"],
               name: "Vehilo",
               url: publicSiteUrl,
-              applicationCategory: ["FinanceApplication", "UtilitiesApplication"],
+              applicationCategory: "FinanceApplication",
               operatingSystem: "Web, Android, iOS",
               inLanguage: "cs-CZ",
               description:
