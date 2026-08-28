@@ -289,7 +289,7 @@ async function Landing({
           </form>
           </div>
           <div className="flex flex-col gap-3 border-t border-[#101418]/10 pt-5 text-sm text-[#5d656d] sm:flex-row sm:items-center sm:justify-between">
-            <div>© 2026 Vehilo. Bezplatná aplikace bez reklam a marketingového sledování.</div>
+            <div>© 2026 Vehilo. Bezplatná aplikace bez marketingového sledování.</div>
             <nav className="flex flex-wrap gap-x-4 gap-y-2">
               {legalLinks.map((link) => (
                 <Link key={link.href} href={link.href} className="underline-offset-4 hover:underline">

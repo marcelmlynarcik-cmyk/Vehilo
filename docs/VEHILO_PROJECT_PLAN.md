@@ -33,9 +33,9 @@ Current launch priority decision:
 - Phase 6 Production Hardening and Phase 7 Public Launch are now the immediate priority.
 - The owner/admin page is part of this immediate Phase 7 priority, not a later optional analytics enhancement.
 - Remaining product feature work from Phase 8-10 will continue after Phase 6-7 are handled.
-- Paid subscription activation and real payment processing are still deferred until the user explicitly asks to start that final payment phase.
-- Legal/accounting/security paid-launch readiness tasks remain in this plan as the final pre-payment checklist unless explicitly selected for implementation.
-- Vehilo will not use a separate `Pro` tier in the core app. The final monetization direction is one low-cost paid subscription for all users, with the full product available to every paying user.
+- Premium tiers and feature gating are no longer planned.
+- Vehilo should not mention `Pro`, premium unlocks or subscription-only features in the user-facing app.
+- Legal/accounting/security launch-readiness tasks remain in this plan, but paid subscription and payment-processing work is deferred unless the product direction changes again explicitly.
 
 Analytics verification rule:
 
@@ -77,7 +77,7 @@ Next session priority:
 - Submit `https://www.vehilo.eu/sitemap.xml` in Google Search Console after domain verification.
 - Keep all unfinished visible app features clearly labelled as `Připravujeme`, `Ve vývoji` or equivalent Czech status copy.
 - After Phase 6-7, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
-- Do not activate real payments until the user explicitly asks for that final payment phase.
+- Do not activate real payments or subscription flows unless the user explicitly changes the monetization direction again.
 
 Mobile/UX verification:
 
@@ -383,7 +383,7 @@ Target feeling:
 Visual direction:
 
 - Professional green/blue accent palette
-- Practical, premium, clean UI
+- Practical, polished, clean UI
 - No childish car graphics
 - Cards, charts, badges, progress bars and dense but readable data views
 - Strong desktop productivity
@@ -1037,9 +1037,8 @@ Sections:
 
 Monetization note:
 
-- Do not present feature gating as `Vehilo Pro`.
-- Future billing should use one paid full-version subscription for all users.
-- Family/shared garage, multi-user access and fleet mode can be planned later as separate product expansion, not as the initial Pro card in Settings.
+- Do not present feature gating as `Vehilo Pro`, premium unlocks or subscription-only features.
+- Family/shared garage, multi-user access and fleet mode can be planned later as product expansion, not as premium-tier gating.
 
 ## Calculation Helpers
 

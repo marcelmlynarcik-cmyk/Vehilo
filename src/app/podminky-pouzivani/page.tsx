@@ -32,8 +32,8 @@ export default function TermsPage() {
 
       <LegalSection title="Cena a registrace">
         <p>
-          Aktuální verze aplikace je zdarma. Nejsou aktivní žádné platby, předplatné, reklamy ani marketingové
-          e-maily. Registrace je veřejná a probíhá přes Google účet.
+          Aktuální verze aplikace je zdarma. Nejsou aktivní žádné platby ani marketingové e-maily. Registrace
+          je veřejná a probíhá přes Google účet.
         </p>
       </LegalSection>
 

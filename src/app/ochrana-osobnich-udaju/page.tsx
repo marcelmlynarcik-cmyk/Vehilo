@@ -72,11 +72,11 @@ export default function PrivacyPage() {
         />
       </LegalSection>
 
-      <LegalSection title="Platby, reklama a marketing">
+      <LegalSection title="Platby a marketing">
         <p>
-          Vehilo je v aktuální verzi poskytováno zdarma. Aplikace nepoužívá platby, reklamy, marketingové
-          e-maily ani reklamní analytiku. Pokud se to v budoucnu změní, budou podmínky a informace o ochraně
-          osobních údajů aktualizovány před spuštěním takové funkce.
+          Vehilo je v aktuální verzi poskytováno zdarma. Aplikace nepoužívá platby ani marketingové e-maily.
+          Pokud se to v budoucnu změní, budou podmínky a informace o ochraně osobních údajů aktualizovány
+          před spuštěním takové funkce.
         </p>
       </LegalSection>
 

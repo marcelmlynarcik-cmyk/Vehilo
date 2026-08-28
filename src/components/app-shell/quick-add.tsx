@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   Bell,
   Car,
@@ -30,8 +32,15 @@ const actions = [
 ];
 
 export function QuickAdd() {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    setOpen(false);
+  }, [pathname]);
+
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger
         render={
           <Button className="gap-2 max-sm:size-14 max-sm:min-h-14 max-sm:rounded-[18px] max-sm:px-0">
@@ -72,7 +81,7 @@ export function QuickAdd() {
                 variant="outline"
                 className="h-auto min-h-14 min-w-0 justify-start gap-3 rounded-[16px] px-3 py-2"
               >
-                <Link href={action.href}>{content}</Link>
+                <Link href={action.href} onClick={() => setOpen(false)}>{content}</Link>
               </Button>
             ) : (
               <Button
