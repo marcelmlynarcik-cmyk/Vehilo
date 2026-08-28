@@ -1196,7 +1196,7 @@ Vehicles are the root entity for almost every other feature.
 - [x] Connect the `vehilo.eu` domain to production.
 - [x] Configure HTTPS, canonical URL and production environment variables.
 - [x] Verify Supabase Auth redirect URLs for `vehilo.eu`.
-- [ ] Verify Supabase RLS and storage policies before public access.
+- [x] Verify Supabase RLS and storage policies before public access.
 - [x] Add a production-safe admin role model.
 - [x] Build the first admin-only page visible only to the app owner/admin.
 - [x] Track active users, new users by day, total registered users and basic usage counts.
@@ -1208,7 +1208,7 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Configure Google Search Console for `vehilo.eu`.
 - [x] Verify that private app pages are not indexed.
 - [x] Add public landing/sign-in entry page if needed for Google indexing.
-- [ ] Add launch checklist and rollback notes.
+- [x] Add launch checklist and rollback notes.
 
 ### Phase 8 - Fuel & Energy Core
 
@@ -2141,6 +2141,20 @@ All items below are `P0 – Launch blocker` and must be closed before activating
 - Added admin overview metrics for profiles, vehicles, expenses, fuel/energy entries, service entries, reminders and documents when the server-only secret is configured.
 - Added admin navigation that appears only for allowed admin users.
 - Added clear `Ve vývoji` labelling for planned admin/support tools that are not implemented yet.
+
+### 2026-08-28
+
+- Removed visible premium, Pro, subscription-only and advertising copy from the user-facing app.
+- Updated Quick Add so the plus-button sheet closes after selecting an action and route navigation.
+- Verified Supabase RLS and Storage before public access on project `elqjzqufqjwiqsqqwhen`.
+- Confirmed RLS is enabled on `profiles`, `vehicles`, `expenses`, `energy_entries`, `service_entries`, `reminders` and `documents`.
+- Confirmed owner-scoped `SELECT`, `INSERT`, `UPDATE` and `DELETE` policies exist for authenticated users, and `UPDATE` policies include both `USING` and `WITH CHECK`.
+- Removed broad `anon` table grants from the verified user-data tables in production.
+- Reduced authenticated table grants to `SELECT`, `INSERT`, `UPDATE` and `DELETE` only.
+- Confirmed Storage buckets `vehicle-photos`, `receipts`, `service-invoices` and `documents` are private and scoped by owner path.
+- Added `docs/LAUNCH_CHECKLIST.md` with public-launch checks, Supabase security gate and rollback notes.
+- Supabase security advisor still reports leaked password protection disabled; this remains acceptable while Google login is the primary path and email/password login is not enabled.
+- Supabase performance advisor reports unused indexes; this remains expected until real traffic/data usage accumulates.
 
 Reminder product requirements captured for future implementation:
 
