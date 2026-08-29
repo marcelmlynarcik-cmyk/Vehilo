@@ -67,16 +67,16 @@ const trustItems = [
 ];
 
 export const metadata: Metadata = {
-  title: "Vehilo | Evidence nákladů, servisu a připomínek pro auta",
+  title: "Vehilo | Správa auta, servis, tankování a náklady",
   description:
-    "Vehilo je česká PWA aplikace pro evidenci nákladů, tankování, nabíjení, servisu, dokumentů a připomínek pro osobní auta i vícevozidlovou garáž.",
+    "Vehilo je česká aplikace pro správu auta. Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "Vehilo | Chytrá garáž pro vaše vozidla",
     description:
-      "Evidujte skutečné náklady, palivo, nabíjení, servis, dokumenty a připomínky na jednom místě.",
+      "Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.",
     url: "/",
   },
 };
@@ -326,8 +326,16 @@ async function Landing({
               "@context": "https://schema.org",
               "@type": "WebSite",
               name: "Vehilo",
+              alternateName: "Vehilo aplikace",
               url: publicSiteUrl,
               inLanguage: "cs-CZ",
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Vehilo",
+              url: publicSiteUrl,
+              logo: `${publicSiteUrl}/pwa/icons/icon-512.png`,
             },
             {
               "@context": "https://schema.org",
@@ -338,7 +346,7 @@ async function Landing({
               operatingSystem: "Web, Android, iOS",
               inLanguage: "cs-CZ",
               description:
-                "Česká PWA aplikace pro evidenci nákladů, tankování, nabíjení, servisu, dokumentů a připomínek pro vozidla.",
+                "Vehilo je česká aplikace pro správu auta. Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.",
               offers: {
                 "@type": "Offer",
                 price: "0",

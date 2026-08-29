@@ -1,7 +1,7 @@
 {
   "name": "Vehilo",
   "short_name": "Vehilo",
-  "description": "Všechny náklady, palivo, energie, servis, dokumenty a připomínky pro vaše vozidla na jednom místě.",
+  "description": "Vehilo je česká aplikace pro správu auta. Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",

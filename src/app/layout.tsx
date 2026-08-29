@@ -6,14 +6,14 @@ import { publicSiteUrl } from "@/lib/site";
 import "./globals.css";
 
 const siteDescription =
-  "Všechny náklady, palivo, energie, servis, dokumenty a připomínky pro vaše vozidla na jednom místě.";
+  "Vehilo je česká aplikace pro správu auta. Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.";
 const socialImage = "/pozadie/vehilo-hero-background.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicSiteUrl),
   applicationName: "Vehilo",
   title: {
-    default: "Vehilo | Chytrá garáž pro náklady, servis a připomínky",
+    default: "Vehilo | Správa auta, servis, tankování a náklady",
     template: "%s | Vehilo",
   },
   description: siteDescription,
@@ -51,8 +51,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/pwa/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/logo/Logo.png", type: "image/png" },
     ],
+    shortcut: "/favicon.ico",
     apple: [
       { url: "/pwa/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
