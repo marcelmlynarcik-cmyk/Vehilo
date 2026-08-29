@@ -1,4 +1,4 @@
-const CACHE_VERSION = "vehilo-pwa-v1";
+const CACHE_VERSION = "vehilo-pwa-v2";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 
@@ -72,4 +72,53 @@ self.addEventListener("fetch", (event) => {
       }),
     );
   }
+});
+
+self.addEventListener("push", (event) => {
+  const fallback = {
+    title: "Vehilo připomínka",
+    body: "Máte připomínku k vozidlu.",
+    url: "/reminders",
+  };
+  let data = fallback;
+
+  if (event.data) {
+    try {
+      data = { ...fallback, ...event.data.json() };
+    } catch {
+      data = { ...fallback, body: event.data.text() || fallback.body };
+    }
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/pwa/icons/icon-512.png",
+      badge: "/pwa/icons/icon-512.png",
+      data: {
+        url: data.url || fallback.url,
+      },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const targetUrl = new URL(event.notification.data?.url || "/reminders", self.location.origin).href;
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        for (const client of clientList) {
+          if ("focus" in client) {
+            client.navigate(targetUrl);
+            return client.focus();
+          }
+        }
+
+        return self.clients.openWindow(targetUrl);
+      }),
+  );
 });

@@ -30,11 +30,15 @@ Povinné proměnné:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY`
 
 Admin proměnné pro owner-only stránku:
 
 - `VEHILO_ADMIN_EMAILS` - čárkou oddělený seznam admin emailů.
 - `SUPABASE_SECRET_KEY` - server-only Supabase secret key pro celkové admin metriky. Nikdy nepoužívat s prefixem `NEXT_PUBLIC_`.
+- `VAPID_PRIVATE_KEY` - server-only klíč pro budoucí odesílání push připomínek. Nikdy nepoužívat s prefixem `NEXT_PUBLIC_`.
+- `NEW_USER_NOTIFICATION_WEBHOOK_URL` - volitelný server-only webhook pro upozornění na nového uživatele.
+- `NEW_USER_NOTIFICATION_WEBHOOK_SECRET` - volitelný sdílený secret pro ověření webhooku.
 
 ## Supabase
 
@@ -49,7 +53,7 @@ Migrace aplikované přes Supabase MCP:
 - `20260710084242_fix_advisor_findings`
 - `create_profile_on_signup`
 
-Supabase security advisors jsou čisté. Performance advisors zatím hlásí pouze nepoužité indexy, což je očekávané u prázdné databáze.
+Supabase security advisor zatím hlásí pouze vypnutou leaked-password ochranu pro Auth. To je přijatelné, dokud je primární přihlášení přes Google a není zapnuté email/heslo. Performance advisors zatím hlásí pouze nepoužité indexy, což je očekávané při nízkém provozu a malém objemu dat.
 
 ## Auth
 

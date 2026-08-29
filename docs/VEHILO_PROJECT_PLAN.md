@@ -1,6 +1,6 @@
 # Vehilo Project Plan
 
-Last updated: 2026-08-28
+Last updated: 2026-08-29
 
 ## Project Summary
 
@@ -75,6 +75,7 @@ Next session priority:
 - Continue Phase 7 Public Launch follow-up.
 - Google login on `https://www.vehilo.eu` is working; keep Google Cloud Console and Supabase Auth settings documented as production-ready.
 - Google Search Console domain property is verified and homepage indexing was requested on 2026-08-28.
+- Google Search Console URL Inspection now reports `https://www.vehilo.eu/` as indexed; indexing was requested again after SEO metadata updates on 2026-08-29.
 - Google Search Console URL Inspection confirms Googlebot Smartphone successfully crawled `https://www.vehilo.eu/` on 2026-08-28 at 20:08:14; crawling and indexing are allowed.
 - `https://www.vehilo.eu/sitemap.xml` was submitted in Google Search Console on 2026-08-28, but Search Console initially reported `Nie je možné načítať`, `Typ: Neznámy` and `Objavené stránky: 0`; production `robots.txt` and `sitemap.xml` are verified, so the next step is monitoring/resubmission if the state does not clear.
 - Monitor `site:vehilo.eu` and Search Console URL Inspection over the next few days; Google indexing is requested but not immediate.
@@ -121,6 +122,9 @@ Latest progress:
 - [x] Google Search Console domain property was verified and homepage indexing was requested on 2026-08-28.
 - [x] Google Search Console URL Inspection confirms `https://www.vehilo.eu/` was crawled successfully by Googlebot Smartphone on 2026-08-28.
 - [x] Sitemap was submitted to Google Search Console on 2026-08-28; current follow-up is monitoring the initial `Nie je možné načítať` state.
+- [x] Improved public SEO title/description, favicon metadata and Organization logo structured data on 2026-08-29.
+- [x] Added production signup notification hook with Google Apps Script webhook env variables on Vercel.
+- [x] Added push subscription storage schema, RLS policies and settings UI for device registration.
 - [x] Added root error fallback and protected-app loading skeleton for broader route-level hardening.
 
 GitHub status:
@@ -2183,6 +2187,14 @@ Advanced statistics requirements captured for future implementation:
 - [x] Add odometer statistics showing average kilometers driven per day, grouped yearly while displaying the daily average for each year.
 - [x] Expand fuel price analytics with a small summary table for minimum, maximum and average fuel price.
 - [x] Add full vs partial refuel statistics: how many refuels were full tank vs partial.
+
+### 2026-08-29
+
+- Homepage is indexed in Google Search Console and a new indexing request was submitted after metadata changes.
+- Deployed improved production metadata: stronger homepage title/description, favicon links and `Organization.logo` JSON-LD.
+- Added optional new-user notification webhook for Google OAuth signups and configured production Vercel secrets for the Apps Script endpoint.
+- Added `public.push_subscriptions` in production with RLS, owner-scoped policies and narrowed authenticated grants.
+- Added client-side push subscription registration UI in Settings; reminder delivery scheduling remains future work.
 - [x] Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.
 - [x] Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
 - [x] Add refueled quantity statistics with minimum, maximum and average quantity.

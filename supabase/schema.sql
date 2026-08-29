@@ -189,6 +189,17 @@ create table if not exists public.documents (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.push_subscriptions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  endpoint text not null check (length(endpoint) > 0),
+  subscription jsonb not null,
+  user_agent text,
+  enabled boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists vehicles_user_id_idx on public.vehicles(user_id);
 create index if not exists expenses_user_vehicle_date_idx on public.expenses(user_id, vehicle_id, date desc);
 create index if not exists energy_entries_user_vehicle_date_idx on public.energy_entries(user_id, vehicle_id, date desc);
@@ -200,6 +211,8 @@ create index if not exists energy_entries_vehicle_id_idx on public.energy_entrie
 create index if not exists service_entries_vehicle_id_idx on public.service_entries(vehicle_id);
 create index if not exists reminders_vehicle_id_idx on public.reminders(vehicle_id);
 create index if not exists documents_vehicle_id_idx on public.documents(vehicle_id);
+create unique index if not exists push_subscriptions_user_endpoint_key on public.push_subscriptions(user_id, endpoint);
+create index if not exists push_subscriptions_user_enabled_idx on public.push_subscriptions(user_id, enabled);
 
 drop trigger if exists set_profiles_updated_at on public.profiles;
 create trigger set_profiles_updated_at
@@ -209,6 +222,11 @@ for each row execute function public.set_updated_at();
 drop trigger if exists set_vehicles_updated_at on public.vehicles;
 create trigger set_vehicles_updated_at
 before update on public.vehicles
+for each row execute function public.set_updated_at();
+
+drop trigger if exists set_push_subscriptions_updated_at on public.push_subscriptions;
+create trigger set_push_subscriptions_updated_at
+before update on public.push_subscriptions
 for each row execute function public.set_updated_at();
 
 drop trigger if exists on_auth_user_created on auth.users;
@@ -223,6 +241,7 @@ alter table public.energy_entries enable row level security;
 alter table public.service_entries enable row level security;
 alter table public.reminders enable row level security;
 alter table public.documents enable row level security;
+alter table public.push_subscriptions enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.profiles to authenticated;
@@ -232,6 +251,11 @@ grant select, insert, update, delete on public.energy_entries to authenticated;
 grant select, insert, update, delete on public.service_entries to authenticated;
 grant select, insert, update, delete on public.reminders to authenticated;
 grant select, insert, update, delete on public.documents to authenticated;
+
+revoke all on public.push_subscriptions from public;
+revoke all on public.push_subscriptions from anon;
+revoke all on public.push_subscriptions from authenticated;
+grant select, insert, update, delete on public.push_subscriptions to authenticated;
 
 create policy "profiles_select_own" on public.profiles for select to authenticated using ((select auth.uid()) = id);
 create policy "profiles_insert_own" on public.profiles for insert to authenticated with check ((select auth.uid()) = id);
@@ -267,6 +291,11 @@ create policy "documents_select_own" on public.documents for select to authentic
 create policy "documents_insert_own" on public.documents for insert to authenticated with check ((select auth.uid()) = user_id);
 create policy "documents_update_own" on public.documents for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
 create policy "documents_delete_own" on public.documents for delete to authenticated using ((select auth.uid()) = user_id);
+
+create policy "push_subscriptions_select_own" on public.push_subscriptions for select to authenticated using ((select auth.uid()) = user_id);
+create policy "push_subscriptions_insert_own" on public.push_subscriptions for insert to authenticated with check ((select auth.uid()) = user_id);
+create policy "push_subscriptions_update_own" on public.push_subscriptions for update to authenticated using ((select auth.uid()) = user_id) with check ((select auth.uid()) = user_id);
+create policy "push_subscriptions_delete_own" on public.push_subscriptions for delete to authenticated using ((select auth.uid()) = user_id);
 
 insert into storage.buckets (id, name, public)
 values

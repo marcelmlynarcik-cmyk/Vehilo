@@ -241,6 +241,25 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["documents"]["Row"]>;
         Relationships: [];
       };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          subscription: Json;
+          user_agent: string | null;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["push_subscriptions"]["Row"]> & {
+          user_id: string;
+          endpoint: string;
+          subscription: Json;
+        };
+        Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

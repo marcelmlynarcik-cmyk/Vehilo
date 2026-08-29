@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { PageHeader } from "@/components/shared/page-header";
+import { PushNotificationsCard } from "@/components/settings/push-notifications-card";
 import { loadGarageData } from "@/lib/data/garage";
 import { supportEmail, supportMailto } from "@/lib/contact";
 import { updatePreferences } from "@/app/(app)/settings/actions";
@@ -56,7 +57,7 @@ export default async function SettingsPage() {
         <Card>
           <CardHeader><CardTitle>Notifikace</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <PlannedFeatureRow title="PWA notifikace" description="Připomínky před servisem, STK/MOT a expirací dokumentů." />
+            <PushNotificationsCard vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
             <PlannedFeatureRow title="E-mailové notifikace" description="Cloudové e-maily přijdou až po výběru e-mailového poskytovatele." />
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
