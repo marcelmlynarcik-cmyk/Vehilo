@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { deliverReminderPushNotificationsSoon } from "@/lib/push/reminder-delivery";
 import type { Database } from "@/types/database";
 import type { EnergyEntryType, PowertrainType, QuantityUnit } from "@/types/domain";
 
@@ -48,6 +49,7 @@ export async function createEnergyEntry(formData: FormData) {
   revalidatePath("/vehicles");
   revalidatePath("/dashboard");
   revalidatePath("/statistics");
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId: vehicle.id });
   redirect("/fuel-energy#records");
 }
 
@@ -107,6 +109,7 @@ export async function updateEnergyEntry(formData: FormData) {
   revalidatePath("/vehicles");
   revalidatePath("/dashboard");
   revalidatePath("/statistics");
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId: vehicle.id });
   redirect("/fuel-energy#records");
 }
 

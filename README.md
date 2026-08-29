@@ -37,6 +37,8 @@ Admin proměnné pro owner-only stránku:
 - `VEHILO_ADMIN_EMAILS` - čárkou oddělený seznam admin emailů.
 - `SUPABASE_SECRET_KEY` - server-only Supabase secret key pro celkové admin metriky. Nikdy nepoužívat s prefixem `NEXT_PUBLIC_`.
 - `VAPID_PRIVATE_KEY` - server-only klíč pro budoucí odesílání push připomínek. Nikdy nepoužívat s prefixem `NEXT_PUBLIC_`.
+- `VAPID_SUBJECT` - volitelný kontakt pro Web Push VAPID, například `mailto:marcel.mlynarcik@gmail.com`.
+- `CRON_SECRET` - server-only token pro autorizaci Vercel Cron endpointů.
 - `NEW_USER_NOTIFICATION_WEBHOOK_URL` - volitelný server-only webhook pro upozornění na nového uživatele.
 - `NEW_USER_NOTIFICATION_WEBHOOK_SECRET` - volitelný sdílený secret pro ověření webhooku.
 

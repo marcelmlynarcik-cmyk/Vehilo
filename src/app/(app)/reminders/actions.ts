@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { deliverReminderPushNotificationsSoon } from "@/lib/push/reminder-delivery";
 import type { Database } from "@/types/database";
 import type { Reminder, ReminderStatus } from "@/types/domain";
 
@@ -22,6 +23,7 @@ export async function createReminder(formData: FormData) {
   }
 
   revalidateReminderPaths(vehicleId);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/reminders#records");
 }
 
@@ -42,6 +44,7 @@ export async function updateReminder(formData: FormData) {
 
   revalidateReminderPaths(vehicleId);
   revalidateReminderPaths(currentReminder.vehicle_id);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/reminders#records");
 }
 

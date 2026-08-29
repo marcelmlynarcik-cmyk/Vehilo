@@ -35,10 +35,6 @@ const plannedAdminTools = [
     description: "Support nástroj bude dostupný až po doplnění audit logu a pravidel přístupu.",
   },
   {
-    title: "Předplatné a platby",
-    description: "Zobrazí se až po výběru platební brány a implementaci fakturace.",
-  },
-  {
     title: "Právní dokumenty",
     description: "Správa verzí podmínek a souhlasů přijde až po právní přípravě.",
   },
@@ -200,7 +196,7 @@ export default async function AdminPage() {
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <StatusRow label="Prostředí" value={process.env.NODE_ENV === "production" ? "Production" : "Development"} ready />
             <StatusRow label="Doména vehilo.eu" value="Aktivní" ready />
-            <StatusRow label="Platby" value="Odloženo" ready={false} />
+            <StatusRow label="Registrace" value="Aktivní" ready />
           </CardContent>
         </Card>
 

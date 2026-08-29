@@ -200,6 +200,17 @@ create table if not exists public.push_subscriptions (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.reminder_push_notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  reminder_id uuid not null references public.reminders(id) on delete cascade,
+  push_subscription_id uuid not null references public.push_subscriptions(id) on delete cascade,
+  notification_key text not null check (length(notification_key) > 0),
+  success boolean not null default false,
+  error text,
+  sent_at timestamptz not null default now()
+);
+
 create index if not exists vehicles_user_id_idx on public.vehicles(user_id);
 create index if not exists expenses_user_vehicle_date_idx on public.expenses(user_id, vehicle_id, date desc);
 create index if not exists energy_entries_user_vehicle_date_idx on public.energy_entries(user_id, vehicle_id, date desc);
@@ -213,6 +224,8 @@ create index if not exists reminders_vehicle_id_idx on public.reminders(vehicle_
 create index if not exists documents_vehicle_id_idx on public.documents(vehicle_id);
 create unique index if not exists push_subscriptions_user_endpoint_key on public.push_subscriptions(user_id, endpoint);
 create index if not exists push_subscriptions_user_enabled_idx on public.push_subscriptions(user_id, enabled);
+create unique index if not exists reminder_push_notifications_once_idx on public.reminder_push_notifications(reminder_id, push_subscription_id, notification_key);
+create index if not exists reminder_push_notifications_user_sent_idx on public.reminder_push_notifications(user_id, sent_at desc);
 
 drop trigger if exists set_profiles_updated_at on public.profiles;
 create trigger set_profiles_updated_at
@@ -242,6 +255,7 @@ alter table public.service_entries enable row level security;
 alter table public.reminders enable row level security;
 alter table public.documents enable row level security;
 alter table public.push_subscriptions enable row level security;
+alter table public.reminder_push_notifications enable row level security;
 
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.profiles to authenticated;
@@ -256,6 +270,10 @@ revoke all on public.push_subscriptions from public;
 revoke all on public.push_subscriptions from anon;
 revoke all on public.push_subscriptions from authenticated;
 grant select, insert, update, delete on public.push_subscriptions to authenticated;
+
+revoke all on public.reminder_push_notifications from public;
+revoke all on public.reminder_push_notifications from anon;
+revoke all on public.reminder_push_notifications from authenticated;
 
 create policy "profiles_select_own" on public.profiles for select to authenticated using ((select auth.uid()) = id);
 create policy "profiles_insert_own" on public.profiles for insert to authenticated with check ((select auth.uid()) = id);

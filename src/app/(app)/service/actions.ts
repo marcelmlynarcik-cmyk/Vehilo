@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { deliverReminderPushNotificationsSoon } from "@/lib/push/reminder-delivery";
 import type { Database } from "@/types/database";
 
 export async function createServiceEntry(formData: FormData) {
@@ -39,6 +40,7 @@ export async function createServiceEntry(formData: FormData) {
 
   await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage);
   revalidateServicePaths(vehicleId);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/service#records");
 }
 
@@ -96,6 +98,7 @@ export async function updateServiceEntry(formData: FormData) {
   revalidateServicePaths(vehicleId);
   revalidateServicePaths(currentEntry.vehicle_id);
   revalidatePath(`/service/${entryId}`);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/service#records");
 }
 

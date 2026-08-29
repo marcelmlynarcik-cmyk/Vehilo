@@ -121,7 +121,7 @@ export function PushNotificationsCard({ vapidPublicKey }: { vapidPublicKey: stri
             <Badge variant={state === "subscribed" ? "secondary" : "outline"}>{formatState(state)}</Badge>
           </div>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Registrace zařízení pro servisní připomínky, STK/MOT a expirace dokumentů. Automatické doručování podle termínů je ve vývoji.
+            Zařízení dostane upozornění, když se servisní, STK/MOT nebo dokumentová připomínka blíží nebo je po termínu.
           </p>
           {message ? <p className="mt-2 text-xs text-muted-foreground">{message}</p> : null}
         </div>
@@ -186,7 +186,7 @@ function formatState(state: PushState) {
   const labels: Record<PushState, string> = {
     checking: "Kontroluji",
     unsupported: "Nepodporováno",
-    "missing-key": "Ve vývoji",
+    "missing-key": "Nenastaveno",
     denied: "Blokováno",
     subscribed: "Zapnuto",
     unsubscribed: "Vypnuto",

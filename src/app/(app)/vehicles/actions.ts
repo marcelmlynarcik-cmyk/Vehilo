@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { deliverReminderPushNotificationsSoon } from "@/lib/push/reminder-delivery";
 import type { Database } from "@/types/database";
 import type { PowertrainType, VehicleStatus } from "@/types/domain";
 
@@ -52,6 +53,7 @@ export async function createVehicle(formData: FormData) {
   }
 
   revalidateVehicleRoutes(data.id);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId: data.id });
   redirect(`/vehicles/${data.id}`);
 }
 
@@ -110,6 +112,7 @@ export async function updateVehicle(formData: FormData) {
   }
 
   revalidateVehicleRoutes(vehicleId);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect(`/vehicles/${vehicleId}`);
 }
 

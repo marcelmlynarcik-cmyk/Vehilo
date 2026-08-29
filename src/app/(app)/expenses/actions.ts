@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { randomUUID } from "crypto";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
+import { deliverReminderPushNotificationsSoon } from "@/lib/push/reminder-delivery";
 import type { Database } from "@/types/database";
 
 export async function createExpense(formData: FormData) {
@@ -37,7 +38,9 @@ export async function createExpense(formData: FormData) {
     throw new Error(error.message);
   }
 
+  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage);
   revalidateExpensePaths(vehicleId);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/expenses#records");
 }
 
@@ -91,9 +94,11 @@ export async function updateExpense(formData: FormData) {
     await deleteRecordFile({ bucket: "receipts", path: currentExpense.receipt_url, supabase });
   }
 
+  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage);
   revalidateExpensePaths(vehicleId);
   revalidateExpensePaths(currentExpense.vehicle_id);
   revalidatePath(`/expenses/${expenseId}`);
+  await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/expenses#records");
 }
 
@@ -159,6 +164,42 @@ async function requireOwnedVehicle(
 
   if (error || !vehicle) {
     throw new Error("Vozidlo pro tento výdaj nebylo nalezeno.");
+  }
+}
+
+async function updateVehicleMileageIfNeeded(
+  supabase: NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>,
+  userId: string,
+  vehicleId: string,
+  mileage: number | null,
+) {
+  if (mileage == null) {
+    return;
+  }
+
+  const { data: vehicle, error } = await supabase
+    .from("vehicles")
+    .select("id,current_mileage")
+    .eq("id", vehicleId)
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !vehicle) {
+    throw new Error("Vozidlo pro aktualizaci nájezdu nebylo nalezeno.");
+  }
+
+  if (mileage <= Number(vehicle.current_mileage ?? 0)) {
+    return;
+  }
+
+  const { error: mileageError } = await supabase
+    .from("vehicles")
+    .update({ current_mileage: mileage })
+    .eq("id", vehicleId)
+    .eq("user_id", userId);
+
+  if (mileageError) {
+    throw new Error(mileageError.message);
   }
 }
 

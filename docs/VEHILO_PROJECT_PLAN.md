@@ -36,6 +36,8 @@ Current launch priority decision:
 - Premium tiers and feature gating are no longer planned.
 - Vehilo should not mention `Pro`, premium unlocks or subscription-only features in the user-facing app.
 - Legal/accounting/security launch-readiness tasks remain in this plan, but paid subscription and payment-processing work is deferred unless the product direction changes again explicitly.
+- Future monetization should be evaluated as ads-first, not subscription-first.
+- For the current PWA/web app, the likely Google ads product is Google AdSense. Google AdMob should only be revisited if Vehilo later ships as a native Android/iOS app or wrapped app that meets Google's app ad requirements.
 
 Analytics verification rule:
 
@@ -82,6 +84,8 @@ Next session priority:
 - Continue Phase 6 hardening: responsive QA, accessibility pass, empty/loading/error states and validation messages.
 - After Phase 6 hardening, return to remaining Phase 8-10 product work: Fuel & Energy calculations, Reminders/Documents and dashboard/statistics.
 - Do not activate real payments or subscription flows unless the user explicitly changes the monetization direction again.
+- Add a future monetization spike for Google AdSense ads on web/PWA after core product quality, privacy/cookie consent and Google policy checks are ready.
+- Resolve Supabase inactivity pausing before public launch. The current Supabase plan can pause the project after 7 days without activity, so we need either a suitable paid Supabase plan, a compliant keep-alive/monitoring approach, or a hosting/database decision that guarantees the app stays available.
 
 Mobile/UX verification:
 
@@ -125,6 +129,9 @@ Latest progress:
 - [x] Improved public SEO title/description, favicon metadata and Organization logo structured data on 2026-08-29.
 - [x] Added production signup notification hook with Google Apps Script webhook env variables on Vercel.
 - [x] Added push subscription storage schema, RLS policies and settings UI for device registration.
+- [x] Added reminder push delivery cron and immediate mileage-triggered delivery attempts.
+- [x] Captured future Google ads monetization direction: AdSense for PWA/web first; AdMob only if a native app path is chosen later.
+- [x] Captured Supabase 7-day inactivity pausing as a launch-readiness risk to resolve before public release.
 - [x] Added root error fallback and protected-app loading skeleton for broader route-level hardening.
 
 GitHub status:
@@ -2194,7 +2201,8 @@ Advanced statistics requirements captured for future implementation:
 - Deployed improved production metadata: stronger homepage title/description, favicon links and `Organization.logo` JSON-LD.
 - Added optional new-user notification webhook for Google OAuth signups and configured production Vercel secrets for the Apps Script endpoint.
 - Added `public.push_subscriptions` in production with RLS, owner-scoped policies and narrowed authenticated grants.
-- Added client-side push subscription registration UI in Settings; reminder delivery scheduling remains future work.
+- Added client-side push subscription registration UI in Settings.
+- Added reminder push delivery groundwork: daily Vercel Cron endpoint, send log table and immediate delivery attempts after mileage/reminder changes.
 - [x] Add days-to-next-refuel statistics with minimum, maximum and average days between refuels.
 - [x] Add kilometers-per-full-tank statistics with minimum, maximum and average distance between full tanks.
 - [x] Add refueled quantity statistics with minimum, maximum and average quantity.

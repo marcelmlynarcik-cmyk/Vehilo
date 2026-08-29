@@ -260,6 +260,26 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Row"]>;
         Relationships: [];
       };
+      reminder_push_notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          reminder_id: string;
+          push_subscription_id: string;
+          notification_key: string;
+          success: boolean;
+          error: string | null;
+          sent_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["reminder_push_notifications"]["Row"]> & {
+          user_id: string;
+          reminder_id: string;
+          push_subscription_id: string;
+          notification_key: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["reminder_push_notifications"]["Row"]>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
