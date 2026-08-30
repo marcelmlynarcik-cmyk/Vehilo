@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Bell, BellOff } from "lucide-react";
+import { Bell, BellOff, BellRing } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -10,6 +10,7 @@ type PushState = "checking" | "unsupported" | "missing-key" | "denied" | "subscr
 export function PushNotificationsCard({ vapidPublicKey }: { vapidPublicKey: string }) {
   const [state, setState] = useState<PushState>("checking");
   const [message, setMessage] = useState("");
+  const [testing, setTesting] = useState(false);
   const supported = useMemo(() => isPushSupported(), []);
 
   useEffect(() => {
@@ -112,6 +113,38 @@ export function PushNotificationsCard({ vapidPublicKey }: { vapidPublicKey: stri
     }
   }
 
+  async function sendTestNotification() {
+    setMessage("");
+    setTesting(true);
+
+    try {
+      const registration = await navigator.serviceWorker.getRegistration("/");
+      const subscription = await registration?.pushManager.getSubscription();
+
+      if (!subscription) {
+        setState("unsubscribed");
+        setMessage("Nejdřív zapněte push připomínky na tomto zařízení.");
+        return;
+      }
+
+      const response = await fetch("/api/push/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: subscription.endpoint }),
+      });
+
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+
+      setMessage("Testovací připomínka byla odeslána na toto zařízení.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Testovací push notifikaci se nepodařilo odeslat.");
+    } finally {
+      setTesting(false);
+    }
+  }
+
   return (
     <div className="rounded-[18px] border border-border bg-muted/35 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -127,10 +160,16 @@ export function PushNotificationsCard({ vapidPublicKey }: { vapidPublicKey: stri
         </div>
         <div className="flex shrink-0 gap-2">
           {state === "subscribed" ? (
-            <Button type="button" variant="outline" size="sm" onClick={unsubscribe}>
-              <BellOff className="mr-2 size-4" aria-hidden="true" />
-              Vypnout
-            </Button>
+            <>
+              <Button type="button" variant="outline" size="sm" onClick={sendTestNotification} disabled={testing}>
+                <BellRing className="mr-2 size-4" aria-hidden="true" />
+                {testing ? "Odesílám" : "Test"}
+              </Button>
+              <Button type="button" variant="outline" size="sm" onClick={unsubscribe}>
+                <BellOff className="mr-2 size-4" aria-hidden="true" />
+                Vypnout
+              </Button>
+            </>
           ) : (
             <Button type="button" variant="outline" size="sm" onClick={subscribe} disabled={state === "unsupported" || state === "missing-key" || state === "denied"}>
               <Bell className="mr-2 size-4" aria-hidden="true" />

@@ -1,5 +1,4 @@
 import { Bell, CalendarClock, CheckCircle2, Clock3, Pencil, Plus, Trash2 } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { ReminderForm } from "@/components/forms/reminder-form";
+import { PushReminderStatus } from "@/components/reminders/push-reminder-status";
 import { countReminderStatus } from "@/lib/calculations/costs";
 import { getMileageProgress, getRemainingDays, getRemainingKilometers } from "@/lib/calculations/reminders";
 import { loadGarageData } from "@/lib/data/garage";
@@ -26,6 +26,7 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
   const query = await searchParams;
   const defaultDate = formatDateInput(new Date());
   const openReminderDialog = query.add === "reminder";
+  const defaultNotifyBeforeDays = data.profile?.default_reminder_notify_before_days ?? 14;
   const vehicleNames = new Map(data.vehicles.map((vehicle) => [vehicle.id, vehicle.name]));
   const reminders = [...data.reminders].sort((a, b) => reminderSortScore(a) - reminderSortScore(b));
 
@@ -34,18 +35,9 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
       <PageHeader
         title="Připomínky"
         description="Datumové, kilometrové i kombinované připomínky pro servis, dokumenty, pojištění a STK/MOT."
-        actions={<ReminderDialog vehicles={data.vehicles} defaultDate={defaultDate} defaultOpen={openReminderDialog} />}
+        actions={<ReminderDialog vehicles={data.vehicles} defaultDate={defaultDate} defaultNotifyBeforeDays={defaultNotifyBeforeDays} defaultOpen={openReminderDialog} />}
       />
-      <Alert>
-        <Bell className="size-4" />
-        <AlertTitle className="flex flex-wrap items-center gap-2">
-          Push notifikace jsou navázané na termíny a nájezd.
-          <Badge variant="secondary">Aktivní</Badge>
-        </AlertTitle>
-        <AlertDescription>
-          Upozornění se odešle při blížícím se termínu, po termínu nebo po dosažení nastavených kilometrů na přihlášeném zařízení.
-        </AlertDescription>
-      </Alert>
+      <PushReminderStatus vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard title="OK" value={String(countReminderStatus(data.reminders, "ok"))} description="Vše v pořádku" icon={Bell} />
         <MetricCard title="Brzy splatné" value={String(countReminderStatus(data.reminders, "due_soon"))} description="Vyžaduje plánování" icon={Clock3} />
@@ -67,6 +59,7 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
                 vehicles={data.vehicles}
                 vehicleName={vehicleNames.get(reminder.vehicle_id) ?? "Vozidlo"}
                 defaultDate={defaultDate}
+                defaultNotifyBeforeDays={defaultNotifyBeforeDays}
               />
             ))}
           </CardContent>
@@ -87,10 +80,12 @@ export default async function RemindersPage({ searchParams }: RemindersPageProps
 function ReminderDialog({
   vehicles,
   defaultDate,
+  defaultNotifyBeforeDays,
   defaultOpen,
 }: {
   vehicles: Vehicle[];
   defaultDate: string;
+  defaultNotifyBeforeDays: number;
   defaultOpen: boolean;
 }) {
   return (
@@ -104,7 +99,7 @@ function ReminderDialog({
           <DialogTitle>Nová připomínka</DialogTitle>
           <DialogDescription>Nastavte datum, kilometry nebo kombinaci obou. Push upozornění bude navázané na tyto termíny.</DialogDescription>
         </DialogHeader>
-        <ReminderForm action={createReminder} vehicles={vehicles} defaultDate={defaultDate} />
+        <ReminderForm action={createReminder} vehicles={vehicles} defaultDate={defaultDate} defaultNotifyBeforeDays={defaultNotifyBeforeDays} />
       </DialogContent>
     </Dialog>
   );
@@ -115,11 +110,13 @@ function ReminderRow({
   vehicles,
   vehicleName,
   defaultDate,
+  defaultNotifyBeforeDays,
 }: {
   reminder: Reminder;
   vehicles: Vehicle[];
   vehicleName: string;
   defaultDate: string;
+  defaultNotifyBeforeDays: number;
 }) {
   const vehicle = vehicles.find((item) => item.id === reminder.vehicle_id) ?? null;
   const remainingDays = getRemainingDays(reminder);
@@ -163,7 +160,7 @@ function ReminderRow({
         <div className="flex flex-wrap gap-2 lg:justify-end">
           <CompleteReminderDialog reminder={reminder} vehicle={vehicle} />
           <PostponeReminderDialog reminder={reminder} />
-          <EditReminderDialog reminder={reminder} vehicles={vehicles} defaultDate={defaultDate} />
+          <EditReminderDialog reminder={reminder} vehicles={vehicles} defaultDate={defaultDate} defaultNotifyBeforeDays={defaultNotifyBeforeDays} />
           <DeleteReminderDialog reminder={reminder} />
         </div>
       </div>
@@ -237,7 +234,7 @@ function PostponeReminderDialog({ reminder }: { reminder: Reminder }) {
   );
 }
 
-function EditReminderDialog({ reminder, vehicles, defaultDate }: { reminder: Reminder; vehicles: Vehicle[]; defaultDate: string }) {
+function EditReminderDialog({ reminder, vehicles, defaultDate, defaultNotifyBeforeDays }: { reminder: Reminder; vehicles: Vehicle[]; defaultDate: string; defaultNotifyBeforeDays: number }) {
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" size="sm" />}>
@@ -249,7 +246,7 @@ function EditReminderDialog({ reminder, vehicles, defaultDate }: { reminder: Rem
           <DialogTitle>Upravit připomínku</DialogTitle>
           <DialogDescription>Změny se uloží do stejné připomínky a přepočítají její termín.</DialogDescription>
         </DialogHeader>
-        <ReminderForm action={updateReminder} vehicles={vehicles} defaultDate={defaultDate} reminder={reminder} />
+        <ReminderForm action={updateReminder} vehicles={vehicles} defaultDate={defaultDate} defaultNotifyBeforeDays={defaultNotifyBeforeDays} reminder={reminder} />
       </DialogContent>
     </Dialog>
   );

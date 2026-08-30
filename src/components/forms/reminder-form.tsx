@@ -35,10 +35,11 @@ interface ReminderFormProps {
   action: (formData: FormData) => void | Promise<void>;
   vehicles: ReminderVehicle[];
   defaultDate: string;
+  defaultNotifyBeforeDays?: number;
   reminder?: Reminder;
 }
 
-export function ReminderForm({ action, vehicles, defaultDate, reminder }: ReminderFormProps) {
+export function ReminderForm({ action, vehicles, defaultDate, defaultNotifyBeforeDays = 14, reminder }: ReminderFormProps) {
   const [vehicleId, setVehicleId] = useState(reminder?.vehicle_id ?? vehicles[0]?.id ?? "");
   const [type, setType] = useState<ReminderType>(reminder?.type ?? "date");
   const selectedVehicle = vehicles.find((vehicle) => vehicle.id === vehicleId) ?? vehicles[0] ?? null;
@@ -104,7 +105,7 @@ export function ReminderForm({ action, vehicles, defaultDate, reminder }: Remind
               label="Upozornit dní předem"
               name="notify_before_days"
               type="number"
-              defaultValue={reminder?.notify_before_days ?? 14}
+              defaultValue={reminder?.notify_before_days ?? defaultNotifyBeforeDays}
             />
           </>
         ) : null}

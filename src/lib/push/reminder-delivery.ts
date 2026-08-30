@@ -134,6 +134,32 @@ export async function deliverReminderPushNotificationsSoon(scope: DeliveryScope)
   }
 }
 
+export async function sendTestPushNotification(subscription: Json) {
+  if (!vapidPublicKey || !vapidPrivateKey) {
+    return { ok: false, error: "VAPID klíče nejsou nakonfigurované.", expired: false };
+  }
+
+  webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
+
+  try {
+    await webpush.sendNotification(toWebPushSubscription(subscription), JSON.stringify({
+      title: "Testovací připomínka",
+      body: "Push notifikace ve Vehilo fungují.",
+      url: "/reminders",
+    }));
+
+    return { ok: true, error: null, expired: false };
+  } catch (error) {
+    const statusCode = getStatusCode(error);
+
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : "Testovací push notifikaci se nepodařilo odeslat.",
+      expired: statusCode === 404 || statusCode === 410,
+    };
+  }
+}
+
 type ReminderNotification = {
   reminder: ReminderRow;
   vehicle: VehicleRow;

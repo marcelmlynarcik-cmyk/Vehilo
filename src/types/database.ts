@@ -32,6 +32,7 @@ export interface Database {
           electric_consumption_format: string;
           language: string;
           theme: string;
+          default_reminder_notify_before_days: number;
           created_at: string;
           updated_at: string;
         };

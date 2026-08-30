@@ -50,6 +50,7 @@ create table if not exists public.profiles (
   electric_consumption_format text not null default 'kWh/100 km',
   language text not null default 'cs',
   theme text not null default 'system',
+  default_reminder_notify_before_days integer not null default 14 check (default_reminder_notify_before_days >= 0),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -88,6 +89,9 @@ create table if not exists public.vehicles (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.profiles
+add column if not exists default_reminder_notify_before_days integer not null default 14 check (default_reminder_notify_before_days >= 0);
 
 create table if not exists public.expenses (
   id uuid primary key default gen_random_uuid(),

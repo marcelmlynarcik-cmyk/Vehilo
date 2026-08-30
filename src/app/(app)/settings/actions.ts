@@ -23,6 +23,17 @@ function readAllowed(formData: FormData, key: string, allowed: Set<string>, fall
   return fallback;
 }
 
+function readNonNegativeInteger(formData: FormData, key: string, fallback: number) {
+  const value = formData.get(key);
+
+  if (typeof value !== "string" || !value.trim()) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
 export async function updatePreferences(formData: FormData) {
   const supabase = await getSupabaseServerClient();
 
@@ -59,6 +70,7 @@ export async function updatePreferences(formData: FormData) {
     ),
     language: readAllowed(formData, "language", allowedLanguages, "cs"),
     theme: readAllowed(formData, "theme", allowedThemes, "system"),
+    default_reminder_notify_before_days: readNonNegativeInteger(formData, "default_reminder_notify_before_days", 14),
   };
 
   const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" });

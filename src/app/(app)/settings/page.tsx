@@ -54,19 +54,26 @@ export default async function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card id="notifications">
           <CardHeader><CardTitle>Notifikace</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <PushNotificationsCard vapidPublicKey={process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""} />
             <PlannedFeatureRow title="E-mailové notifikace" description="Cloudové e-maily přijdou až po výběru e-mailového poskytovatele." />
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-3">
-                <Label htmlFor="notify_before_days">Upozornit dní předem</Label>
-                <Badge variant="outline">Připravujeme</Badge>
+                <Label htmlFor="default_reminder_notify_before_days">Upozornit dní předem</Label>
               </div>
-              <Input id="notify_before_days" placeholder="14" disabled aria-describedby="notify_before_days_status" />
-              <p id="notify_before_days_status" className="text-xs text-muted-foreground">
-                Tato volba zatím není aktivní.
+              <Input
+                id="default_reminder_notify_before_days"
+                name="default_reminder_notify_before_days"
+                form="preferences-form"
+                type="number"
+                min={0}
+                defaultValue={profile?.default_reminder_notify_before_days ?? 14}
+                aria-describedby="default_reminder_notify_before_days_status"
+              />
+              <p id="default_reminder_notify_before_days_status" className="text-xs text-muted-foreground">
+                Výchozí hodnota pro nové datumové a kombinované připomínky.
               </p>
             </div>
           </CardContent>
