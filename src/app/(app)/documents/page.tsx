@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarClock, FileText, Pencil, Plus, Trash2 } from "lucide-react";
+import { CalendarClock, ExternalLink, FileText, Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/shared/empty-state";
 import { MetricCard } from "@/components/shared/metric-card";
 import { PageHeader } from "@/components/shared/page-header";
 import { loadGarageData } from "@/lib/data/garage";
+import { getSupabaseServerClient } from "@/lib/supabase/server";
 import type { Vehicle, VehicleDocument } from "@/types/domain";
 import { createDocument, deleteDocument, updateDocument } from "./actions";
 
@@ -28,6 +29,7 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
     .sort((a, b) => documentSortScore(a) - documentSortScore(b));
   const visibleDocuments = documents.slice(0, 10);
   const hiddenDocuments = documents.slice(10);
+  const documentUrls = await createSignedDocumentUrls(documents);
 
   return (
     <div className="space-y-6">
@@ -71,11 +73,12 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
                   document={document}
                   vehicles={data.vehicles}
                   vehicleName={vehicleNames.get(document.vehicle_id) ?? "Vozidlo"}
+                  documentUrl={documentUrls.get(document.id) ?? null}
                 />
               ))}
             </div>
             <div className="hidden md:block">
-              <DocumentTable documents={visibleDocuments} vehicles={data.vehicles} vehicleNames={vehicleNames} />
+              <DocumentTable documents={visibleDocuments} vehicles={data.vehicles} vehicleNames={vehicleNames} documentUrls={documentUrls} />
             </div>
             {hiddenDocuments.length > 0 ? (
               <details className="group border-t border-border md:mx-0">
@@ -89,11 +92,12 @@ export default async function DocumentsPage({ searchParams }: DocumentsPageProps
                       document={document}
                       vehicles={data.vehicles}
                       vehicleName={vehicleNames.get(document.vehicle_id) ?? "Vozidlo"}
+                      documentUrl={documentUrls.get(document.id) ?? null}
                     />
                   ))}
                 </div>
                 <div className="hidden md:block">
-                  <DocumentTable documents={hiddenDocuments} vehicles={data.vehicles} vehicleNames={vehicleNames} />
+                  <DocumentTable documents={hiddenDocuments} vehicles={data.vehicles} vehicleNames={vehicleNames} documentUrls={documentUrls} />
                 </div>
               </details>
             ) : null}
@@ -184,10 +188,12 @@ function DocumentTable({
   documents,
   vehicles,
   vehicleNames,
+  documentUrls,
 }: {
   documents: VehicleDocument[];
   vehicles: Vehicle[];
   vehicleNames: Map<string, string>;
+  documentUrls: Map<string, string>;
 }) {
   return (
     <Table>
@@ -216,6 +222,7 @@ function DocumentTable({
             <TableCell><DocumentStatusBadge status={document.status} /></TableCell>
             <TableCell>{document.file_url ? "Přiložen" : "-"}</TableCell>
             <TableCell className="flex justify-end gap-2">
+              <OpenDocumentButton documentUrl={documentUrls.get(document.id) ?? null} />
               <EditDocumentDialog document={document} vehicles={vehicles} />
               <DeleteDocumentDialog document={document} />
             </TableCell>
@@ -230,10 +237,12 @@ function DocumentMobileCard({
   document,
   vehicles,
   vehicleName,
+  documentUrl,
 }: {
   document: VehicleDocument;
   vehicles: Vehicle[];
   vehicleName: string;
+  documentUrl: string | null;
 }) {
   return (
     <div className="min-w-0 rounded-[18px] border border-border bg-[rgba(8,17,23,0.42)] p-4">
@@ -250,12 +259,72 @@ function DocumentMobileCard({
         <span>{document.expiration_date ? `Platí do ${formatDisplayDate(document.expiration_date)}` : "Bez konce platnosti"}</span>
         <span>{document.file_url ? "Soubor přiložen" : "Bez souboru"}</span>
       </div>
-      <div className="mt-3 flex gap-2">
+      <div className="mt-3 flex flex-wrap gap-2">
+        <OpenDocumentButton documentUrl={documentUrl} />
         <EditDocumentDialog document={document} vehicles={vehicles} />
         <DeleteDocumentDialog document={document} />
       </div>
     </div>
   );
+}
+
+function OpenDocumentButton({ documentUrl }: { documentUrl: string | null }) {
+  if (!documentUrl) {
+    return null;
+  }
+
+  return (
+    <Button asChild variant="outline" size="sm">
+      <Link href={documentUrl} target="_blank" rel="noreferrer">
+        <ExternalLink className="mr-2 size-4" aria-hidden="true" />
+        Otevřít
+      </Link>
+    </Button>
+  );
+}
+
+async function createSignedDocumentUrls(documents: VehicleDocument[]) {
+  const urls = new Map<string, string>();
+  const privateDocuments = documents.filter((document) => {
+    if (!document.file_url) {
+      return false;
+    }
+
+    if (/^https?:\/\//i.test(document.file_url)) {
+      urls.set(document.id, document.file_url);
+      return false;
+    }
+
+    return true;
+  });
+
+  if (privateDocuments.length === 0) {
+    return urls;
+  }
+
+  const supabase = await getSupabaseServerClient();
+
+  if (!supabase) {
+    return urls;
+  }
+
+  await Promise.all(
+    privateDocuments.map(async (document) => {
+      if (!document.file_url) {
+        return;
+      }
+
+      const { data, error } = await supabase.storage
+        .from("documents")
+        .createSignedUrl(document.file_url, 60 * 10);
+
+      if (!error && data?.signedUrl) {
+        urls.set(document.id, data.signedUrl);
+      }
+    }),
+  );
+
+  return urls;
 }
 
 function DocumentStatusBadge({ status }: { status: VehicleDocument["status"] }) {
