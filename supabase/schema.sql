@@ -193,6 +193,9 @@ create table if not exists public.documents (
   created_at timestamptz not null default now()
 );
 
+alter table public.reminders
+add column if not exists document_id uuid references public.documents(id) on delete cascade;
+
 create table if not exists public.push_subscriptions (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -220,6 +223,7 @@ create index if not exists expenses_user_vehicle_date_idx on public.expenses(use
 create index if not exists energy_entries_user_vehicle_date_idx on public.energy_entries(user_id, vehicle_id, date desc);
 create index if not exists service_entries_user_vehicle_date_idx on public.service_entries(user_id, vehicle_id, date desc);
 create index if not exists reminders_user_vehicle_status_idx on public.reminders(user_id, vehicle_id, status);
+create index if not exists reminders_document_id_idx on public.reminders(document_id);
 create index if not exists documents_user_vehicle_status_idx on public.documents(user_id, vehicle_id, status);
 create index if not exists expenses_vehicle_id_idx on public.expenses(vehicle_id);
 create index if not exists energy_entries_vehicle_id_idx on public.energy_entries(vehicle_id);

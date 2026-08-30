@@ -1248,7 +1248,7 @@ Vehicles are the root entity for almost every other feature.
 - [ ] Push reminder delivery scheduler for Android and iPhone.
 - [x] Documents CRUD.
 - [x] Supabase Storage uploads.
-- [ ] Document expiration reminders.
+- [x] Document expiration reminders.
 
 ### Phase 10 - Advanced Dashboard And Statistics
 
@@ -2218,3 +2218,4 @@ Advanced statistics requirements captured for future implementation:
 - Added full Documents CRUD: create, edit, delete, per-vehicle filtering, mobile/desktop document lists and document detail pages.
 - Documents now support private Supabase Storage uploads in the `documents` bucket, file replacement/removal and signed URLs for opening attached PDF/image files.
 - Quick Add now opens the new document dialog through `/documents?add=document`.
+- Added automatic document expiration reminders linked from documents to reminders through `reminders.document_id`.

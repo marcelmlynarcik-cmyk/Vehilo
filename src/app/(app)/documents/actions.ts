@@ -8,6 +8,12 @@ import type { Database } from "@/types/database";
 import type { DocumentStatus } from "@/types/domain";
 
 type SupabaseServerClient = NonNullable<Awaited<ReturnType<typeof getSupabaseServerClient>>>;
+type DocumentPayload = Database["public"]["Tables"]["documents"]["Insert"] & {
+  name: string;
+  category: string;
+  expiration_date: string | null;
+  status: DocumentStatus;
+};
 
 export async function createDocument(formData: FormData) {
   const { supabase, userId } = await requireAuthenticatedUser();
@@ -24,16 +30,17 @@ export async function createDocument(formData: FormData) {
     payload.file_url = uploadedDocumentPath;
   }
 
-  const { error } = await supabase.from("documents").insert(payload);
+  const { data: document, error } = await supabase.from("documents").insert(payload).select("id").single();
 
-  if (error) {
+  if (error || !document) {
     if (uploadedDocumentPath) {
       await deleteDocumentFile({ path: uploadedDocumentPath, supabase });
     }
 
-    throw new Error(error.message);
+    throw new Error(error?.message ?? "Dokument se nepodařilo uložit.");
   }
 
+  await syncDocumentExpirationReminder(supabase, userId, document.id, payload);
   revalidateDocumentPaths(vehicleId);
   redirect("/documents#records");
 }
@@ -82,6 +89,7 @@ export async function updateDocument(formData: FormData) {
     await deleteDocumentFile({ path: currentDocument.file_url, supabase });
   }
 
+  await syncDocumentExpirationReminder(supabase, userId, documentId, payload);
   revalidateDocumentPaths(vehicleId);
   revalidateDocumentPaths(currentDocument.vehicle_id);
   revalidatePath(`/documents/${documentId}`);
@@ -102,6 +110,8 @@ export async function deleteDocument(formData: FormData) {
   if (currentDocumentError || !currentDocument) {
     throw new Error("Dokument pro smazání nebyl nalezen.");
   }
+
+  await supabase.from("reminders").delete().eq("document_id", documentId).eq("user_id", userId);
 
   const { error } = await supabase.from("documents").delete().eq("id", documentId).eq("user_id", userId);
 
@@ -153,7 +163,7 @@ function buildDocumentPayload(
   formData: FormData,
   userId: string,
   vehicleId: string,
-): Database["public"]["Tables"]["documents"]["Insert"] {
+): DocumentPayload {
   const issueDate = optionalDate(formData, "issue_date");
   const expirationDate = optionalDate(formData, "expiration_date");
 
@@ -167,6 +177,86 @@ function buildDocumentPayload(
     notes: optionalText(formData, "notes"),
     status: documentStatus(expirationDate),
   };
+}
+
+async function syncDocumentExpirationReminder(
+  supabase: SupabaseServerClient,
+  userId: string,
+  documentId: string,
+  document: DocumentPayload,
+) {
+  if (!document.expiration_date) {
+    const { error } = await supabase.from("reminders").delete().eq("document_id", documentId).eq("user_id", userId);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return;
+  }
+
+  const notifyBeforeDays = await loadDefaultNotifyBeforeDays(supabase, userId);
+  const payload: Database["public"]["Tables"]["reminders"]["Insert"] = {
+    user_id: userId,
+    vehicle_id: document.vehicle_id,
+    document_id: documentId,
+    type: "date",
+    title: `Platnost dokumentu: ${document.name}`,
+    category: "Dokumenty",
+    due_date: document.expiration_date,
+    next_due_date: document.expiration_date,
+    next_due_mileage: null,
+    notify_before_days: notifyBeforeDays,
+    notify_before_km: null,
+    status: reminderStatus(document.expiration_date, notifyBeforeDays),
+    notes: `${document.category} - automaticky vytvořeno z dokumentu.`,
+  };
+
+  const { data: existingReminder, error: existingReminderError } = await supabase
+    .from("reminders")
+    .select("id")
+    .eq("document_id", documentId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existingReminderError) {
+    throw new Error(existingReminderError.message);
+  }
+
+  const result = existingReminder
+    ? await supabase.from("reminders").update(payload).eq("id", existingReminder.id).eq("user_id", userId)
+    : await supabase.from("reminders").insert(payload);
+
+  if (result.error) {
+    throw new Error(result.error.message);
+  }
+}
+
+async function loadDefaultNotifyBeforeDays(supabase: SupabaseServerClient, userId: string) {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("default_reminder_notify_before_days")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return Number(data?.default_reminder_notify_before_days ?? 14);
+}
+
+function reminderStatus(expirationDate: string, notifyBeforeDays: number): Database["public"]["Tables"]["reminders"]["Row"]["status"] {
+  const today = new Date();
+  const startOfToday = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+  const expiresAt = new Date(`${expirationDate}T00:00:00.000Z`).getTime();
+  const daysRemaining = Math.ceil((expiresAt - startOfToday) / (1000 * 60 * 60 * 24));
+
+  if (daysRemaining < 0) {
+    return "overdue";
+  }
+
+  return daysRemaining <= notifyBeforeDays ? "due_soon" : "upcoming";
 }
 
 function documentStatus(expirationDate: string | null): DocumentStatus {

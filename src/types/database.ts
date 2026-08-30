@@ -190,6 +190,7 @@ export interface Database {
           id: string;
           user_id: string;
           vehicle_id: string;
+          document_id: string | null;
           type: ReminderType;
           title: string;
           category: string;
