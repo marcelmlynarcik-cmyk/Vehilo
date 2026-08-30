@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supportEmail, supportMailto } from "@/lib/contact";
 import { legalLinks } from "@/lib/legal";
+import { seoPages } from "@/lib/seo-pages";
 import { publicSiteUrl } from "@/lib/site";
 
 const heroMetrics = [
@@ -282,6 +283,36 @@ async function Landing({
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section className="border-t border-[#101418]/10 bg-[#ebe6dc]">
+        <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 md:px-8">
+          <div className="max-w-3xl">
+            <Badge variant="outline" className="border-[#101418]/15 bg-white/70 text-[#101418]">
+              Podrobnosti
+            </Badge>
+            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+              Vehilo podle toho, co právě řešíte s autem.
+            </h2>
+          </div>
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {seoPages.map((page) => {
+              const Icon = page.icon;
+
+              return (
+                <Link
+                  key={page.slug}
+                  href={`/${page.slug}`}
+                  className="rounded-2xl border border-[#101418]/10 bg-white p-5 shadow-sm transition-colors hover:border-[#101418]/25"
+                >
+                  <Icon className="size-5 text-emerald-700" aria-hidden="true" />
+                  <h3 className="mt-4 text-base font-semibold">{page.h1}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#5d656d]">{page.description}</p>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 

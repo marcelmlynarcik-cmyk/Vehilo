@@ -2219,3 +2219,4 @@ Advanced statistics requirements captured for future implementation:
 - Documents now support private Supabase Storage uploads in the `documents` bucket, file replacement/removal and signed URLs for opening attached PDF/image files.
 - Quick Add now opens the new document dialog through `/documents?add=document`.
 - Added automatic document expiration reminders linked from documents to reminders through `reminders.document_id`.
+- Added public SEO landing pages for long-tail Czech search intents and included them in the sitemap.
