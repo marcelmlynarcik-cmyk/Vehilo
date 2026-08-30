@@ -1,4 +1,4 @@
-import type { EnergyEntry, Expense, ServiceEntry, Vehicle } from "@/types/domain";
+import type { EnergyEntry, Expense, ServiceEntry, Vehicle, VehicleDocument } from "@/types/domain";
 import { hasSupabaseConfig } from "@/lib/supabase/config";
 import { getSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -93,6 +93,36 @@ export async function loadServiceEntryDetailData(entryId: string) {
   return { entry, vehicle, invoiceUrl };
 }
 
+export async function loadDocumentDetailData(documentId: string) {
+  const context = await getAuthenticatedContext();
+
+  if (!context) {
+    return null;
+  }
+
+  const { supabase, userId } = context;
+  const documentResult = await supabase
+    .from("documents")
+    .select("*")
+    .eq("id", documentId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (documentResult.error) {
+    throw new Error(documentResult.error.message);
+  }
+
+  if (!documentResult.data) {
+    return null;
+  }
+
+  const document = documentResult.data as VehicleDocument;
+  const vehicle = await loadVehicle(document.vehicle_id, userId);
+  const documentUrl = await createSignedRecordUrl("documents", document.file_url);
+
+  return { document, vehicle, documentUrl };
+}
+
 async function loadVehicle(vehicleId: string, userId: string) {
   const supabase = await getSupabaseServerClient();
 
@@ -114,7 +144,7 @@ async function loadVehicle(vehicleId: string, userId: string) {
   return (vehicleResult.data ?? null) as Vehicle | null;
 }
 
-async function createSignedRecordUrl(bucket: "receipts" | "service-invoices", path: string | null) {
+async function createSignedRecordUrl(bucket: "receipts" | "service-invoices" | "documents", path: string | null) {
   if (!path) {
     return null;
   }

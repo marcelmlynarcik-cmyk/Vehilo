@@ -1240,14 +1240,14 @@ Vehicles are the root entity for almost every other feature.
 
 ### Phase 9 - Service, Reminders, Documents
 
-- [ ] Service entries CRUD.
+- [x] Service entries CRUD.
 - [ ] Maintenance timeline.
-- [ ] Reminders CRUD.
-- [ ] Reminder status calculations.
-- [ ] Push notification device registration for reminders.
+- [x] Reminders CRUD.
+- [x] Reminder status calculations.
+- [x] Push notification device registration for reminders.
 - [ ] Push reminder delivery scheduler for Android and iPhone.
-- [ ] Documents CRUD.
-- [ ] Supabase Storage uploads.
+- [x] Documents CRUD.
+- [x] Supabase Storage uploads.
 - [ ] Document expiration reminders.
 
 ### Phase 10 - Advanced Dashboard And Statistics
@@ -2212,3 +2212,9 @@ Advanced statistics requirements captured for future implementation:
 - [x] Add cost per kilometer for operating costs.
 - [x] Add pure ownership cost including vehicle purchase price, not only recorded operating costs.
 - Review existing statistics first, reuse anything already implemented and then expand the Statistics/Fuel & Energy/Dashboard views as broadly as useful.
+
+### 2026-08-30
+
+- Added full Documents CRUD: create, edit, delete, per-vehicle filtering, mobile/desktop document lists and document detail pages.
+- Documents now support private Supabase Storage uploads in the `documents` bucket, file replacement/removal and signed URLs for opening attached PDF/image files.
+- Quick Add now opens the new document dialog through `/documents?add=document`.

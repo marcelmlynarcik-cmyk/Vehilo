@@ -28,7 +28,7 @@ const actions = [
   { label: "Přidat servis", icon: Wrench, href: "/service?add=service" },
   { label: "Přidat připomínku", icon: Bell, href: "/reminders?add=reminder" },
   { label: "Přidat vozidlo", icon: Car },
-  { label: "Přidat dokument", icon: FileText },
+  { label: "Přidat dokument", icon: FileText, href: "/documents?add=document" },
 ];
 
 export function QuickAdd() {
