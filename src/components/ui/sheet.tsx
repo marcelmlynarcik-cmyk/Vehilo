@@ -65,7 +65,7 @@ function SheetContent({
             render={
               <Button
                 variant="ghost"
-                className="absolute top-3 right-3 z-[60] bg-popover/80 text-foreground backdrop-blur"
+                className="absolute top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-[60] bg-popover/80 text-foreground backdrop-blur sm:top-3 sm:right-3"
                 size="icon"
               />
             }
