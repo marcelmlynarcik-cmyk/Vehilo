@@ -996,14 +996,14 @@ Notification copy:
 
 Features:
 
-- [ ] Real document metadata CRUD
-- [ ] Supabase Storage upload
-- [ ] Documents table
-- [ ] Mobile document cards
-- [ ] Expiring soon documents
-- [ ] Expired documents
-- [ ] Documents by vehicle
-- [ ] Document-to-reminder connection design
+- [x] Real document metadata CRUD
+- [x] Supabase Storage upload
+- [x] Documents table
+- [x] Mobile document cards
+- [x] Expiring soon documents
+- [x] Expired documents
+- [x] Documents by vehicle
+- [x] Document-to-reminder connection design
 
 ### Statistics
 
@@ -1154,7 +1154,7 @@ Reminder calculations:
 
 ### Phase 3 - Auth And App Shell
 
-- [ ] Public landing/sign-in page with Vehilo logo and product information.
+- [x] Public landing/sign-in page with Vehilo logo and product information.
 - [x] Google OAuth sign-in.
 - [x] Auth callback route.
 - [ ] Sign in page.
@@ -1245,7 +1245,7 @@ Vehicles are the root entity for almost every other feature.
 - [x] Reminders CRUD.
 - [x] Reminder status calculations.
 - [x] Push notification device registration for reminders.
-- [ ] Push reminder delivery scheduler for Android and iPhone.
+- [x] Push reminder delivery scheduler for Android and iPhone.
 - [x] Documents CRUD.
 - [x] Supabase Storage uploads.
 - [x] Document expiration reminders.
@@ -2220,3 +2220,6 @@ Advanced statistics requirements captured for future implementation:
 - Quick Add now opens the new document dialog through `/documents?add=document`.
 - Added automatic document expiration reminders linked from documents to reminders through `reminders.document_id`.
 - Added public SEO landing pages for long-tail Czech search intents and included them in the sitemap.
+- Added direct `Otevřít` actions to document lists so attached files can be opened without entering edit mode.
+- Enlarged shared Dialog/Sheet close buttons for more reliable mobile tapping from Quick Add and related forms.
+- Updated SEO logo signals with an explicit crawlable `Organization` `ImageObject` logo and removed stale `/favicon.ico` metadata references.
