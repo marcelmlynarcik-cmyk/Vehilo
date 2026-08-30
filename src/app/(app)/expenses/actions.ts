@@ -38,7 +38,7 @@ export async function createExpense(formData: FormData) {
     throw new Error(error.message);
   }
 
-  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage);
+  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage ?? null);
   revalidateExpensePaths(vehicleId);
   await deliverReminderPushNotificationsSoon({ userId, vehicleId });
   redirect("/expenses#records");
@@ -94,7 +94,7 @@ export async function updateExpense(formData: FormData) {
     await deleteRecordFile({ bucket: "receipts", path: currentExpense.receipt_url, supabase });
   }
 
-  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage);
+  await updateVehicleMileageIfNeeded(supabase, userId, vehicleId, payload.mileage ?? null);
   revalidateExpensePaths(vehicleId);
   revalidateExpensePaths(currentExpense.vehicle_id);
   revalidatePath(`/expenses/${expenseId}`);
