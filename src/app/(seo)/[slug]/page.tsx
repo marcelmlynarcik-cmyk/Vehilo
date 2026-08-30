@@ -5,7 +5,7 @@ import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { findSeoPage, seoPages } from "@/lib/seo-pages";
-import { publicSiteUrl } from "@/lib/site";
+import { publicSiteLogoUrl, publicSiteUrl } from "@/lib/site";
 
 type SeoLandingPageProps = {
   params: Promise<{ slug: string }>;
@@ -113,6 +113,19 @@ export default async function SeoLandingPage({ params }: SeoLandingPageProps) {
               "@type": "WebSite",
               name: "Vehilo",
               url: publicSiteUrl,
+              publisher: {
+                "@type": "Organization",
+                "@id": `${publicSiteUrl}/#organization`,
+                name: "Vehilo",
+                url: publicSiteUrl,
+                logo: {
+                  "@type": "ImageObject",
+                  url: publicSiteLogoUrl,
+                  contentUrl: publicSiteLogoUrl,
+                  width: 512,
+                  height: 512,
+                },
+              },
             },
             inLanguage: "cs-CZ",
           }),

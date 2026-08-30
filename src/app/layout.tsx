@@ -51,10 +51,8 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/pwa/icons/icon-512.png", sizes: "512x512", type: "image/png" },
-      { url: "/favicon.ico", sizes: "any" },
       { url: "/logo/Logo.png", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
     apple: [
       { url: "/pwa/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],

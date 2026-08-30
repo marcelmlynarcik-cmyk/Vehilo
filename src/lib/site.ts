@@ -5,3 +5,4 @@ export function getSiteUrl() {
 }
 
 export const publicSiteUrl = getSiteUrl();
+export const publicSiteLogoUrl = `${publicSiteUrl}/pwa/icons/icon-512.png`;

@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { supportEmail, supportMailto } from "@/lib/contact";
 import { legalLinks } from "@/lib/legal";
 import { seoPages } from "@/lib/seo-pages";
-import { publicSiteUrl } from "@/lib/site";
+import { publicSiteLogoUrl, publicSiteUrl } from "@/lib/site";
 
 const heroMetrics = [
   { label: "Náklady", value: "Měsíce i celkem", tone: "text-emerald-300" },
@@ -359,14 +359,25 @@ async function Landing({
               name: "Vehilo",
               alternateName: "Vehilo aplikace",
               url: publicSiteUrl,
+              publisher: {
+                "@id": `${publicSiteUrl}/#organization`,
+              },
               inLanguage: "cs-CZ",
             },
             {
               "@context": "https://schema.org",
               "@type": "Organization",
+              "@id": `${publicSiteUrl}/#organization`,
               name: "Vehilo",
               url: publicSiteUrl,
-              logo: `${publicSiteUrl}/pwa/icons/icon-512.png`,
+              logo: {
+                "@type": "ImageObject",
+                url: publicSiteLogoUrl,
+                contentUrl: publicSiteLogoUrl,
+                width: 512,
+                height: 512,
+              },
+              image: publicSiteLogoUrl,
             },
             {
               "@context": "https://schema.org",
@@ -376,6 +387,9 @@ async function Landing({
               applicationCategory: "FinanceApplication",
               operatingSystem: "Web, Android, iOS",
               inLanguage: "cs-CZ",
+              provider: {
+                "@id": `${publicSiteUrl}/#organization`,
+              },
               description:
                 "Vehilo je česká aplikace pro správu auta. Sledujte náklady, tankování, nabíjení, servis, dokumenty a připomínky pro jedno vozidlo i celou garáž.",
               offers: {
